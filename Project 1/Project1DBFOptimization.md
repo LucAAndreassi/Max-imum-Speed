@@ -48,7 +48,7 @@ $Score = \frac{SensorWeight_{1,2}}{10} + \frac{SensorWeight_{1,2}/Time}{0.15} + 
 Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores. 
 
 ### Constraints:
-
+The following constraints define the feasible design space for the optimization and are summarized in the table below. They include both competition rules and additional design constraints adopted by the team to ensure manufacturability and computational efficiency.
 #### Rule-Imposed Limitations
 - Wing span, $b \le 6 ft$
 - Aircraft Weight, $W_T \le 55 lbs$
