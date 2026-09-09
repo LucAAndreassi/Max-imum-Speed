@@ -26,6 +26,22 @@ The aircraft will take off from the 'Starting Line', and each lap is counted onc
 - Sensor Weights, $SW_{1,2}$ and $SW_3$
 - Cruise Velocities, $V_2$ and $V_3$
 
+| Variable   | Definition                                     | Bounds                     | Type       |
+| ---------- | ---------------------------------------------- | -------------------------- | ---------- |
+| $S_w$      | Wing area                                      | Design variable            | Continuous |
+| $L_F$      | Fuselage length                                | Design variable            | Continuous |
+| $SW_{1,2}$ | Sensor weight for Ground Mission and Mission 2 | $0 \le SW_{1,2} \le 10$ lb | Continuous |
+| $SW_3$     | Sensor weight for Mission 3                    | $0 \le SW_3 \le SW_{1,2}$  | Continuous |
+| $V_2$      | Cruise velocity during Mission 2               | Design variable            | Continuous |
+| $V_3$      | Cruise velocity during Mission 3               | Design variable            | Continuous |
+
+
+
+
+
+
+
+
 All other aircraft parameters, such as the sizing of the vertical/horizontal tail surfaces and the fuselage diameter, will be driven by these optimization variables.
 
 ### Objective Function:
@@ -39,6 +55,20 @@ Success in the competition is purely determined by maximizing the total score, w
 - Wing span, $b \le 6 ft$
 - Aircraft Weight, $W_T \le 55 lbs$
 - Propulsion battery energy $\le 100Wh$
+
+|         Symbol         | Definition                |            Value / Constraint            |          Type         |
+| :--------------------: | ------------------------- | :--------------------------------------: | :-------------------: |
+|           $b$          | Wing span                 |            $b = 6\ \text{ft}$            |    Fixed Parameter    |
+|          $W_T$         | Total aircraft weight     |          $W_T \le 20\ \text{lb}$         | Inequality Constraint |
+|          $W_e$         | Empty aircraft weight     |          $W_e \ge 10\ \text{lb}$         | Inequality Constraint |
+|          $E_b$         | Propulsion battery energy |         $E_b \le 100\ \text{Wh}$         | Inequality Constraint |
+|           $n$          | Load factor during turns  |                 $n = 2.5$                |    Fixed Parameter    |
+|          $SM$          | Static margin             |                $SM = 10%$                |    Fixed Parameter    |
+| Aircraft Configuration | Vehicle layout            | Fixed-wing, single wing, inverted T-tail |       Assumption      |
+|    Fuselage Geometry   | Cross-section             |                 Circular                 |       Assumption      |
+|    Propulsion Model    | Motor/propeller           |         Fixed tested combination         |       Assumption      |
+|     Sensor Geometry    | Payload shape             |      6:1 L/D cylinder with nosecone      |       Assumption      |
+
 
 #### Operational Limitations and Early Design Decisions 
 These are design decisions based on engineering intuition and historically successful DBF teams. This is intended to reduce the computational load of the model, and enforce several non-optimization related parameters such as manufacturability and available hardware.   
