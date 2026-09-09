@@ -29,9 +29,8 @@ The aircraft will take off from the 'Starting Line', and each lap is counted onc
 All other aircraft parameters, such as the sizing of the vertical/horizontal tail surfaces and the fuselage diameter, will be driven by these optimization variables.
 
 ### Objective Function:
-$$
- Score = \frac{SensorWeight_{1,2}}{10} + \frac{SensorWeight_{1,2}/Time}{0.15} + \frac{SensorWeight_{3}*Laps_3}{50}
-$$
+$Score = \frac{SensorWeight_{1,2}}{10} + \frac{SensorWeight_{1,2}/Time}{0.15} + \frac{SensorWeight_{3}*Laps_3}{50}$
+
 Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores. 
 
 ### Constraints:
@@ -58,10 +57,10 @@ These are simplifications to estimate preliminary design and increase fidelity i
   
 
 ### Problem Classification
-This problem is non-convex, non-linear, and mixed integer. Within the scope of our design space, this problem is non-convex due to the uncertainty that only one solution exists based on the limited design space. If the design space is expanded to include all the variables, then it is possible to show the design is the global minimum (convex), but since it is not in the scope of this problem, this remains classified as a non-convex problem. Additionally, this problem is non-linear due to the nature of the lap simulator used to model the vehicle's performance as a function of its characteristic parameters. Various parts of the simulation such as lift and drag are non-linear by nature and result in this problem being non-linear. Finally, this problem is MINLP since various input parameters can only be expressed in integer form, such as the number of laps, and other values are allowed to be continuous, such as wing area, cruise speed, coefficients of lift and drag.  
+This problem is non-convex and non-linear. Within the scope of our design space, this problem is non-convex due to the uncertainty that only one solution exists based on the limited design space. If the design space is expanded to include all the variables, then it is possible to show the design is the global minimum (convex), but since it is not in the scope of this problem, this remains classified as a non-convex problem. Additionally, this problem is non-linear due to the nature of the lap simulator used to model the vehicle's performance as a function of its characteristic parameters. Various parts of the simulation such as lift and drag are non-linear by nature and result in this problem being non-linear. 
 
 ### Solution Methodology
-The design optimization is based off the results of a lap simulator intended to model the performance of the vehicle under certain parameters. The optimization itself varies the decision variables and imposes contraints, finally using the objective function to evaluate a configuration.  
+The design optimization is based on the results of a lap simulator intended to model the performance of the vehicle under certain parameters. The optimization itself varies the decision variables and imposes contraints, finally using the objective function to evaluate a configuration.  
 
 ### Results and Interpretation
 
