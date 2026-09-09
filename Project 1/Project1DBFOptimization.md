@@ -28,12 +28,13 @@ The aircraft will take off from the 'Starting Line', and each lap is counted onc
 
 | Variable   | Definition                                     | Bounds                     | Type       |
 | ---------- | ---------------------------------------------- | -------------------------- | ---------- |
-| $S_w$      | Wing area                                      | Design variable            | Continuous |
-| $L_F$      | Fuselage length                                | Design variable            | Continuous |
-| $SW_{1,2}$ | Sensor weight for Ground Mission and Mission 2 | $0 \le SW_{1,2} \le 10$ lb | Continuous |
-| $SW_3$     | Sensor weight for Mission 3                    | $0 \le SW_3 \le SW_{1,2}$  | Continuous |
-| $V_2$      | Cruise velocity during Mission 2               | Design variable            | Continuous |
-| $V_3$      | Cruise velocity during Mission 3               | Design variable            | Continuous |
+| $S_w$      | Wing area                                      | $2 \le S_w \le 10$ ft²     | Continuous |
+| $L_F$      | Fuselage length                                | $5 \le L_F \le 7$ ft       | Continuous |
+| $SW_{1,2}$ | Sensor weight for Ground Mission and Mission 2 | $4 \le SW_{1,2} \le 12$ lb | Continuous |
+| $SW_3$     | Sensor weight for Mission 3                    | $0 \le SW_3 \le 6$ lb      | Continuous |
+| $V_2$      | Cruise velocity during Mission 2               | $40 \le V_2 \le 140$ ft/s  | Continuous |
+| $V_3$      | Cruise velocity during Mission 3               | $40 \le V_3 \le 140$ ft/s  | Continuous |
+
 
 
 
