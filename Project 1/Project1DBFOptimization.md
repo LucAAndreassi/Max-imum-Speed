@@ -21,10 +21,7 @@ The aircraft will take off from the 'Starting Line', and each lap is counted onc
 ---
 
 ### Decision Variables:
-- Wing Area, $S_w$
-- Fuselage Length, $L_F$
-- Sensor Weights, $SW_{1,2}$ and $SW_3$
-- Cruise Velocities, $V_2$ and $V_3$
+The optimization varies the following design variables to maximize the total competition score.
 
 | Variable   | Definition                                     | Bounds                     | Type       |
 | ---------- | ---------------------------------------------- | -------------------------- | ---------- |
