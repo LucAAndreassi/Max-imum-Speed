@@ -56,20 +56,6 @@ Success in the competition is purely determined by maximizing the total score, w
 - Aircraft Weight, $W_T \le 55 lbs$
 - Propulsion battery energy $\le 100Wh$
 
-|         Symbol         | Definition                |            Value / Constraint            |          Type         |
-| :--------------------: | ------------------------- | :--------------------------------------: | :-------------------: |
-|           $b$          | Wing span                 |            $b = 6\ \text{ft}$            |    Fixed Parameter    |
-|          $W_T$         | Total aircraft weight     |          $W_T \le 20\ \text{lb}$         | Inequality Constraint |
-|          $W_e$         | Empty aircraft weight     |          $W_e \ge 10\ \text{lb}$         | Inequality Constraint |
-|          $E_b$         | Propulsion battery energy |         $E_b \le 100\ \text{Wh}$         | Inequality Constraint |
-|           $n$          | Load factor during turns  |                 $n = 2.5$                |    Fixed Parameter    |
-|          $SM$          | Static margin             |                $SM = 10%$                |    Fixed Parameter    |
-| Aircraft Configuration | Vehicle layout            | Fixed-wing, single wing, inverted T-tail |       Assumption      |
-|    Fuselage Geometry   | Cross-section             |                 Circular                 |       Assumption      |
-|    Propulsion Model    | Motor/propeller           |         Fixed tested combination         |       Assumption      |
-|     Sensor Geometry    | Payload shape             |      6:1 L/D cylinder with nosecone      |       Assumption      |
-
-
 #### Operational Limitations and Early Design Decisions 
 These are design decisions based on engineering intuition and historically successful DBF teams. This is intended to reduce the computational load of the model, and enforce several non-optimization related parameters such as manufacturability and available hardware.   
 - Aircraft Weight, $W_T \le 20 lbs$
@@ -84,6 +70,21 @@ These are simplifications to estimate preliminary design and increase fidelity i
 - Sensor will be a 6:1 length:diameter cylinder filled with leadshot with a nosecone for reduced drag
 - Turns will be done at 2.5g
 - Static margin at 10%
+
+
+|         Symbol         | Definition                |            Value / Constraint            |          Type         |
+| :--------------------: | ------------------------- | :--------------------------------------: | :-------------------: |
+|           $b$          | Wing span                 |            $b = 6\ \text{ft}$            |    Fixed Parameter    |
+|          $W_T$         | Total aircraft weight     |          $W_T \le 20\ \text{lb}$         | Inequality Constraint |
+|          $W_e$         | Empty aircraft weight     |          $W_e \ge 10\ \text{lb}$         | Inequality Constraint |
+|          $E_b$         | Propulsion battery energy |         $E_b \le 100\ \text{Wh}$         | Inequality Constraint |
+|           $n$          | Load factor during turns  |                 $n = 2.5$                |    Fixed Parameter    |
+|          $SM$          | Static margin             |                $SM = 10%$                |    Fixed Parameter    |
+| Aircraft Configuration | Vehicle layout            | Fixed-wing, single wing, inverted T-tail |       Assumption      |
+|    Fuselage Geometry   | Cross-section             |                 Circular                 |       Assumption      |
+|    Propulsion Model    | Motor/propeller           |         Fixed tested combination         |       Assumption      |
+|     Sensor Geometry    | Payload shape             |      6:1 L/D cylinder with nosecone      |       Assumption      |
+
   
 
 ### Problem Classification
