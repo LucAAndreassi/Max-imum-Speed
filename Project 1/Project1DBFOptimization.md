@@ -98,7 +98,7 @@ These are simplifications to estimate preliminary design and increase fidelity i
 This problem is formulated as a constrained nonlinear programming (NLP) problem. The objective function depends on the results of a lap simulator that predicts aircraft performance based on the selected design variables. The simulator incorporates nonlinear aerodynamic, propulsion, and flight dynamics models, causing the objective function to vary nonlinearly with the design variables. Additionally, the optimization problem is nonconvex because the aerodynamic performance, mission completion time, and aircraft stability characteristics may produce multiple local optima within the feasible design space. As a result, there is no guarantee that a locally optimal solution is also the global optimum. Therefore, the Design/Build/Fly aircraft optimization problem is classified as a constrained, nonconvex nonlinear optimization problem.
 
 ### Solution Methodology
-The design optimization is based on the results of a lap simulator intended to model the performance of the vehicle under certain parameters. The optimization itself varies the decision variables and imposes contraints, finally using the objective function to evaluate a configuration.  
+The design optimization is based on the results of a lap simulator intended to model the performance of the vehicle under certain parameters. The optimization itself varies the decision variables and imposes constraints, finally using the objective function to evaluate a configuration.  
 
 ### Results and Interpretation
 
