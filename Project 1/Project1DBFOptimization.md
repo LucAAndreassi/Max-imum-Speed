@@ -72,7 +72,7 @@ These are design decisions based on engineering intuition and historically succe
 | Mission 3 payload | $0 \le SW_3 \le SW_{1,2}$ | Mission 3 payload cannot exceed the payload carried during the Ground Mission and Mission 2. |
 
 
-#### Lap Simulator Assumptions and Simplifications
+#### Lap Simulator Simplifications
 These are simplifications to estimate preliminary design and increase fidelity in certain parts of the simulation. 
 - Propulsion will be modelled after a known/tested motor and propeller combination.
 - Aircraft configuration will be fixed-wing, with a single wing and inverted T-Tail
@@ -82,7 +82,7 @@ These are simplifications to estimate preliminary design and increase fidelity i
 - Static margin at 10%
 
 
-| Assumption             | Description                                                                                          |
+| Simplification             | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
 | Propulsion model       | Aircraft performance is modeled using a known and experimentally tested motor/propeller combination. |
 | Aircraft configuration | Fixed-wing aircraft with a single wing and inverted T-tail configuration.                            |
