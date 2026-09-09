@@ -63,7 +63,16 @@ These are design decisions based on engineering intuition and historically succe
 - Aircraft Empty Weight, $W_e \ge 10 lbs$
 - Wing span, $b = 6 ft$
 
-#### Lap Simulator Simplifications
+| Constraint | Mathematical Expression | Description |
+|------------|-------------------------|-------------|
+| Wing span | $b = 6$ ft | Wing span is fixed to the maximum allowable span to maximize lifting surface while satisfying competition rules. |
+| Total aircraft weight | $W_T \le 20$ lb | Limits total aircraft weight based on the team's manufacturing target. |
+| Empty aircraft weight | $W_e \ge 10$ lb | Prevents unrealistic structural designs with insufficient empty weight. |
+| Battery energy | $E_b \le 100$ Wh | Satisfies the competition battery energy limit. |
+| Mission 3 payload | $0 \le SW_3 \le SW_{1,2}$ | Mission 3 payload cannot exceed the payload carried during the Ground Mission and Mission 2. |
+
+
+#### Lap Simulator Assumptions and Simplifications
 These are simplifications to estimate preliminary design and increase fidelity in certain parts of the simulation. 
 - Propulsion will be modelled after a known/tested motor and propeller combination.
 - Aircraft configuration will be fixed-wing, with a single wing and inverted T-Tail
@@ -73,18 +82,15 @@ These are simplifications to estimate preliminary design and increase fidelity i
 - Static margin at 10%
 
 
-|         Symbol         | Definition                |            Value / Constraint            |          Type         |
-| :--------------------: | ------------------------- | :--------------------------------------: | :-------------------: |
-|           $b$          | Wing span                 |            $b = 6\ \text{ft}$            |    Fixed Parameter    |
-|          $W_T$         | Total aircraft weight     |          $W_T \le 20\ \text{lb}$         | Inequality Constraint |
-|          $W_e$         | Empty aircraft weight     |          $W_e \ge 10\ \text{lb}$         | Inequality Constraint |
-|          $E_b$         | Propulsion battery energy |         $E_b \le 100\ \text{Wh}$         | Inequality Constraint |
-|           $n$          | Load factor during turns  |                 $n = 2.5$                |    Fixed Parameter    |
-|          $SM$          | Static margin             |                $SM = 10%$                |    Fixed Parameter    |
-| Aircraft Configuration | Vehicle layout            | Fixed-wing, single wing, inverted T-tail |       Assumption      |
-|    Fuselage Geometry   | Cross-section             |                 Circular                 |       Assumption      |
-|    Propulsion Model    | Motor/propeller           |         Fixed tested combination         |       Assumption      |
-|     Sensor Geometry    | Payload shape             |      6:1 L/D cylinder with nosecone      |       Assumption      |
+| Assumption             | Description                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| Propulsion model       | Aircraft performance is modeled using a known and experimentally tested motor/propeller combination. |
+| Aircraft configuration | Fixed-wing aircraft with a single wing and inverted T-tail configuration.                            |
+| Fuselage geometry      | Circular fuselage cross-section is assumed.                                                          |
+| Sensor geometry        | Payload is modeled as a 6:1 length-to-diameter cylinder with a nosecone.                             |
+| Turn model             | All turns are performed at a constant load factor of 2.5 g.                                          |
+| Static stability       | Static margin is fixed at 10%.                                                                       |
+
 
   
 
