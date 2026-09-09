@@ -73,7 +73,7 @@ These are design decisions based on engineering intuition and historically succe
 
 
 #### Lap Simulator Simplifications
-These are simplifications to estimate preliminary design and increase fidelity in certain parts of the simulation. 
+These are simplifications to estimate preliminary design and increase fidelity in certain parts of the simulation. All of these simplifications are fixed throughout the optimization to reduce model complexity.
 - Propulsion will be modelled after a known/tested motor and propeller combination.
 - Aircraft configuration will be fixed-wing, with a single wing and inverted T-Tail
 - Fuselage will have a circular cross-section
