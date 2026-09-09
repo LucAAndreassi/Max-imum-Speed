@@ -47,10 +47,10 @@ class PlaneModel:
         electronics_weight = 2.5 # Based on last year's competition sizing
         wing_weight = 2/7*self.wing_area # Based on last year's competition sizing
         empennage_weight = 1 # Based on last year's competition sizing
-
+        
         self.total_weight = fuselage_weight + electronics_weight + wing_weight + empennage_weight
         self.cgx = (electronics_weight*0.5 + empennage_weight*self.fuselage_length + fuselage_weight*self.fuselage_length/2 + wing_weight*self.chord/10) / (self.total_weight - wing_weight) # Assume wing is at 1/10 chord, electronics at 0.5 ft, empennage at end of fuselage, and fuselage weight at 1/2 fuselage length
-
+        print(self.total_weight)
         # Tail Sizing
         lt = self.fuselage_length - (self.cgx + self.chord/10) # Distance from aerodynamic center to tail
         self.Sv = 0.07*self.wing_area*6/lt 
@@ -59,7 +59,7 @@ class PlaneModel:
         # Drag Area for everything but the wing
         cd0fuselage = 0.3 # Nose and propeller frontal drag coefficient
         cfskin = 0.0042 # Skin friction coefficient for all external surfaces
-        self.drag_area = cd0fuselage * fuselage_diameter**2 * math.pi / 4 + cfskin * (math.pi*self.fuselage_diameter*self.fuselage_length + 2*(self.Sh + self.Sv)) # Drag area for fuselage and empennage
+        self.drag_area = cd0fuselage * fuselage_diameter**2 * math.pi / 4 + cfskin * (math.pi*fuselage_diameter*self.fuselage_length + 2*(self.Sh + self.Sv)) # Drag area for fuselage and empennage
 
 
 
@@ -89,12 +89,13 @@ class PlaneModel:
         th = np.linspace(0.3, 1, 100)
         T = 21.175 
         V = velocity 
-        Do = total_drag
+        Do = total_drag/velocity**2
         Vmax = 170 # pitch speed in ft/s
-        v = (-T * (1.4 * th - 0.4) / (Do * Vmax *th) + math.sqrt((T * (1.4 * th - 0.4) / (Do * Vmax * th))**2 + 4 * T * (1.4 * th - 0.4) / Do)) / 2
-        throttle = th(abs(v-V) == min(abs(v-V)))
+        v = (-T * (1.4 * th - 0.4) / (Do * Vmax *th) + np.sqrt((T * (1.4 * th - 0.4) / (Do * Vmax * th))**2 + 4 * T * (1.4 * th - 0.4) / Do)) / 2
+        throttle = th[np.abs(v-V) == np.min(np.abs(v-V))]
         Thrust = T*(1.4*throttle-0.4)
         Amps = 85*(1.8541 * throttle**2 - 1.0736 * throttle + 0.2136)
+        
         return Amps
 
 
@@ -105,7 +106,7 @@ class Course:
         self.wing_area = wing_area
         self.fuselage_length = fuselage_length
         self.SW2 = SW2
-        self.SW3 = SW3
+        self.SW3 = SW2 - abs(SW3)
         self.V2 = V2
         self.V3 = V3
 
@@ -121,17 +122,26 @@ class Course:
         AmpsM3 = aircraft.calculate_power(self.V3, LwingM3, sensor_deployed=True) # Amps at M3
 
         # For turns, assume 2.5g turn
-        LwingM2_turn = 2.5 * LwingM2
-        LwingM3_turn = 2.5 * LwingM3
+        self.nM2 = 2.5
+        self.nM3 = 2.5
+        LwingM2_turn = self.nM2 * LwingM2
+        LwingM3_turn = self.nM3 * LwingM3
         AmpsM2_turn = aircraft.calculate_power(self.V2, LwingM2_turn, sensor_deployed=False) # Amps at M2 turn
         if AmpsM2_turn == False:
-            return False
+            result = False
+            while result == False:
+                self.nM2 = self.nM2 - 0.1
+                LwingM2_turn = self.nM2 * LwingM2
+                result = aircraft.calculate_power(self.V2, LwingM2_turn, sensor_deployed=False)
+            AmpsM2_turn = result
         AmpsM3_turn = aircraft.calculate_power(self.V3, LwingM3_turn, sensor_deployed=True) # Amps at M3 turn
         if AmpsM3_turn == False:
-            return False
-
-        if self.V2 or self.V3 < 40:
-            return False
+            result = False
+            while result == False:
+                self.nM3 = self.nM3 - 0.1
+                LwingM3_turn = self.nM3 * LwingM3
+                result = aircraft.calculate_power(self.V3, LwingM3_turn, sensor_deployed=True)
+            AmpsM3_turn = result
 
         return AmpsM2, AmpsM3, AmpsM2_turn, AmpsM3_turn
 
@@ -140,38 +150,42 @@ class Course:
         
         straight_timeM2 = 2000 / self.V2  # Time to complete the straight segment at M2 in seconds
         straight_timeM3 = 2000 / self.V3  # Time to complete the straight segment at M3 in seconds
-        turn_radiusM2 = self.V2**2 / (32.2*(2.5**2-1))
-        turn_radiusM3 = self.V3**2 / (32.2*(2.5**2-1))
+        turn_radiusM2 = self.V2**2 / (32.2*(self.nM2**2-1))
+        turn_radiusM3 = self.V3**2 / (32.2*(self.nM3**2-1))
+        
         turn_timeM2 = 4*math.pi*turn_radiusM2 / self.V2  # Time to complete all turns in M2 in seconds
         turn_timeM3 = 4*math.pi*turn_radiusM3 / self.V3  # Time to complete all turns in M3 in seconds
 
         total_capacity_drawM2 = (AmpsM2*(straight_timeM2) + AmpsM2_turn*(turn_timeM2))  # Average current draw over the course
         total_capacity_drawM3 = (AmpsM3*(straight_timeM3) + AmpsM3_turn*(turn_timeM3))  # Average current draw over the course
         
-        lap_timeM2 = straight_timeM2 + straight_timeM3  # Average speed over the course
-        lap_timeM3 = turn_timeM2 + turn_timeM3  # Average speed over the course
-
+        lap_timeM2 = straight_timeM2 + turn_timeM2  # Average speed over the course
+        lap_timeM3 = straight_timeM3 + turn_timeM3  # Average speed over the course
+        print(lap_timeM2,lap_timeM3)
         return total_capacity_drawM2, total_capacity_drawM3, lap_timeM2, lap_timeM3
 
     def mission_scores(self):
-        battery_capacity = 3300*0.8  # in mAh, and accounting for a 5% buffer for takeoff and landing
+        battery_capacity = 3300*0.75*3600/1000  # in mAh, and accounting for a 5% buffer for takeoff and landing
 
         # M2, where 5 laps have to be completed in 5 minutes
         
-        total_capacity_drawM2, total_capacity_drawM3, lap_timeM2, lap_timeM3 = self.calculate_lap_consumption(*self.calculate_forces())
+        raw_forces = self.calculate_forces()
+        AmpsM2, AmpsM3, AmpsM2_turn, AmpsM3_turn = raw_forces
+        total_capacity_drawM2, total_capacity_drawM3, lap_timeM2, lap_timeM3 = self.calculate_lap_consumption(AmpsM2, AmpsM3, AmpsM2_turn, AmpsM3_turn)
         M2_time = 5*lap_timeM2
         M2_capacity = total_capacity_drawM2*5
+        '''
         if M2_time > 300:
-            M2_score = 0
+            return np.nan, np.nan, np.nan
         if M2_capacity > battery_capacity:
-            M2_score = 0
-
+            return np.nan, np.nan, np.nan
+        '''
         M2_score = self.SW2/M2_time
 
         # M3, where 5 minutes are given to complete as many laps as possible
 
         num_lapsM3 = math.floor(300 / lap_timeM3)
-        feasible_lapsM3 = math.floor(battery_capacity / total_capacity_drawM3)
+        feasible_lapsM3 = np.floor(battery_capacity / total_capacity_drawM3)
         if num_lapsM3 > feasible_lapsM3:
             num_lapsM3 = feasible_lapsM3
 
@@ -179,22 +193,18 @@ class Course:
 
         GM_score = self.SW2 
 
-        return M2_score, M3_score, GM_score
+        return M2_score, M3_score, GM_score, num_lapsM3
 
 
 
 
-class objective_function:
+def objective_function(params):
+    wing_area, fuselage_length, SW2, SW3, V2, V3 = params
     
-    def __init__(self, wing_area, fuselage_length, SW2, SW3, V2, V3):
-        self.wing_area = wing_area
-        self.fuselage_length = fuselage_length
-        self.SW2 = SW2
-        self.SW3 = SW3
-        self.V2 = V2
-        self.V3 = V3
-
-    def evaluate(self):
-        course = Course(self.wing_area, self.fuselage_length, self.SW2, self.SW3, self.V2, self.V3)
-        M2_score, M3_score, GM_score = course.mission_scores()
-        return M2_score + M3_score + GM_score
+    course = Course(wing_area, fuselage_length, SW2, SW3, V2, V3)
+    scores = course.mission_scores()
+    M2_score, M3_score, GM_score, num_lapsM3 = course.mission_scores()
+    
+    score = - (M2_score/0.15 + M3_score/50 + GM_score/10)
+    print(f"Testing -> Area: {wing_area:.2f}, Length: {fuselage_length:.2f}, SW2: {SW2:.2f}, SW3: {SW3:.2f}, V2: {V2:.1f}, V3: {V3:.1f}, M3 Laps: {num_lapsM3}, Score = {score.item():.2f}")
+    return score
