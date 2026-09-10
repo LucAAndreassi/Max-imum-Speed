@@ -101,6 +101,17 @@ The design optimization is based on the results of a lap simulator intended to m
 
 ### Results and Interpretation
 
+| Variable   | Definition                                     | Optimized Value            | 
+| ---------- | ---------------------------------------------- | -------------------------- | 
+| $S_w$      | Wing area                                      | $4.73$ ft²     |
+| $L_F$      | Fuselage length                                | $5.1$ ft       | 
+| $SW_{1,2}$ | Sensor weight for Ground Mission and Mission 2 | $8.92$ lb | 
+| $SW_3$     | Sensor weight for Mission 3                    | $7.82$ lb      | 
+| $V_2$      | Cruise velocity during Mission 2               | $65.17$ ft/s  | 
+| $V_3$      | Cruise velocity during Mission 3               | $89.86$ ft/s  |
+
+The table shows the optimized outputs with a score of -2.38. This is a decent result considering the vehicle has decent performance on all missions and none of the optimization parameters are intuitively incorrect. 
+
 The results of the optimizer give a good starting place of how to design our vehicle to perform well at competition. While this would lead to a good performance on paper, the real results are contingent on many things not within our control. For one, this is a model, so there is always a difference that could lead us to not completing exactly what the optimizer says we should theoretically be capable of. Additionally, the competition performance depends heavily on how other teams perform, so our final performance may be adjusted by certain teams that heavily design to one mission over the other or optimize to different parameters. Overall, the results of the optimizer give the team information to what parameters to design the aircraft to, but cannot predict our performance at competition.  
 
 ### Code and Reproducibility
