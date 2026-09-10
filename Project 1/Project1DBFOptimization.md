@@ -101,6 +101,7 @@ The design optimization is based on the results of a lap simulator intended to m
 
 ### Results and Interpretation
 
+The results of the optimizer give a good starting place of how to design our vehicle to perform well at competition. While this would lead to a good performance on paper, the real results are contingent on many things not within our control. For one, this is a model, so there is always a difference that could lead us to not completing exactly what the optimizer says we should theoretically be capable of. Additionally, the competition performance depends heavily on how other teams perform, so our final performance may be adjusted by certain teams that heavily design to one mission over the other or optimize to different parameters. Overall, the results of the optimizer give the team information to what parameters to design the aircraft to, but cannot predict our performance at competition.  
 
 ### Code and Reproducibility
 There are two Python scripts. 
