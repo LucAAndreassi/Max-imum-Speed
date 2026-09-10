@@ -43,10 +43,10 @@ The optimization varies the following design variables to maximize the total com
 All other aircraft parameters, such as the sizing of the vertical/horizontal tail surfaces and the fuselage diameter, will be driven by these optimization variables.
 
 ### Objective Function:
-$Score = \frac{SW_{1,2}}{10} + \frac{SW_{1,2}/Time}{0.15} + \frac{SW_{3}*Laps_3}{50}$
+$Score = - ( \frac{SW_{1,2}}{12} + \frac{SW_{1,2}/Time}{0.15} + \frac{SW_{3}*Laps_3}{50})$
 
 In the objective function, Time and Laps are outputs of the lap simulator, which are functions of the decision variables. 
-Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores.
+Success in the competition is purely determined by maximizing the magnitude of the total score, which is a sum of all three mission scores.
 
 ### Constraints:
 The following constraints define the feasible design space for the optimization and are summarized in the table below. They include both competition rules and additional design constraints adopted by the team to ensure manufacturability and computational efficiency.
@@ -106,8 +106,8 @@ The results of the optimizer give a good starting place of how to design our veh
 ### Code and Reproducibility
 There are two Python scripts. 
 
-[Models.py](Models.py) is used for the lap simulation
+[Models.py](Models.py) is used for the lap simulation. Inside are classes with methods that define the aircraft shape, structure, and performance based on the optimization parameters. The structure, propulsion, and energy consumption methods were derived from previous experience and proven empirical methods.
 
-[Optimizer.py](Optimizer.py) is used for the optimization
+[Optimizer.py](Optimizer.py) is used for the optimization. The 'scipy' library is used to perform the 'Nelder-Mead' method on the model, with the aforementioned input bounds and a set of initial conditions deemed appropriate for a feasible aircraft design. 
 
 Running the optimization multiple times yields the same results. Changing the initial conditions can result in the optimizer converging to a different result. 
