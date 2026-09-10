@@ -1,9 +1,9 @@
 # Project 1 - Design/Build/Fly Aircraft Design Optimization
 
 ## Problem Outline:
-Design/Build/Fly (DBF) is an annual collegiate aircraft design competition hosted by the AIAA (American Institute of Aeronautics and Astronautics), that several of our team members are participating in as part of an ASU Student Organization. The rules for this years' competition are linked [here](https://aiaa.org/wp-content/uploads/2026/09/DBF-2027-Rules-Draft.pdf). The purpose of this event is to put teams through a full design cycle from initial requirements to a fully-built and mission capable system in the span of an academic year. A significant part of the design cycle is optimization to maximize scoring potential, and thus placement in the competition. Aside from the competition itself, there are many implications for the use of design optimizaiton within the UAV (Unmanned Aerial Vehicle) domain that share similar processes and applications with DBF. 
+Design/Build/Fly (DBF) is an annual collegiate aircraft design competition hosted by the AIAA (American Institute of Aeronautics and Astronautics), that several of our team members are participating in as part of an ASU Student Organization. The rules for this year's competition are linked [here](https://aiaa.org/wp-content/uploads/2026/09/DBF-2027-Rules-Draft.pdf). The purpose of this event is to put teams through a full design cycle from initial requirements to a fully-built and mission capable system in the span of an academic year. A significant part of the design cycle is optimization to maximize scoring potential, and thus placement in the competition. Aside from the competition itself, there are many implications for the use of design optimization within the UAV (Unmanned Aerial Vehicle) domain that share similar processes and applications with DBF. 
 
-The objective for this year's competition is to design a remotely-piloted UAV to carry a 'sensor' payload for transportation and deployment. In our simplification of the ruleset, there are three scoring missions:
+The objective for this year's competition is to design a remotely piloted UAV to carry a 'sensor' payload for transportation and deployment. In our simplification of the ruleset, there are three scoring missions:
 
 **Ground Mission**:  Drop the sensor within a protective shipping container from 5 feet off the ground and sustain no damage. This is done in a stationary position on the ground. 
     GM score is the sensor weight in lbs, normalized to a maximum weight of 10 lbs
@@ -45,7 +45,7 @@ All other aircraft parameters, such as the sizing of the vertical/horizontal tai
 ### Objective Function:
 $Score = \frac{SW_{1,2}}{10} + \frac{SW_{1,2}/Time}{0.15} + \frac{SW_{3}*Laps_3}{50}$
 
-From the objective function, Time and Laps are outputs of the lap simulator, which are functions of the decision variables. 
+In the objective function, Time and Laps are outputs of the lap simulator, which are functions of the decision variables. 
 Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores.
 
 ### Constraints:
