@@ -43,7 +43,7 @@ The optimization varies the following design variables to maximize the total com
 All other aircraft parameters, such as the sizing of the vertical/horizontal tail surfaces and the fuselage diameter, will be driven by these optimization variables.
 
 ### Objective Function:
-$Score = - ( \frac{SW_{1,2}}{12} + \frac{SW_{1,2}/Time}{0.15} + \frac{SW_{3}*Laps_3}{50})$
+$Score = - \left( \frac{SW_{1,2}}{12} + \frac{SW_{1,2}/Time}{0.15} + \frac{(SW_{1,2}-SW_{3})*Laps_3}{50}\right)$
 
 In the objective function, Time and Laps are outputs of the lap simulator, which are functions of the decision variables. 
 Success in the competition is purely determined by maximizing the magnitude of the total score, which is a sum of all three mission scores.
