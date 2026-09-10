@@ -43,9 +43,9 @@ The optimization varies the following design variables to maximize the total com
 All other aircraft parameters, such as the sizing of the vertical/horizontal tail surfaces and the fuselage diameter, will be driven by these optimization variables.
 
 ### Objective Function:
-$Score = \frac{SensorWeight_{1,2}}{10} + \frac{SensorWeight_{1,2}/Time}{0.15} + \frac{SensorWeight_{3}*Laps_3}{50}$
+$Score = \frac{SW_{1,2}}{10} + \frac{SW_{1,2}/Time}{0.15} + \frac{SW_{3}*Laps_3}{50}$
 
-Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores. 
+Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores.
 
 ### Constraints:
 The following constraints define the feasible design space for the optimization and are summarized in the table below. They include both competition rules and additional design constraints adopted by the team to ensure manufacturability and computational efficiency.
