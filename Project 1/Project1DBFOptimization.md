@@ -106,7 +106,7 @@ The design optimization is based on the results of a lap simulator intended to m
 | $S_w$      | Wing area                                      | $4.73$ ft²     |
 | $L_F$      | Fuselage length                                | $5.1$ ft       | 
 | $SW_{1,2}$ | Sensor weight for Ground Mission and Mission 2 | $8.92$ lb | 
-| $SW_3$     | Sensor weight for Mission 3                    | $7.82$ lb      | 
+| $SW_{1,2} - SW_3$     | Sensor weight for Mission 3                    | $7.82$ lb      | 
 | $V_2$      | Cruise velocity during Mission 2               | $65.17$ ft/s  | 
 | $V_3$      | Cruise velocity during Mission 3               | $89.86$ ft/s  |
 
