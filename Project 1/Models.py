@@ -205,6 +205,6 @@ def objective_function(params):
     scores = course.mission_scores()
     M2_score, M3_score, GM_score, num_lapsM3 = course.mission_scores()
     
-    score = - (M2_score/0.15 + M3_score/50 + GM_score/10)
+    score = - (M2_score/0.15 + M3_score/50 + GM_score/12)
     print(f"Testing -> Area: {wing_area:.2f}, Length: {fuselage_length:.2f}, SW2: {SW2:.2f}, SW3: {SW3:.2f}, V2: {V2:.1f}, V3: {V3:.1f}, M3 Laps: {num_lapsM3}, Score = {score.item():.2f}")
     return score
