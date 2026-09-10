@@ -45,6 +45,7 @@ All other aircraft parameters, such as the sizing of the vertical/horizontal tai
 ### Objective Function:
 $Score = \frac{SW_{1,2}}{10} + \frac{SW_{1,2}/Time}{0.15} + \frac{SW_{3}*Laps_3}{50}$
 
+From the objective function, Time and Laps are outputs of the lap simulator, which are functions of the decision variables. 
 Success in the competition is purely determined by maximizing the total score, which is a sum of all three mission scores.
 
 ### Constraints:
@@ -67,6 +68,7 @@ These are design decisions based on engineering intuition and historically succe
 | Empty aircraft weight | $W_e \ge 10$ lb | Prevents unrealistic structural designs with insufficient empty weight. |
 | Battery energy | $E_b \le 100$ Wh | Satisfies the competition battery energy limit. |
 | Mission 3 payload | $0 \le SW_3 \le SW_{1,2}$ | Mission 3 payload cannot exceed the payload carried during the Ground Mission and Mission 2. |
+| Mission 2 Time | $t_2 \le 300s$ | Enforces maximum mission time of 5 minutes (300 seconds) |
 
 
 #### Lap Simulator Simplifications
@@ -95,7 +97,7 @@ These are simplifications to estimate preliminary design and increase fidelity i
 This problem is formulated as a constrained nonlinear programming (NLP) problem. The objective function depends on the results of a lap simulator that predicts aircraft performance based on the selected design variables. The simulator incorporates nonlinear aerodynamic, propulsion, and flight dynamics models, causing the objective function to vary nonlinearly with the design variables. Additionally, the optimization problem is nonconvex because the aerodynamic performance, mission completion time, and aircraft stability characteristics may produce multiple local optima within the feasible design space. As a result, there is no guarantee that a locally optimal solution is also the global optimum. Therefore, the Design/Build/Fly aircraft optimization problem is classified as a constrained, nonconvex nonlinear optimization problem.
 
 ### Solution Methodology
-The design optimization is based on the results of a lap simulator intended to model the performance of the vehicle under certain parameters. The optimization itself varies the decision variables and imposes constraints, finally using the objective function to evaluate a configuration.  
+The design optimization is based on the results of a lap simulator intended to model the performance of the vehicle under certain parameters. The optimization itself varies the decision variables and imposes constraints, finally using the objective function to evaluate a configuration. Configurations that do not meet the constraints are thrown out. The configuration with the highest score gives the payload sizing/weight, cruise speed, and airframe sizing, as well as the number of laps needed to achieve such score.  
 
 ### Results and Interpretation
 
