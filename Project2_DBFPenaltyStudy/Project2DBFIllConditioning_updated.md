@@ -82,9 +82,8 @@ $$
 with
 
 $$
-W_{M2}
-=
-W_e+1.1SW_2.
+W_{\mathrm{M2}} =
+W_e + 1.1\,SW_2
 $$
 
 Here, $W_e$ is the modeled empty-aircraft weight. The factor 1.1 accounts for the modeled Mission 2 shipping-container weight used in Project 1.
