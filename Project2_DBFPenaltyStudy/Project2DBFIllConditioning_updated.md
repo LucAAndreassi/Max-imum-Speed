@@ -25,12 +25,16 @@ The three scoring missions remain based on the Project 1 model:
 The optimization uses six continuous design variables:
 
 $$
-\mathbf{x}
-=
-\begin{bmatrix}
-S_w & L_F & SW_2 & SW_3 & V_2 & V_3
-\end{bmatrix}^{T}
-\in \mathbb{R}^{6}.
+\mathbf{x} =
+\left[
+S_w,\;
+L_F,\;
+SW_2,\;
+SW_3,\;
+V_2,\;
+V_3
+\right]^T
+\in \mathbb{R}^6
 $$
 
 | Variable | Definition | Project 2 bounds | Type |
