@@ -167,9 +167,8 @@ For the conditioning study, the Mission 2 inequality constraint is moved into th
 When the weight constraint is active, the penalty contribution can be written locally as
 
 $$
-P(\mathbf{x})
-=
-\frac{\rho}{2}g(\mathbf{x})^2.
+P(\mathbf{x}) =
+\frac{\rho}{2}\,g(\mathbf{x})^2
 $$
 
 Its Hessian is
