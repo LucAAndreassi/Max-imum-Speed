@@ -193,9 +193,8 @@ This term creates a stiff direction normal to the weight-constraint surface. Dir
 The local Hessian condition number is
 
 $$
-\kappa(H)
-=
-\frac{\lambda_{\max}(H)}{\lambda_{\min}(H)},
+\kappa(H) =
+\frac{\lambda_{\max}(H)}{\lambda_{\min}(H)}
 $$
 
 where $\lambda_{\max}$ and $\lambda_{\min}$ are the largest and smallest positive eigenvalues used in the local conditioning analysis. As $\rho$ increases, the penalty-dominated eigenvalue increases approximately in proportion to $\rho$, while the smaller-curvature directions change much less. The result is an increasingly elongated optimization landscape and a rapidly increasing condition number.
