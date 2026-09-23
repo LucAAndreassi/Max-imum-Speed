@@ -55,15 +55,14 @@ All other aircraft geometry is derived from these variables. Wing span remains f
 The base objective is the negative normalized DBF competition score because the numerical optimizer minimizes its objective:
 
 $$
-f(\mathbf{x})
-=
--\left(
+f(\mathbf{x}) =
+-\left[
 \frac{SW_2}{12}
 +
-\frac{SW_2/t_2}{0.15}
+\frac{SW_2}{0.15\,t_2}
 +
-\frac{(SW_2-SW_3)\widetilde{L}_3}{50}
-\right),
+\frac{(SW_2-SW_3)\,\widetilde{L}_3}{50}
+\right]
 $$
 
 where:
