@@ -74,10 +74,9 @@ where:
 The physical weight constraint used in this project is
 
 $$
-g(\mathbf{x})
-=
-W_{M2}(\mathbf{x})-20
-\le 0,
+g(\mathbf{x}) =
+W_{M2}(\mathbf{x}) - 20
+\le 0
 $$
 
 with
