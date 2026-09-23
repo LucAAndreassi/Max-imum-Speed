@@ -377,11 +377,10 @@ $$
 
 The augmented Lagrangian started with $\rho=5$ and reached a feasible solution after two outer iterations. Its final constraint residual was
 
-$$
-g(\mathbf{x})
-=
--5.11\times10^{-6}\ \mathrm{lb},
-$$
+```math
+g(\mathbf{x}) =
+-5.11 \times 10^{-6}\,\mathrm{lb}
+```
 
 while the local condition number was approximately
 
