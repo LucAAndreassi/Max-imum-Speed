@@ -254,15 +254,14 @@ is a good approximation.
 For the second requirement, let
 
 $$
-D=\operatorname{diag}(H)
+D = \mathrm{diag}(H)
 $$
 
 and apply symmetric Jacobi rescaling:
 
 $$
-H_J
-=
-D^{-1/2}HD^{-1/2}.
+H_J =
+D^{-1/2} H D^{-1/2}
 $$
 
 At $\rho=10{,}000$, the rescaled condition number is still approximately
@@ -288,11 +287,9 @@ To demonstrate the practical effect of the increasing condition number, projecte
 The local fixed step size was chosen from the positive Hessian eigenvalues using
 
 $$
-\alpha
-=
-\frac{2}{L+\mu},
+\alpha =
+\frac{2}{L + \mu}
 $$
-
 where
 
 $$
