@@ -286,10 +286,9 @@ To demonstrate the practical effect of the increasing condition number, projecte
 
 The local fixed step size was chosen from the positive Hessian eigenvalues using
 
-$$
-\alpha =
-\frac{2}{L + \mu}
-$$
+```math
+\alpha = \frac{2}{L + \mu}
+```
 where
 
 $$
