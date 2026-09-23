@@ -174,11 +174,10 @@ $$
 Its Hessian is
 
 $$
-\nabla^2P
-=
-\rho\,\nabla g\,\nabla g^T
+\nabla^2 P =
+\rho\,\nabla g\,\nabla g^{T}
 +
-\rho\,g\,\nabla^2g.
+\rho\,g\,\nabla^2 g
 $$
 
 Near the active constraint boundary, $g(\mathbf{x})\approx0$, so the second term becomes small and the dominant penalty curvature is approximately
