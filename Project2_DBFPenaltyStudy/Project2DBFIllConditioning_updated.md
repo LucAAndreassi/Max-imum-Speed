@@ -329,32 +329,32 @@ A fixed quadratic penalty creates a numerical tradeoff. A small penalty weight p
 
 The proposed remedy is an **augmented Lagrangian method**. For the inequality constraint $g(\mathbf{x})\le0$, the implemented augmented objective is
 
-$$
-\mathcal{L}_A(\mathbf{x},\lambda,\rho)
+```math
+\mathcal{L}_A(\mathbf{x}, \lambda, \rho)
 =
 f(\mathbf{x})
 +
 \frac{\rho}{2}
 \left[
 \max\left(
-0,
-g(\mathbf{x})+\frac{\lambda}{\rho}
+0,\,
+g(\mathbf{x}) + \frac{\lambda}{\rho}
 \right)
 \right]^2
 -
-\frac{\lambda^2}{2\rho}.
-$$
+\frac{\lambda^2}{2\rho}
+```
 
 After each inner optimization, the multiplier is updated as
 
-$$
+```math
 \lambda_{k+1}
 =
 \max\left(
-0,
-\lambda_k+\rho g(\mathbf{x}_k)
-\right).
-$$
+0,\,
+\lambda_k + \rho\,g(\mathbf{x}_k)
+\right)
+```
 
 The multiplier carries information about the active constraint, allowing the method to obtain high constraint accuracy without increasing $\rho$ to the extremely large values required by a pure fixed-penalty method.
 
@@ -362,11 +362,10 @@ The multiplier carries information about the active constraint, allowing the met
 
 The large fixed-penalty case used $\rho=10{,}000$ and produced
 
-$$
-g(\mathbf{x})
-=
-1.02\times10^{-5}\ \mathrm{lb}
-$$
+```math
+g(\mathbf{x}) =
+1.02 \times 10^{-5}\,\mathrm{lb}
+```
 
 with
 
