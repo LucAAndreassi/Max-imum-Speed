@@ -103,14 +103,13 @@ $$
 For the Project 2 conditioning study, the Mission 2 weight constraint is moved into the objective with a quadratic exterior penalty:
 
 $$
-F_{\rho}(\mathbf{x})
-=
+F_{\rho}(\mathbf{x}) =
 f(\mathbf{x})
 +
 \frac{\rho}{2}
 \left[
-\max\left(0,g(\mathbf{x})\right)
-\right]^2.
+\max\left(0,\,g(\mathbf{x})\right)
+\right]^2
 $$
 
 The scalar $\rho>0$ is the penalty weight. A larger value of $\rho$ penalizes constraint violation more strongly, forcing the solution closer to the boundary $g(\mathbf{x})=0$. The same parameter also becomes the structural knob used to demonstrate ill-conditioning.
