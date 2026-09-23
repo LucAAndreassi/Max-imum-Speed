@@ -428,11 +428,9 @@ The final augmented-Lagrangian design is approximately:
 
 The final unpenalized objective is approximately
 
-$$
-f(\mathbf{x})
-=
--3.39336.
-$$
+```math
+f(\mathbf{x}) = -3.39336
+```
 
 ### 5.4 Results and Interpretation
 
