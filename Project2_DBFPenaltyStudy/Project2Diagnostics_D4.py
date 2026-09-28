@@ -148,6 +148,150 @@ def main():
     plt.title('D4: Before/after convergence with the same first-order method')
     plt.grid(True,alpha=.25); plt.legend(); plt.tight_layout(); plt.savefig(OUT/'D4_before_after_convergence.png',dpi=180); plt.close()
 
+    # Example values from your study
+    rho_fix = 10000.0
+    rho_al = 5.0
+    lam = 0.1026548095667223   # replace with your final lambda if needed
+
+    # Residual range near the true boundary g = 0
+    g = np.linspace(-0.03, 0.03, 1000)
+
+    # Penalty terms
+    P_fix = 0.5 * rho_fix * np.maximum(0.0, g)**2
+    P_al = 0.5 * rho_al * np.maximum(0.0, g + lam/rho_al)**2 - 0.5 * lam**2 / rho_al
+
+    # Derivatives with respect to g
+    dP_fix = np.where(g > 0.0, rho_fix * g, 0.0)
+    dP_al = np.where(g + lam/rho_al > 0.0, rho_al * (g + lam/rho_al), 0.0)
+
+        # ------------------------------------------------------------
+    # D4: Local geometry near the weight-constraint boundary
+    # ------------------------------------------------------------
+
+    # Fixed-penalty value used in the comparison
+    rho_fix = 10000.0
+
+    # Use the actual final augmented-Lagrangian parameters
+    rho_al = rho_final
+    lam = lam_final
+
+    # Augmented-Lagrangian active-branch transition
+    g_activation = -lam / rho_al
+
+    # Zoom in around the true constraint boundary g(x) = 0
+    g = np.linspace(-0.025, 0.010, 1400)
+
+    # Fixed exterior quadratic penalty
+    P_fix = (
+        0.5
+        * rho_fix
+        * np.maximum(0.0, g)**2
+    )
+
+    # Augmented-Lagrangian constraint contribution
+    P_al = (
+        0.5
+        * rho_al
+        * np.maximum(0.0, g + lam / rho_al)**2
+        - 0.5 * lam**2 / rho_al
+    )
+
+    # Plot local geometry
+    plt.figure(figsize=(7, 4.5))
+
+    plt.plot(
+        g,
+        P_fix,
+        linewidth=2.0,
+        label=fr"Fixed penalty ($\rho={rho_fix:g}$)"
+    )
+
+    plt.plot(
+        g,
+        P_al,
+        linewidth=2.0,
+        label=fr"Augmented Lagrangian "
+              fr"($\rho={rho_al:g},\ \lambda={lam:.3f}$)"
+    )
+
+    # True weight-constraint boundary
+    plt.axvline(
+        0.0,
+        linestyle="--",
+        linewidth=1.4,
+        label=r"Weight boundary $g(x)=0$"
+    )
+
+    # Point where the AL active branch begins
+    plt.axvline(
+        g_activation,
+        linestyle=":",
+        linewidth=1.4,
+        label=fr"AL activation "
+              fr"$g=-\lambda/\rho={g_activation:.4f}$"
+    )
+
+    plt.axhline(0.0, linewidth=1.0)
+
+    # Allows both the small AL response and very stiff fixed penalty
+    # to be visible on the same plot.
+    plt.yscale("symlog", linthresh=1e-4)
+
+    plt.xlabel(
+        r"Weight-constraint residual "
+        r"$g(x)=W_{M2}-20$"
+    )
+
+    plt.ylabel(
+        "Local constraint contribution to objective"
+    )
+
+    plt.title(
+        "D4: Local geometry near the weight-constraint boundary"
+    )
+
+    plt.grid(True, alpha=0.25)
+    plt.legend()
+    plt.tight_layout()
+
+    plt.savefig(
+        OUT / "D4_local_boundary_geometry.png",
+        dpi=180
+    )
+
+    plt.close()
+
+        # D4: Weight-constraint violation, fixed penalty vs augmented Lagrangian
+    rho_vals = np.array([0.1, 1, 5, 10, 100, 1000, 10000.0])
+    z_cmp = to_z(np.array([7., 6., 10., 2., 100., 90.]))
+    g_fix_vals, g_al_vals = [], []
+
+    for rho in rho_vals:
+        _, x_fix = optimize_penalty(rho, z_cmp)
+        z_a, _, _, _ = augmented_lagrangian(z_cmp, rho0=rho)
+        g_fix_vals.append(weight_constraint(x_fix))
+        g_al_vals.append(weight_constraint(to_x(z_a)))
+
+    v_fix = np.maximum(g_fix_vals, 1e-8)
+    v_al = np.maximum(g_al_vals, 1e-8)
+
+    plt.figure(figsize=(7, 4.5))
+    plt.loglog(rho_vals, v_fix, "o-", label="Fixed quadratic penalty")
+    plt.loglog(rho_vals, v_al, "s--", label="Augmented Lagrangian")
+    plt.axhline(1e-6, linestyle=":", label=r"$10^{-6}$ feasibility tolerance")
+    plt.xlabel(r"Penalty parameter $\rho$")
+    plt.ylabel("Weight-constraint violation [lb]")
+    plt.title("D4: Weight-constraint violation comparison")
+    plt.grid(True, which="both", alpha=0.25)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(OUT / "D4_weight_violation_fixed_vs_AL.png", dpi=180)
+    plt.close()
+
+    print("\nD4 weight-constraint violation comparison")
+    for rho, gf, ga in zip(rho_vals, g_fix_vals, g_al_vals):
+        print(f"rho={rho:7g}  fixed g={gf:+.3e}  AL g={ga:+.3e}")
+
     d4_rows=[
         ['fixed_penalty',10000.0,k_pen,weight_constraint(x_pen),len(hist_pen),hist_pen[-1,2],float(gap_pen[-1]),step_pen],
         ['augmented_lagrangian',rho_final,k_al,g_al,len(hist_al_gd),hist_al_gd[-1,2],float(gap_al[-1]),step_al],
