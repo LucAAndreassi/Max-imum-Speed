@@ -329,7 +329,7 @@ $$
 \alpha = \frac{2}{\lambda_{\max}+\lambda_{\min}}.
 $$
 
-Both runs use the same projected-gradient tolerance, $10^{-5}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
+Both runs use the same projected-gradient tolerance, $10^{-6}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
 
 ![D4 before/after convergence](project2_outputs/D4_before_after_convergence.png)
 
@@ -340,7 +340,13 @@ The corresponding numerical comparison is:
 | Fixed quadratic penalty | $10{,}000$ | $1.70\times10^7$ | $20{,}000$ (limit) | $3.68\times10^{-1}$ | $1.26\times10^{-2}$ |
 | Augmented Lagrangian | $5$ | $8.51\times10^3$ | $20{,}000$ (limit) | $2.18\times10^{-2}$ | $2.50\times10^{-7}$ |
 
-After the same iteration budget, the augmented-Lagrangian formulation has a projected-gradient norm about 17 times smaller and an objective gap about $5.0\times10^4$ times smaller. At the same time, the local condition number is reduced by approximately $2.0\times10^3$. Neither run reaches the strict $10^{-5}$ projected-gradient tolerance within 20,000 iterations, so the comparison is based on the same fixed computational budget rather than claiming a time-to-tolerance that was not observed.
+After the same iteration budget, the augmented-Lagrangian formulation has a projected-gradient norm about 17 times smaller and an objective gap about $5.0\times10^4$ times smaller. At the same time, the local condition number is reduced by approximately $2.0\times10^3$. Neither run reaches the strict $10^{-6}$ projected-gradient tolerance within 20,000 iterations, so the comparison is based on the same fixed computational budget rather than claiming a time-to-tolerance that was not observed.
+
+To observe the impact of the augmented-Lagrangian formulation and its effectiveness at enforcing the weight constraint, the violation severity as a function of the penalty penalty parameter are shown and compared against the chosen feasibility tolerance of $10^{-6}$.
+
+![D4_weight_violation_fixed_vs_AL](project2_outputs/D4_weight_violation_fixed_vs_AL.png)
+
+The results here show that for nearly every penalty parameter, the augmented-Langrangian formulation is able to enforce the weight constraint to a tolerable level for all values of $\rho$. The fixed penalty has the expected downward slope, which makes sense given the increasing penalty weight's implications on the optimization, however it further proves that the fixed penalty solution needs high penalty weight for constraint enforcement, putting the optimization under ill-conditioning. Overall, the plot supports that augmented-Langrangian formulation allows for sufficient constraints without the use of large penalty weights, which can impose ill-conditioning onto the optimization process. 
 
 Together with the constraint-residual comparison in Section 5.2, this completes D4: the augmented Lagrangian achieves essentially the same engineering constraint accuracy, substantially lowers the local condition number, and produces a much faster convergence curve for the same first-order method.
 
@@ -357,6 +363,7 @@ The final augmented-Lagrangian design is approximately:
 | Mission 2 gross weight | $20.00\ \mathrm{lb}$ |
 | Mission 2 five-lap time | $123.46\ \mathrm{s}$ |
 | Continuous Mission 3 lap estimate | $7.21$ laps |
+
 The final unpenalized objective is approximately
 
 ```math
