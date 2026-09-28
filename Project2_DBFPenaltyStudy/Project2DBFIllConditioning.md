@@ -37,6 +37,7 @@ $$
 | $SW_3$ | Sensor-weight reduction for Mission 3 | $0 \le SW_3 \le 6\ \mathrm{lb}$ | Continuous |
 | $V_2$ | Mission 2 cruise velocity | $40 \le V_2 \le 140\ \mathrm{ft/s}$ | Continuous |
 | $V_3$ | Mission 3 cruise velocity | $40 \le V_3 \le 140\ \mathrm{ft/s}$ | Continuous |
+
 The Project 1 upper bound on $SW_2$ was 12 lb. For this conditioning study, the upper bound is intentionally increased to 16 lb. This allows the 20 lb Mission 2 gross-weight constraint to become active before the payload box bound becomes active. This is a Project 2 study modification and is not intended to represent a change to the original competition rules.
 All other aircraft geometry is derived from these variables. Wing span remains fixed at 6 ft, the sensor is modeled as a 6:1 cylindrical payload, and the fuselage and empennage dimensions are determined from the selected design variables.
 ### 2.2 Original Constrained Problem
@@ -69,34 +70,28 @@ $$
 
 with
 
-$$
-W_{\mathrm{M2}} =
-W_e + 1.1\,SW_2
-$$
+$W_{\mathrm{M2}} = W_e + 1.1SW_2$
 Here, $W_e$ is the modeled empty-aircraft weight. The factor 1.1 accounts for the modeled Mission 2 shipping-container weight used in Project 1.
 
 The original constrained problem can therefore be written as
 
 $$
 \begin{aligned}
-\min_{\mathbf{x}}\quad & f(\mathbf{x}) \\
-\text{subject to}\quad & g(\mathbf{x}) \le 0, \\
-& \mathbf{x}_{\min} \le \mathbf{x} \le \mathbf{x}_{\max}.
+\min_{\mathbf{x}} \quad & f(\mathbf{x}) \\
+\text{subject to} \quad & g(\mathbf{x}) \le 0, \\
+& \mathbf{x}^{\min} \le \mathbf{x} \le \mathbf{x}^{\max}.
 \end{aligned}
 $$
-### 2.3 Quadratic Penalty Reformulation
 
 For the Project 2 conditioning study, the Mission 2 weight constraint is moved into the objective with a quadratic exterior penalty:
 
-$$
-F_{\rho}(\mathbf{x}) =
+$F_{\rho}(\mathbf{x}) =
 f(\mathbf{x})
 +
 \frac{\rho}{2}
 \left[
-\max\left(0,\,g(\mathbf{x})\right)
-\right]^2
-$$
+\max\left(0,g(\mathbf{x})\right)
+\right]^2$
 The scalar $\rho>0$ is the penalty weight. A larger value of $\rho$ penalizes constraint violation more strongly, forcing the solution closer to the boundary $g(\mathbf{x})=0$. The same parameter also becomes the structural knob used to demonstrate ill-conditioning.
 ### 2.4 Constraints and Bounds
 | Constraint or bound | Mathematical expression | Description |
@@ -156,19 +151,12 @@ $$
 
 Near the active constraint boundary, $g(\mathbf{x})\approx0$, so the second term becomes small and the dominant penalty curvature is approximately
 
-$$
-\nabla^2P
-\approx
-\rho\,\nabla g\,\nabla g^T.
-$$
+$$\nabla^2P\approx\rho\,\nabla g\,\nabla g^T.$$
 This term creates a stiff direction normal to the weight-constraint surface. Directions tangent to the constraint remain governed primarily by the original aircraft objective and therefore retain much smaller curvature.
 
 The local Hessian condition number is
 
-$$
-\kappa(H) =
-\frac{\lambda_{\max}(H)}{\lambda_{\min}(H)}
-$$
+$$\kappa(H) =\frac{\lambda_{\max}(H)}{\lambda_{\min}(H)}$$
 where $\lambda_{\max}$ and $\lambda_{\min}$ are the largest and smallest positive eigenvalues used in the local conditioning analysis. As $\rho$ increases, the penalty-dominated eigenvalue increases approximately in proportion to $\rho$, while the smaller-curvature directions change much less. The result is an increasingly elongated optimization landscape and a rapidly increasing condition number.
 ### 3.2 D1 - Hessian Eigenvalue Spectrum
 
@@ -186,11 +174,7 @@ $$
 
 Therefore,
 
-$$
-\kappa(H)
-\approx
-1.70\times10^7.
-$$
+$$\kappa(H)\approx1.70\times10^7.$$
 The spectrum spans many orders of magnitude, demonstrating a strongly elongated local optimization landscape.
 
 ![D1 Hessian eigenvalue spectrum](project2_outputs/D1_hessian_spectrum.png)
@@ -210,6 +194,7 @@ For this problem, the structural knob is the penalty weight $\rho$. The penalty 
 | 100 | 0.00103 | $1.70\times10^5$ | $1.57\times10^3$ |
 | 1,000 | 0.000103 | $1.70\times10^6$ | $1.57\times10^4$ |
 | 10,000 | 0.0000102 | $1.70\times10^7$ | $1.57\times10^5$ |
+
 The first requirement is satisfied because $\kappa(H)$ increases by approximately one order of magnitude each time $\rho$ increases by one order of magnitude. Over the tested range,
 
 $$
@@ -233,12 +218,8 @@ $$
 
 At $\rho=10{,}000$, the rescaled condition number is still approximately
 
-$$
-\kappa(H_J)
-\approx
-1.57\times10^5.
-$$
-Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic-$\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
+$$\kappa(H_J)\approx1.57\times10^5.$$
+Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic $\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
 
 ![D2 condition number versus penalty weight](project2_outputs/D2_kappa_vs_rho.png)
 
@@ -254,11 +235,7 @@ The local fixed step size was chosen from the positive Hessian eigenvalues using
 \alpha = \frac{2}{L + \mu}
 ```
 where
-$$
-L=\lambda_{\max}(H)
-\qquad\text{and}\qquad
-\mu=\lambda_{\min}(H).
-$$
+$$L=\lambda_{\max}(H)\qquad\text{and}\qquad\mu=\lambda_{\min}(H).$$
 
 Convergence was declared when the projected-gradient norm satisfied
 
@@ -325,11 +302,7 @@ g(\mathbf{x}) =
 
 with
 
-$$
-\kappa(H)
-\approx
-1.70\times10^7.
-$$
+$$\kappa(H)\approx1.70\times10^7.$$
 
 The augmented Lagrangian started with $\rho=5$ and reached a feasible solution after two outer iterations. Its final constraint residual was
 
@@ -339,11 +312,7 @@ g(\mathbf{x}) =
 ```
 
 while the local condition number was approximately
-$$
-\kappa(H_{AL})
-\approx
-8.51\times10^3.
-$$
+$$\kappa(H_{AL})\approx8.51\times10^3.$$
 
 Thus, both methods enforce the gross-weight requirement to approximately the same numerical accuracy, but the augmented-Lagrangian local problem has a condition number roughly three orders of magnitude smaller.
 
@@ -360,7 +329,7 @@ $$
 
 Both runs use the same projected-gradient tolerance, $10^{-5}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
 
-![D4 before/after projected-gradient convergence](project2_outputs/D4_before_after_convergence.png)
+![D4 before/after projected-gradient convergence(1)](D4_before_after_convergence(1).png)
 
 The corresponding numerical comparison is:
 
@@ -420,7 +389,7 @@ The results depend on the aircraft model and several simplifying assumptions:
 
 Two Python scripts are used for the Project 2 study:
 - [`Project2Models.py`](Project2Models.py) contains the smooth DBF aircraft model, mission-performance calculations, base competition objective, gross-weight constraint, quadratic penalty objective, and augmented-Lagrangian objective.
-- [`Project2Diagnostics.py`](Project2Diagnostics.py) runs the numerical experiments, computes finite-difference gradients and Hessians, evaluates Hessian spectra and condition numbers, performs Jacobi rescaling, runs projected gradient descent, and evaluates the augmented-Lagrangian remedy including the D4 before/after projected-gradient comparison.
+- [`Project2Diagnostics_D4.py`](Project2Diagnostics_D4.py) runs the numerical experiments, computes finite-difference gradients and Hessians, evaluates Hessian spectra and condition numbers, performs Jacobi rescaling, runs projected gradient descent, and evaluates the augmented-Lagrangian remedy including the D4 before/after projected-gradient comparison.
 ### 7.1 Software Requirements
 
 The analysis uses Python 3 and the following third-party packages:
