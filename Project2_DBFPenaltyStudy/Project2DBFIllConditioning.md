@@ -77,9 +77,9 @@ The original constrained problem can therefore be written as
 
 $$
 \begin{aligned}
-\min_{\mathbf{x}} \quad & f(\mathbf{x}) \\
+\min  \quad & f(\mathbf{x}) \\
 \text{subject to} \quad & g(\mathbf{x}) \le 0, \\
-& \mathbf{x}^{\min} \le \mathbf{x} \le \mathbf{x}^{\max}.
+& \mathbf{x}_{\min} \le \mathbf{x} \le \mathbf{x}_{\max}.
 \end{aligned}
 $$
 
@@ -252,7 +252,7 @@ Each case used a maximum of 15,000 iterations.
 | 1 | 9,668 | $1.00\times10^{-5}$ | $1.00\times10^{-10}$ |
 | 10 | 15,000* | $3.49\times10^{-1}$ | $3.43\times10^{-4}$ |
 
-\*The $\rho=10$ case reached the 15,000-iteration limit before satisfying the convergence tolerance.
+The $\rho=10$ case reached the 15,000-iteration limit before satisfying the convergence tolerance.
 The increase from 849 iterations at $\rho=0.1$ to 9,668 iterations at $\rho=1$ shows the practical slowdown caused by the increasingly elongated local landscape. At $\rho=10$, the baseline first-order method does not reach the required tolerance within the allowed iteration count.
 
 ![D3 projected-gradient convergence](project2_outputs/D3_gradient_descent_convergence.png)
