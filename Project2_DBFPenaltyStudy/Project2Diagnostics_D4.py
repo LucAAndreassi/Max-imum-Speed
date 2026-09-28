@@ -94,12 +94,12 @@ def main():
 
     rho_spec=rhos[-1]; _,_,_,ev=optima[rho_spec]
     plt.figure(figsize=(7,4.5)); plt.semilogy(np.arange(1,len(ev)+1),np.maximum(np.abs(ev),1e-14),'o-')
-    plt.xlabel('Eigenvalue index'); plt.ylabel('|Hessian eigenvalue|'); plt.title(f'D1: Penalized DBF Hessian spectrum (rho={rho_spec:g})')
+    plt.xlabel('Eigenvalue index'); plt.ylabel('|Hessian eigenvalue|'); plt.title(f'D1: Penalized DBF Hessian spectrum ($\\rho={rho_spec:g}$)')
     plt.grid(True,alpha=.25); plt.tight_layout(); plt.savefig(OUT/'D1_hessian_spectrum.png',dpi=180); plt.close()
 
     rr=np.array([r['rho'] for r in rows]); kk=np.array([r['kappa'] for r in rows]); kj=np.array([r['kappa_jacobi'] for r in rows])
     plt.figure(figsize=(7,4.5)); plt.loglog(rr,kk,'o-',label='Original Hessian'); plt.loglog(rr,kj,'s--',label='After Jacobi rescaling')
-    plt.xlabel('Penalty weight rho'); plt.ylabel('Condition number kappa'); plt.title('D2: Intrinsic ill-conditioning test')
+    plt.xlabel(r'Penalty weight $\rho$'); plt.ylabel(r'Condition number $\kappa$'); plt.title('D2: Intrinsic ill-conditioning test')
     plt.grid(True,which='both',alpha=.25); plt.legend(); plt.tight_layout(); plt.savefig(OUT/'D2_kappa_vs_rho.png',dpi=180); plt.close()
 
     gd_rhos=[0.1,1.0,10.0]; plt.figure(figsize=(7,4.5)); gd_summary=[]
@@ -110,8 +110,8 @@ def main():
         fun=lambda z,rr=rho: penalized_objective(to_x(z),rr)
         z_gd0=np.clip(zstar+0.08*direction/max(np.linalg.norm(direction),1e-12),0,1)
         zend,hist=projected_gd(fun,z_gd0,step,tol=1e-5,maxit=15000); f_ref=fun(zstar); gap=np.maximum(hist[:,1]-f_ref,1e-16)
-        plt.semilogy(hist[:,0],gap,label=f'rho={rho:g}'); gd_summary.append((rho,len(hist),hist[-1,2],fun(zend)-f_ref))
-    plt.xlabel('Iteration'); plt.ylabel('Objective gap'); plt.title('D3: Penalty weight slows projected gradient descent')
+        plt.semilogy(hist[:,0],gap,label=rf'$\rho={rho:g}$'); gd_summary.append((rho,len(hist),hist[-1,2],fun(zend)-f_ref))
+    plt.xlabel('Iteration'); plt.ylabel('Objective Gap'); plt.title('D3: Objective Gap vs Iteration for Various Penalty Weights')
     plt.grid(True,alpha=.25); plt.legend(); plt.tight_layout(); plt.savefig(OUT/'D3_gradient_descent_convergence.png',dpi=180); plt.close()
     with (OUT/'gradient_descent_summary.csv').open('w',newline='') as f:
         w=csv.writer(f); w.writerow(['rho','iterations','final_projected_grad','final_objective_gap']); w.writerows(gd_summary)
@@ -143,8 +143,8 @@ def main():
     gap_pen=np.maximum(hist_pen[:,1]-fref_pen,1e-16); gap_al=np.maximum(hist_al_gd[:,1]-fref_al,1e-16)
 
     plt.figure(figsize=(7,4.5)); plt.semilogy(hist_pen[:,0],gap_pen,label='Fixed penalty (rho=10,000)')
-    plt.semilogy(hist_al_gd[:,0],gap_al,label=f'Augmented Lagrangian (rho={rho_final:g})')
-    plt.xlabel('Projected-gradient iteration'); plt.ylabel('Objective gap')
+    plt.semilogy(hist_al_gd[:,0],gap_al,label=f'Augmented Lagrangian ($\\rho={rho_final:g}$)')
+    plt.xlabel('Projected-gradient iteration'); plt.ylabel('Objective Gap')
     plt.title('D4: Before/after convergence with the same first-order method')
     plt.grid(True,alpha=.25); plt.legend(); plt.tight_layout(); plt.savefig(OUT/'D4_before_after_convergence.png',dpi=180); plt.close()
 
