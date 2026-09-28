@@ -83,6 +83,8 @@ $$
 \end{aligned}
 $$
 
+### 2.3 Quadratic Penalty Reformulation
+
 For the Project 2 conditioning study, the Mission 2 weight constraint is moved into the objective with a quadratic exterior penalty:
 
 $F_{\rho}(\mathbf{x}) =
@@ -329,7 +331,7 @@ $$
 
 Both runs use the same projected-gradient tolerance, $10^{-5}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
 
-![D4 before/after projected-gradient convergence(1)](D4_before_after_convergence(1).png)
+![D4 before/after convergence](project2_outputs/D4_before_after_convergence.png)
 
 The corresponding numerical comparison is:
 
@@ -410,16 +412,16 @@ python -m pip install numpy scipy matplotlib
 Place the following files in the repository root:
 
 ```text
-Project2DBFIllConditioning_updated.md
+Project2DBFIllConditioning.md
 Project2Models.py
-Project2Diagnostics.py
+Project2Diagnostics_D4.py
 project2_outputs/
 ```
 
 From the repository root, run:
 
 ```bash
-python Project2Diagnostics.py
+python Project2Diagnostics_D4.py
 ```
 
 The script recreates the numerical tables and figures in `project2_outputs/`.
