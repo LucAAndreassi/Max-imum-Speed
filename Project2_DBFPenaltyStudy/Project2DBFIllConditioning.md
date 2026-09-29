@@ -73,15 +73,23 @@ with
 $W_{\mathrm{M2}} = W_e + 1.1SW_2$
 Here, $W_e$ is the modeled empty-aircraft weight. The factor 1.1 accounts for the modeled Mission 2 shipping-container weight used in Project 1.
 
-The original constrained problem can therefore be written as
+The constrained design problem can therefore be written as
 
 $$
 \begin{aligned}
-\min  \quad & f(\mathbf{x}) \\
-\text{subject to} \quad & g(\mathbf{x}) \le 0, \\
+\min_{\mathbf{x}} \quad & f(\mathbf{x}) \\
+\text{subject to} \quad
+& g(\mathbf{x}) \le 0, \\
+& \mathbf{c}_{\mathrm{prop}}(\mathbf{x}) \ge 0, \\
+& c_{\mathrm{battery}}(\mathbf{x}) \ge 0, \\
 & \mathbf{x}_{\min} \le \mathbf{x} \le \mathbf{x}_{\max}.
 \end{aligned}
 $$
+
+For the conditioning study, only the Mission 2 gross-weight constraint
+$g(\mathbf{x})$ is moved into the fixed-penalty or augmented-Lagrangian
+objective. The propulsion and battery constraints remain explicit physical
+feasibility constraints.
 
 ### 2.3 Quadratic Penalty Reformulation
 
@@ -105,6 +113,11 @@ The scalar $\rho>0$ is the penalty weight. A larger value of $\rho$ penalizes co
 | Mission 3 payload reduction | $0 \le SW_3 \le 6\ \mathrm{lb}$ | Limits payload reduction between missions |
 | Mission 2 speed | $40 \le V_2 \le 140\ \mathrm{ft/s}$ | Cruise-speed range |
 | Mission 3 speed | $40 \le V_3 \le 140\ \mathrm{ft/s}$ | Cruise-speed range |
+| M2 straight propulsion | $V_{\max,M2,\mathrm{straight}}-V_2 \ge 0$ | M2 straight speed must be achievable at or below 100% throttle |
+| M2 turn propulsion | $V_{\max,M2,\mathrm{turn}}-V_2 \ge 0$ | M2 turn speed must be sustainable at or below 100% throttle |
+| M3 straight propulsion | $V_{\max,M3,\mathrm{straight}}-V_3 \ge 0$ | M3 straight speed must be achievable at or below 100% throttle |
+| M3 turn propulsion | $V_{\max,M3,\mathrm{turn}}-V_3 \ge 0$ | M3 turn speed must be sustainable at or below 100% throttle |
+| M2 battery energy | $E_{\mathrm{battery}}-E_{M2} \ge 0$ | Five M2 laps must fit within usable battery capacity |
 
 
 ### 2.5 Aircraft Model and Numerical Smoothing
