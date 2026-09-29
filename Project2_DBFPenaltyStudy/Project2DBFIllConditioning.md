@@ -183,8 +183,7 @@ $$
 
 Therefore,
 
-$$
-\kappa(H)=\frac{\lambda_{\max}}{\lambda_{\min}}\approx8.90\times10^7.$$
+$$\kappa(H)=\frac{\lambda_{\max}}{\lambda_{\min}}\approx8.90\times10^7.$$
 The spectrum spans many orders of magnitude, demonstrating a strongly elongated local optimization landscape.
 
 ![D1 Hessian eigenvalue spectrum](project2_outputs/D1_hessian_spectrum.png)
@@ -209,30 +208,21 @@ For this problem, the structural knob is the penalty weight $\rho$. The penalty 
 
 The first requirement is satisfied because $\kappa(H)$ increases by approximately one order of magnitude each time $\rho$ increases by one order of magnitude. Over the tested range,
 
-$$
-\kappa(H)\propto\rho
-$$
+$$\kappa(H)\propto\rho$$
 
 is a good approximation.
 
 For the second requirement, let
 
-$$
-D = \mathrm{diag}(H)
-$$
+$$D = \mathrm{diag}(H)$$
 
 and apply symmetric Jacobi rescaling:
 
-$$
-H_J =
-D^{-1/2} H D^{-1/2}
-$$
+$$H_J =D^{-1/2} H D^{-1/2}$$
 
 At $\rho=10{,}000$, the rescaled condition number is still approximately
 
-$$
-\kappa(H_J)\approx5.07\times10^5.
-$$
+$$\kappa(H_J)\approx5.07\times10^5.$$
 Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic $\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
 
 ![D2 condition number versus penalty weight](project2_outputs/D2_kappa_vs_rho.png)
