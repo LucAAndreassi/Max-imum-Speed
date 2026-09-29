@@ -197,8 +197,23 @@ $$
 Therefore,
 
 $$\kappa(H)=\frac{\lambda_{\max}}{\lambda_{\min}}\approx8.90\times10^7.$$
-The spectrum spans many orders of magnitude, demonstrating a strongly elongated local optimization landscape.
+The Hessian spectrum spans more than eight orders of magnitude in curvature. At $\rho=10{,}000$, the smallest positive eigenvalue is approximately
 
+$$
+\lambda_{\min}\approx1.20\times10^{-1},
+$$
+
+while the largest eigenvalue is approximately
+
+$$
+\lambda_{\max}\approx1.98\times10^6.
+$$
+
+Therefore,
+
+$$\kappa(H)=\frac{\lambda_{\max}}{\lambda_{\min}}\approx1.65\times10^7.$$
+
+This large eigenvalue separation indicates a strongly elongated local optimization landscape. Motion in the penalty-dominated constraint-normal direction experiences extremely large curvature, while other directions remain comparatively shallow. This is the local geometric signature of the penalty-induced ill-conditioning investigated in this study.
 ![D1 Hessian eigenvalue spectrum](project2_outputs/D1_hessian_spectrum.png)
 ### 3.3 D2 - Intrinsic Ill-Conditioning Test
 
@@ -211,13 +226,13 @@ For this problem, the structural knob is the penalty weight $\rho$. The penalty 
 
 | Penalty weight $\rho$ | Weight residual $g$ (lb) | $\kappa(H)$ | $\kappa$ after Jacobi rescaling |
 |---:|---:|---:|---:|
-| 0.1 | $7.80\times10^{-1}$ | $1.48\times10^3$ | $5.22\times10^1$ |
-| 1 | $9.72\times10^{-2}$ | $8.82\times10^3$ | $4.86\times10^1$ |
-| 10 | $9.80\times10^{-3}$ | $8.90\times10^4$ | $5.02\times10^2$ |
-| 100 | $9.84\times10^{-4}$ | $8.91\times10^5$ | $5.07\times10^3$ |
-| 500 | $1.99\times10^{-4}$ | $4.46\times10^6$ | $2.54\times10^4$ |
-| 1,000 | $9.83\times10^{-5}$ | $8.91\times10^6$ | $5.07\times10^4$ |
-| 10,000 | $9.76\times10^{-6}$ | $8.90\times10^7$ | $5.07\times10^5$ |
+| 0.1 | $7.212\times10^{-1}$ | $2.16\times10^2$ | $1.28\times10^1$ |
+| 1 | $7.378\times10^{-2}$ | $1.67\times10^3$ | $1.62\times10^1$ |
+| 10 | $7.380\times10^{-3}$ | $1.65\times10^4$ | $1.25\times10^2$ |
+| 100 | $7.380\times10^{-4}$ | $1.65\times10^5$ | $1.23\times10^3$ |
+| 500 | $1.436\times10^{-4}$ | $8.27\times10^5$ | $6.14\times10^3$ |
+| 1,000 | $7.386\times10^{-5}$ | $1.65\times10^6$ | $1.23\times10^4$ |
+| 10,000 | $6.347\times10^{-6}$ | $1.65\times10^7$ | $1.23\times10^5$ |
 
 The first requirement is satisfied because $\kappa(H)$ increases by approximately one order of magnitude each time $\rho$ increases by one order of magnitude. Over the tested range,
 
@@ -239,6 +254,45 @@ $$\kappa(H_J)\approx5.07\times10^5.$$
 Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic $\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
 
 ![D2 condition number versus penalty weight](project2_outputs/D2_kappa_vs_rho.png)
+The first part of the intrinsic-conditioning test is satisfied because the condition number increases strongly with the penalty parameter $\rho$. Above the lowest penalty values, increasing $\rho$ by approximately one order of magnitude produces a corresponding order-of-magnitude increase in $\kappa(H)$. The relationship is therefore approximately
+
+$$\kappa(H)\propto\rho.$$
+
+At the same time, increasing $\rho$ decreases the Mission 2 weight-constraint residual. For example, the residual decreases from approximately
+
+$$7.21\times10^{-1}\ \mathrm{lb}$$
+
+at $\rho=0.1$ to
+
+$$6.35\times10^{-6}\ \mathrm{lb}$$
+
+at $\rho=10{,}000$.
+
+This demonstrates the central tradeoff of the fixed quadratic penalty formulation: larger penalty weights enforce the constraint more accurately, but they also introduce increasingly severe curvature into the optimization problem.
+
+The second part of the intrinsic-conditioning test is evaluated using symmetric Jacobi rescaling,
+
+$$H_J=D^{-1/2}HD^{-1/2},$$
+
+where
+
+$$
+D=\mathrm{diag}(H).
+$$
+
+At $\rho=10{,}000$, Jacobi rescaling reduces the condition number from approximately
+
+$$
+1.65\times10^7
+$$
+
+to
+
+$$
+1.23\times10^5.
+$$
+
+Although this scaling substantially improves the numerical magnitude of the condition number, the scaled condition number still grows strongly as $\rho$ increases. Therefore, the observed ill-conditioning cannot be attributed only to differences in engineering units or variable scaling. The problem passes both parts of the intrinsic $\kappa$ test: the conditioning deteriorates with the structural parameter $\rho$ and remains strongly dependent on $\rho$ after per-coordinate rescaling.
 
 ---
 ## 4. Effect of Ill-Conditioning
@@ -262,20 +316,57 @@ $$
 10^{-5}.
 $$
 
+![D3 projected-gradient convergence](project2_outputs/D3_gradient_descent_convergence.png)
 Each case used a maximum of 15,000 iterations.
 | Penalty weight $\rho$ | Iterations | Final projected-gradient norm | Final objective gap |
 |---:|---:|---:|---:|
-| 500 | 15,000* | $1.27\times10^{-1}$ | $5.58\times10^{-4}$ |
-| 1,000 | 15,000* | $1.75\times10^{-1}$ | $4.31\times10^{-3}$ |
-| 10,000 | 15,000* | $1.44\times10^{-1}$ | $1.04\times10^{-2}$ |
+| 500 | 15,000* | $7.02\times10^{-2}$ | $8.77\times10^{-4}$ |
+| 1,000 | 15,000* | $1.16\times10^{-1}$ | $2.31\times10^{-3}$ |
+| 10,000 | 15,000* | $3.18\times10^{-1}$ | $9.10\times10^{-3}$ |
 
 \*Iteration limit reached before satisfying the projected-gradient tolerance.
 
-All three high-penalty cases reach the iteration budget without converging to the required tolerance. More importantly, the remaining objective gap after the same computational budget increases substantially as $\rho$ is increased. The $\rho=10{,}000$ case retains an objective gap almost twenty times larger than the $\rho=500$ case after the same 15,000 projected-gradient iterations.
+None of the tested high-penalty cases reaches the prescribed projected-gradient tolerance within the 15,000-iteration budget. More importantly, the remaining convergence error becomes progressively worse as the penalty parameter increases.
 
-The result demonstrates the practical implication of the D1/D2 conditioning analysis: as the penalty-induced Hessian becomes increasingly elongated, a fixed-step first-order method makes progressively less effective progress.
+At $\rho=500$, the final projected-gradient norm is approximately
 
-![D3 projected-gradient convergence](project2_outputs/D3_gradient_descent_convergence.png)
+$$
+7.02\times10^{-2},
+$$
+
+with a remaining objective gap of
+
+$$
+8.77\times10^{-4}.
+$$
+
+At $\rho=1{,}000$, these increase to approximately
+
+$$
+1.16\times10^{-1}
+$$
+
+and
+
+$$
+2.31\times10^{-3},
+$$
+
+respectively. For the most severely penalized case, $\rho=10{,}000$, the projected-gradient norm remains approximately
+
+$$
+3.18\times10^{-1},
+$$
+
+with an objective gap of approximately
+
+$$
+9.10\times10^{-3}
+$$
+
+after the same 15,000 iterations.
+
+The monotonic degradation in both the projected-gradient norm and the remaining objective gap provides direct computational evidence of the conditioning effect identified in D1 and D2. As the quadratic penalty increases the separation between the largest and smallest Hessian eigenvalues, a fixed-step first-order method becomes progressively less effective at making simultaneous progress in both the stiff and shallow directions of the objective landscape.
 
 ---
 ## 5. Proposed Solution and Demonstration
@@ -393,15 +484,15 @@ displayed convergence curve.
 
 The corresponding numerical results are:
 
-| Formulation | $\rho$ | $\kappa(H)$ | Iterations | Final projected-gradient norm | Best final absolute objective gap |
+| Formulation | $\rho$ | $\kappa(H)$ | Iterations used | Final projected-gradient norm | Final objective gap to reference |
 |---|---:|---:|---:|---:|---:|
-| Fixed quadratic penalty | 10,000 | $8.90\times10^7$ | 20,000* | $3.07\times10^{-2}$ | $3.83\times10^{-4}$ |
-| Augmented Lagrangian | 5 | $8.28\times10^3$ | 5,571 | $1.00\times10^{-5}$ | $\le10^{-14}$ plotting floor |
+| Fixed quadratic penalty | $10{,}000$ | $1.65\times10^7$ | 20,000* | $8.40\times10^{-2}$ | See generated D4 summary |
+| Augmented Lagrangian | $5$ | $8.28\times10^3$ | 5,803 | $1.00\times10^{-5}$ | See generated D4 summary |
 
 \*Maximum iteration budget reached.
 
 The augmented-Lagrangian formulation reaches the prescribed
-$10^{-5}$ projected-gradient tolerance after 5,571 iterations.
+$10^{-5}$ projected-gradient tolerance after 5,803 iterations.
 The fixed-penalty formulation does not reach the tolerance within the
 20,000-iteration budget and finishes with a projected-gradient norm of
 approximately $3.07\times10^{-2}$.
