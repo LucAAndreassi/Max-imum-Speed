@@ -184,20 +184,6 @@ where $\lambda_{\max}$ and $\lambda_{\min}$ are the largest and smallest positiv
 
 The Hessian was evaluated numerically in normalized design coordinates near the optimum of the penalized problem. For the largest tested penalty weight, $\rho=10{,}000$, the smallest positive eigenvalue is approximately
 
-$$
-\lambda_{\min}=2.22\times10^{-2},
-$$
-
-and the largest is approximately
-
-$$
-\lambda_{\max}=1.97\times10^6.
-$$
-
-Therefore,
-
-$$\kappa(H)=\frac{\lambda_{\max}}{\lambda_{\min}}\approx8.90\times10^7.$$
-The Hessian spectrum spans more than eight orders of magnitude in curvature. At $\rho=10{,}000$, the smallest positive eigenvalue is approximately
 
 $$
 \lambda_{\min}\approx1.20\times10^{-1},
@@ -250,7 +236,7 @@ $$H_J =D^{-1/2} H D^{-1/2}$$
 
 At $\rho=10{,}000$, the rescaled condition number is still approximately
 
-$$\kappa(H_J)\approx5.07\times10^5.$$
+$$\kappa(H_J)\approx1.233\times10^5.$$
 Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic $\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
 
 ![D2 condition number versus penalty weight](project2_outputs/D2_kappa_vs_rho.png)
@@ -436,7 +422,7 @@ $$g(\mathbf{x})=9.76\times10^{-6}\ \mathrm{lb},$$
 
 with a local Hessian condition number of
 
-$$\kappa(H_{\mathrm{pen}})\approx8.90\times10^7.$$
+$$\kappa(H_{\mathrm{pen}})\approx1.65\times10^7.$$
 
 
 The augmented Lagrangian started with $\rho=5$. By outer iteration 2,
@@ -450,7 +436,7 @@ $$\kappa(H_{\mathrm{AL}})\approx8.28\times10^3.$$
 
 Thus, the augmented-Lagrangian formulation obtains better weight-constraint accuracy while reducing the local Hessian condition number by approximately
 
-$$\frac{8.90\times10^7}{8.28\times10^3}\approx1.07\times10^4.$$
+$$\frac{1.65\times10^7}{8.28\times10^3}\approx1.996\times10^3.$$
 
 The augmented-Lagrangian outer-iteration history is shown below.
 
@@ -495,12 +481,12 @@ The augmented-Lagrangian formulation reaches the prescribed
 $10^{-5}$ projected-gradient tolerance after 5,803 iterations.
 The fixed-penalty formulation does not reach the tolerance within the
 20,000-iteration budget and finishes with a projected-gradient norm of
-approximately $3.07\times10^{-2}$.
+approximately $8.40\times10^{-2}$.
 
 At the same time, the local Hessian condition number is reduced from
-approximately $8.90\times10^7$ for the fixed penalty to
+approximately $1.65\times10^7$ for the fixed penalty to
 $8.28\times10^3$ for the augmented Lagrangian, a reduction of roughly
-$1.07\times10^4$.
+$1.996\times10^3$.
 
 Thus, the same first-order method converges successfully on the
 augmented-Lagrangian formulation while the highly ill-conditioned
