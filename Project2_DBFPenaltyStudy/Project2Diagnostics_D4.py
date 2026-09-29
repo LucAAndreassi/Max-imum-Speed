@@ -700,10 +700,7 @@ def main():
     plt.savefig(OUT / "D4_local_boundary_geometry.png", dpi=180)
     plt.close()
 
-    # ------------------------------------------------------------------
-    # Optional extra D4 rho sweep.  Disabled by default because it requires
-    # seven additional fixed-penalty solves and seven additional AL solves.
-    # ------------------------------------------------------------------
+
     if RUN_EXTRA_D4_SWEEP:
         print("\nRunning optional D4 rho sweep...")
         rho_vals = np.array([0.1, 1, 5, 10, 100, 1000, 10000.0])
