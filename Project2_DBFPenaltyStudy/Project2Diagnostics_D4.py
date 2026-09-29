@@ -536,6 +536,16 @@ def main():
     print(f"M2 gross weight:       {s_al['m2_takeoff_weight']:.4f} lb")
     print(f"M2 five-lap time:      {s_al['m2_time']:.4f} s")
     print(f"M3 continuous laps:    {s_al['laps3']:.4f}")
+    final_objective = dbf_objective(x_al)
+
+    print(f"Final DBF objective at AL solution: {final_objective:.6f}")
+    final_al_value = augmented_lagrangian_objective(
+    x_al,
+    lam_final,
+    rho_final
+)
+
+    print(f"Final AL function value: {final_al_value:.6f}")
 
     x_pen, z_pen, H_pen, ev_pen = optima[10000.0]
 
