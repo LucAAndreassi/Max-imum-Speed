@@ -357,9 +357,26 @@ To satisfy the D4 requirement directly, the same projected-gradient method used 
 
 $$\alpha = \frac{2}{\lambda_{\max}+\lambda_{\min}}.$$
 
-Both runs use the same projected-gradient tolerance, $10^{-6}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
+Both runs use the same projected-gradient tolerance, $10^{-5}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
 
 ![D4 before/after convergence](project2_outputs/D4_before_after_convergence.png)
+
+For visualization, the convergence histories are shown using the
+best-so-far normalized objective gap. At each iteration, the best
+objective attained up to that point is retained, and the resulting
+gap is divided by its initial value:
+
+$$
+\widehat{\Delta f}_k =
+\frac{f_{\mathrm{best},k}-f^\star}
+     {f_{\mathrm{best},0}-f^\star}.
+$$
+
+This allows the two formulations to be compared by relative convergence
+rate despite their very different absolute curvature scales and prevents
+small fixed-step overshoots from producing misleading increases in the
+displayed convergence curve.
+
 
 The corresponding numerical results are:
 
@@ -411,7 +428,24 @@ The final unpenalized objective is approximately
 ```math
 f(\mathbf{x}) = -3.39336
 ```
-### 5.4 Results and Interpretation
+### 5.4 Local Geometry at the Weight-Constraint Boundary
+
+The local constraint contribution also illustrates the geometric source
+of the conditioning difference. The fixed quadratic penalty remains
+inactive on the feasible side of the boundary and develops extremely
+large curvature after activation when $\rho=10{,}000$. The augmented
+Lagrangian instead uses the multiplier to shift the active branch while
+retaining the much smaller penalty coefficient $\rho=5$.
+
+![D4 local boundary geometry](project2_outputs/D4_local_boundary_geometry.png)
+
+This illustrates the mechanism responsible for the conditioning
+improvement: the fixed penalty creates a very stiff constraint-normal
+direction, while the augmented Lagrangian provides constraint enforcement
+without requiring the same extreme quadratic curvature.
+
+
+### 5.5 Results and Interpretation
 
 The penalty study demonstrates the expected Family G mechanism. Increasing the quadratic penalty weight reduces the weight-constraint violation, but the penalty also introduces a very stiff curvature direction normal to the constraint surface. The remaining directions retain substantially smaller curvature from the underlying aircraft-performance objective. This produces approximately linear growth of the condition number with $\rho$.
 The Jacobi-rescaling test shows that the effect is not only a consequence of the variables having different units. Although diagonal rescaling improves the numerical condition number, the scaled problem still becomes increasingly ill-conditioned as $\rho$ grows.
@@ -419,7 +453,51 @@ The conditioning change has a direct effect on a baseline first-order optimizer.
 the projected-gradient tolerance within the 15,000-iteration budget,
 and the remaining objective gap grows substantially as the penalty
 weight is increased.
-The augmented-Lagrangian method addresses the mechanism directly. Instead of relying on an extremely large fixed penalty, it uses a moderate penalty together with a multiplier update. It reaches essentially the same constraint accuracy as the $\rho=10{,}000$ penalty case while keeping the local condition number far smaller and avoiding the large penalty curvature responsible for the observed first-order slowdown. The D4 same-method comparison confirms that this conditioning improvement translates into faster first-order progress: after 20,000 projected-gradient iterations, the augmented-Lagrangian objective gap is about $5.0\times10^4$ times smaller and its projected-gradient norm is about 17 times smaller than the fixed-penalty case.
+The augmented-Lagrangian method addresses the mechanism directly. Instead of relying on an extremely large fixed penalty, it uses a moderate penalty together with a multiplier update. It reaches essentially the same constraint accuracy as the $\rho=10{,}000$ penalty case while keeping the local condition number far smaller and avoiding the large penalty curvature responsible for the observed first-order slowdown. The D4 same-method comparison confirms that the conditioning improvement translates directly into faster first-order convergence. The augmented-Lagrangian formulation reaches the prescribed projected-gradient tolerance of
+
+$$
+10^{-5}
+$$
+
+after 5,571 iterations, while the fixed quadratic-penalty formulation remains unconverged after the full 20,000-iteration budget.
+
+At the end of the comparison, the fixed-penalty formulation has a projected-gradient norm of approximately
+
+$$
+3.07\times10^{-2},
+$$
+
+whereas the augmented-Lagrangian formulation reaches approximately
+
+$$
+1.00\times10^{-5}.
+$$
+
+The local Hessian condition number is also reduced from approximately
+
+$$
+\kappa(H_{\mathrm{pen}})
+\approx
+8.90\times10^7
+$$
+
+for the fixed penalty to
+
+$$
+\kappa(H_{\mathrm{AL}})
+\approx
+8.28\times10^3
+$$
+
+for the augmented Lagrangian. This corresponds to a reduction in local condition number of approximately
+
+$$
+\frac{8.90\times10^7}{8.28\times10^3}
+\approx
+1.07\times10^4.
+$$
+
+Therefore, the augmented-Lagrangian formulation achieves substantially better conditioning and reaches the prescribed first-order convergence criterion, while the highly ill-conditioned fixed-penalty formulation does not converge within the larger iteration budget.
 For this DBF design problem, the result demonstrates that directly forcing engineering constraints with increasingly large penalty coefficients can make an otherwise manageable optimization problem unnecessarily difficult to solve. A constraint-handling approach such as an augmented Lagrangian can enforce the same engineering requirement while maintaining a better-conditioned numerical problem.
 
 ---
