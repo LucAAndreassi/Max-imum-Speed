@@ -426,7 +426,7 @@ The final augmented-Lagrangian design is approximately:
 The final unpenalized objective is approximately
 
 ```math
-f(\mathbf{x}) = -3.39336
+f(\mathbf{x}) = -3.309965
 ```
 ### 5.4 Local Geometry at the Weight-Constraint Boundary
 
