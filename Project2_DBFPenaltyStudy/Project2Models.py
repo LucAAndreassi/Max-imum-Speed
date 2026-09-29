@@ -35,7 +35,7 @@ PROJECT1_BOUNDS = np.array(
 BOUNDS = PROJECT1_BOUNDS.copy()
 BOUNDS[2, 1] = 16.0
 
-X0 = np.array([6.0, 6.0, 5.0, 5.0, 80.0, 80.0], dtype=float)
+X0 = np.array([6.0, 6.0, 5.0, 1.0, 80.0, 80.0], dtype=float)
 
 
 def softmin(a: float, b: float, tau: float = 0.10) -> float:

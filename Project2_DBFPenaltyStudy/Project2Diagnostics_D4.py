@@ -525,11 +525,12 @@ def main():
     # D4: augmented Lagrangian solution and local conditioning.
     # ------------------------------------------------------------------
     print("\nRunning D4 augmented-Lagrangian diagnostics...")
-    z_seed = to_z(np.array([7.0, 6.0, 10.0, 2.0, 100.0, 90.0]))
+    z_seed = to_z(np.array([6.0, 6.0, 5.0, 1.0, 80.0, 80.0]))
     z_al, hist_al, rho_final, lam_final = augmented_lagrangian(z_seed, rho0=5.0)
     x_al = to_x(z_al)
     g_al = weight_constraint(x_al)
     s_al = state(x_al)
+   
 
     print("\nFinal augmented-Lagrangian aircraft metrics")
     print(f"Empty aircraft weight: {s_al['empty_weight']:.4f} lb")
