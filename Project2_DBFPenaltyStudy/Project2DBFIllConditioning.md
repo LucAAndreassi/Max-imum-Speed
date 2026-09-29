@@ -335,10 +335,9 @@ with a local Hessian condition number of
 $$\kappa(H_{\mathrm{pen}})\approx8.90\times10^7.$$
 
 
-The augmented Lagrangian started with $\rho=5$ and reached a feasible solution after two outer iterations. Its final constraint residual was
-
-By outer iteration 2, corresponding to three augmented-Lagrangian subproblem solves, the weight residual is reduced to approximately
-
+The augmented Lagrangian started with $\rho=5$. By outer iteration 2,
+corresponding to three augmented-Lagrangian subproblem solves, the weight
+residual was reduced to approximately
 $$g(\mathbf{x})=2.78\times10^{-7}\ \mathrm{lb},$$
 
 while the local condition number is only
@@ -371,9 +370,21 @@ The corresponding numerical results are:
 
 \*Maximum iteration budget reached.
 
-After the same iteration budget, the augmented-Lagrangian formulation has a projected-gradient norm about 17 times smaller and an objective gap about $5.0\times10^4$ times smaller. At the same time, the local condition number is reduced by approximately $2.0\times10^3$. Neither run reaches the strict $10^{-6}$ projected-gradient tolerance within 20,000 iterations, so the comparison is based on the same fixed computational budget rather than claiming a time-to-tolerance that was not observed.
+The augmented-Lagrangian formulation reaches the prescribed
+$10^{-5}$ projected-gradient tolerance after 5,571 iterations.
+The fixed-penalty formulation does not reach the tolerance within the
+20,000-iteration budget and finishes with a projected-gradient norm of
+approximately $3.07\times10^{-2}$.
 
-To observe the impact of the augmented-Lagrangian formulation and its effectiveness at enforcing the weight constraint, the violation severity as a function of the penalty penalty parameter are shown and compared against the chosen feasibility tolerance of $10^{-6}$.
+At the same time, the local Hessian condition number is reduced from
+approximately $8.90\times10^7$ for the fixed penalty to
+$8.28\times10^3$ for the augmented Lagrangian, a reduction of roughly
+$1.07\times10^4$.
+
+Thus, the same first-order method converges successfully on the
+augmented-Lagrangian formulation while the highly ill-conditioned
+fixed-penalty formulation remains unconverged after the larger
+iteration budget.
 
 ![D4_weight_violation_fixed_vs_AL](project2_outputs/D4_weight_violation_fixed_vs_AL.png)
 
@@ -390,9 +401,9 @@ The final augmented-Lagrangian design is approximately:
 | Mission 3 sensor reduction, $SW_3$ | $1.00\ \mathrm{lb}$ |
 | Mission 2 cruise velocity, $V_2$ | $101.27\ \mathrm{ft/s}$ |
 | Mission 3 cruise velocity, $V_3$ | $86.94\ \mathrm{ft/s}$ |
-| Empty-aircraft weight | $6.25\ \mathrm{lb}$ |
+| Empty-aircraft weight | $6.19\ \mathrm{lb}$ |
 | Mission 2 gross weight | $20.00\ \mathrm{lb}$ |
-| Mission 2 five-lap time | $123.46\ \mathrm{s}$ |
+| Mission 2 five-lap time | $139.73\ \mathrm{s}$ |
 | Continuous Mission 3 lap estimate | $7.21$ laps |
 
 The final unpenalized objective is approximately
@@ -404,7 +415,10 @@ f(\mathbf{x}) = -3.39336
 
 The penalty study demonstrates the expected Family G mechanism. Increasing the quadratic penalty weight reduces the weight-constraint violation, but the penalty also introduces a very stiff curvature direction normal to the constraint surface. The remaining directions retain substantially smaller curvature from the underlying aircraft-performance objective. This produces approximately linear growth of the condition number with $\rho$.
 The Jacobi-rescaling test shows that the effect is not only a consequence of the variables having different units. Although diagonal rescaling improves the numerical condition number, the scaled problem still becomes increasingly ill-conditioned as $\rho$ grows.
-The conditioning change has a direct effect on a baseline first-order optimizer. Projected gradient descent requires substantially more iterations as the penalty weight grows and does not reach the target tolerance for the $\rho=10$ test within 15,000 iterations.
+The conditioning change has a direct effect on a baseline first-order optimizer. None of the $\rho=500$, $1{,}000$, or $10{,}000$ cases reach
+the projected-gradient tolerance within the 15,000-iteration budget,
+and the remaining objective gap grows substantially as the penalty
+weight is increased.
 The augmented-Lagrangian method addresses the mechanism directly. Instead of relying on an extremely large fixed penalty, it uses a moderate penalty together with a multiplier update. It reaches essentially the same constraint accuracy as the $\rho=10{,}000$ penalty case while keeping the local condition number far smaller and avoiding the large penalty curvature responsible for the observed first-order slowdown. The D4 same-method comparison confirms that this conditioning improvement translates into faster first-order progress: after 20,000 projected-gradient iterations, the augmented-Lagrangian objective gap is about $5.0\times10^4$ times smaller and its projected-gradient norm is about 17 times smaller than the fixed-penalty case.
 For this DBF design problem, the result demonstrates that directly forcing engineering constraints with increasingly large penalty coefficients can make an otherwise manageable optimization problem unnecessarily difficult to solve. A constraint-handling approach such as an augmented Lagrangian can enforce the same engineering requirement while maintaining a better-conditioned numerical problem.
 
