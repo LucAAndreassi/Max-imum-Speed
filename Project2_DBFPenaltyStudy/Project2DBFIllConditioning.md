@@ -472,8 +472,8 @@ The corresponding numerical results are:
 
 | Formulation | $\rho$ | $\kappa(H)$ | Iterations used | Final projected-gradient norm | Final objective gap to reference |
 |---|---:|---:|---:|---:|---:|
-| Fixed quadratic penalty | $10{,}000$ | $1.65\times10^7$ | 20,000* | $8.40\times10^{-2}$ | See generated D4 summary |
-| Augmented Lagrangian | $5$ | $8.28\times10^3$ | 5,803 | $1.00\times10^{-5}$ | See generated D4 summary |
+| Fixed quadratic penalty | $10{,}000$ | $1.65\times10^7$ | 20,000* | $8.40\times10^{-2}$ | $5.68\times10^{-5}$ |
+| Augmented Lagrangian | $5$ | $8.28\times10^3$ | 5,803 | $1.00\times10^{-5}$ | $\le1.00\times10^{-14}$ |
 
 \*Maximum iteration budget reached.
 
