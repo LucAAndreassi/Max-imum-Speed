@@ -405,7 +405,7 @@ iteration budget.
 
 ![D4_weight_violation_fixed_vs_AL](project2_outputs/D4_weight_violation_fixed_vs_AL.png)
 
-The results here show that for nearly every penalty parameter, the augmented-Langrangian formulation is able to enforce the weight constraint to a tolerable level for all values of $\rho$. The fixed penalty has the expected downward slope, which makes sense given the increasing penalty weight's implications on the optimization, however it further proves that the fixed penalty solution needs high penalty weight for constraint enforcement, putting the optimization under ill-conditioning. Overall, the plot supports that augmented-Langrangian formulation allows for sufficient constraints without the use of large penalty weights, which can impose ill-conditioning onto the optimization process. 
+The results here show that for nearly every penalty parameter, the augmented-Lagrangian formulation is able to enforce the weight constraint to a tolerable level across the tested penalty parameters of $\rho$. The fixed penalty has the expected downward slope, which makes sense given the increasing penalty weight's implications on the optimization, however it further proves that the fixed penalty solution needs high penalty weight for constraint enforcement, putting the optimization under ill-conditioning. Overall, the plot supports that augmented-Lagrangian formulation allows for sufficient constraints without the use of large penalty weights, which can impose ill-conditioning onto the optimization process. 
 
 Together with the constraint-residual comparison in Section 5.2, this completes D4: the augmented Lagrangian achieves essentially the same engineering constraint accuracy, substantially lowers the local condition number, and produces a much faster convergence curve for the same first-order method.
 
@@ -423,7 +423,7 @@ The final augmented-Lagrangian design is approximately:
 | Mission 2 five-lap time | $139.73\ \mathrm{s}$ |
 | Continuous Mission 3 lap estimate | $7.21$ laps |
 
-The final unpenalized objective is approximately
+The final DBF objective evaluated at the augmented-Lagrangian solution is approximately
 
 ```math
 f(\mathbf{x}) = -3.309965
@@ -569,6 +569,7 @@ project2_outputs/D3_gradient_descent_convergence.png
 project2_outputs/D4_augmented_lagrangian_constraint.png
 project2_outputs/D4_before_after_convergence.png
 project2_outputs/D4_local_boundary_geometry.png
+project2_outputs/D4_weight_violation_fixed_vs_AL.png
 project2_outputs/conditioning_vs_rho.csv
 project2_outputs/gradient_descent_summary.csv
 project2_outputs/augmented_lagrangian_history.csv
