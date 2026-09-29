@@ -105,6 +105,8 @@ The scalar $\rho>0$ is the penalty weight. A larger value of $\rho$ penalizes co
 | Mission 3 payload reduction | $0 \le SW_3 \le 6\ \mathrm{lb}$ | Limits payload reduction between missions |
 | Mission 2 speed | $40 \le V_2 \le 140\ \mathrm{ft/s}$ | Cruise-speed range |
 | Mission 3 speed | $40 \le V_3 \le 140\ \mathrm{ft/s}$ | Cruise-speed range |
+
+
 ### 2.5 Aircraft Model and Numerical Smoothing
 
 The Project 2 model preserves the main engineering relationships from Project 1, including:
@@ -118,12 +120,17 @@ The Project 2 model preserves the main engineering relationships from Project 1,
 - normalized DBF mission scoring.
 Several numerical changes are required because Project 2 uses gradients, Hessians, and eigenvalue analysis. The original Project 1 simulator contained discrete switching operations that are appropriate for competition scoring but do not produce a smooth objective for local conditioning analysis.
 
-The Project 2 model therefore makes the following changes:
-1. Mission 3 lap count is treated continuously instead of applying `floor()`.
-2. Throttle is solved continuously rather than selected from a 100-point throttle array.
-3. Turn load factor is handled with a continuous $C_{L,\max}$-limited relation rather than repeated discrete decrements.
-4. Smooth limiting expressions are used where the original model switched abruptly between limiting cases.
-These changes preserve the same underlying aircraft-design relationships while allowing meaningful finite-difference gradients and Hessians to be computed.
+1. Mission 3 lap count is treated continuously rather than applying `floor()`.
+2. Throttle is solved continuously and is capped at 100%.
+3. Requested speeds that cannot be sustained at full throttle are treated as physically infeasible through continuous propulsion-margin constraints.
+4. Straight and turning propulsion feasibility are checked separately for Missions 2 and 3.
+5. Mission 2 battery feasibility is imposed with a continuous energy-margin constraint for the required five laps.
+6. Mission 3 remains continuously battery limited through a smooth minimum of the time-limited and energy-limited lap estimates.
+7. Turn load factor is handled with a continuous $C_{L,\max}$-limited relation rather than discrete load-factor decrements.
+8. Smooth limiting expressions are used where the original simulator contained abrupt switching operations.
+
+When the design optima are located, the physical propulsion and battery constraints are enforced directly with SLSQP. The Mission 2 weight constraint remains in the fixed-penalty or augmented-Lagrangian formulation because that constraint is the deliberate source of the conditioning study.
+
 ### 2.6 Problem Classification
 
 The Project 2 aircraft formulation is a **constrained, nonlinear, nonconvex optimization problem** studied through a smooth penalty reformulation.
@@ -165,18 +172,19 @@ where $\lambda_{\max}$ and $\lambda_{\min}$ are the largest and smallest positiv
 The Hessian was evaluated numerically in normalized design coordinates near the optimum of the penalized problem. For the largest tested penalty weight, $\rho=10{,}000$, the smallest positive eigenvalue is approximately
 
 $$
-\lambda_{\min}=0.1166,
+\lambda_{\min}=2.22\times10^{-2},
 $$
 
 and the largest is approximately
 
 $$
-\lambda_{\max}=1.98\times10^6.
+\lambda_{\max}=1.97\times10^6.
 $$
 
 Therefore,
 
-$$\kappa(H)\approx1.70\times10^7.$$
+$$
+\kappa(H)=\frac{\lambda_{\max}}{\lambda_{\min}}\approx8.90\times10^7.$$
 The spectrum spans many orders of magnitude, demonstrating a strongly elongated local optimization landscape.
 
 ![D1 Hessian eigenvalue spectrum](project2_outputs/D1_hessian_spectrum.png)
@@ -188,14 +196,16 @@ The required intrinsic-conditioning test has two parts:
 2. The large condition number must survive best per-coordinate Jacobi rescaling.
 
 For this problem, the structural knob is the penalty weight $\rho$. The penalty weight was varied from $0.1$ to $10{,}000$. At each value, the penalized problem was optimized and the local Hessian was evaluated.
+
 | Penalty weight $\rho$ | Weight residual $g$ (lb) | $\kappa(H)$ | $\kappa$ after Jacobi rescaling |
 |---:|---:|---:|---:|
-| 0.1 | 1.03646 | $2.09\times10^2$ | $1.22\times10^1$ |
-| 1 | 0.10278 | $1.71\times10^3$ | $1.95\times10^1$ |
-| 10 | 0.01027 | $1.70\times10^4$ | $1.60\times10^2$ |
-| 100 | 0.00103 | $1.70\times10^5$ | $1.57\times10^3$ |
-| 1,000 | 0.000103 | $1.70\times10^6$ | $1.57\times10^4$ |
-| 10,000 | 0.0000102 | $1.70\times10^7$ | $1.57\times10^5$ |
+| 0.1 | $7.80\times10^{-1}$ | $1.48\times10^3$ | $5.22\times10^1$ |
+| 1 | $9.72\times10^{-2}$ | $8.82\times10^3$ | $4.86\times10^1$ |
+| 10 | $9.80\times10^{-3}$ | $8.90\times10^4$ | $5.02\times10^2$ |
+| 100 | $9.84\times10^{-4}$ | $8.91\times10^5$ | $5.07\times10^3$ |
+| 500 | $1.99\times10^{-4}$ | $4.46\times10^6$ | $2.54\times10^4$ |
+| 1,000 | $9.83\times10^{-5}$ | $8.91\times10^6$ | $5.07\times10^4$ |
+| 10,000 | $9.76\times10^{-6}$ | $8.90\times10^7$ | $5.07\times10^5$ |
 
 The first requirement is satisfied because $\kappa(H)$ increases by approximately one order of magnitude each time $\rho$ increases by one order of magnitude. Over the tested range,
 
@@ -220,7 +230,9 @@ $$
 
 At $\rho=10{,}000$, the rescaled condition number is still approximately
 
-$$\kappa(H_J)\approx1.57\times10^5.$$
+$$
+\kappa(H_J)\approx5.07\times10^5.
+$$
 Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic $\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
 
 ![D2 condition number versus penalty weight](project2_outputs/D2_kappa_vs_rho.png)
@@ -250,12 +262,15 @@ $$
 Each case used a maximum of 15,000 iterations.
 | Penalty weight $\rho$ | Iterations | Final projected-gradient norm | Final objective gap |
 |---:|---:|---:|---:|
-| 0.1 | 849 | $9.97\times10^{-6}$ | $1.14\times10^{-11}$ |
-| 1 | 9,668 | $1.00\times10^{-5}$ | $1.00\times10^{-10}$ |
-| 10 | 15,000* | $3.49\times10^{-1}$ | $3.43\times10^{-4}$ |
+| 500 | 15,000* | $1.27\times10^{-1}$ | $5.58\times10^{-4}$ |
+| 1,000 | 15,000* | $1.75\times10^{-1}$ | $4.31\times10^{-3}$ |
+| 10,000 | 15,000* | $1.44\times10^{-1}$ | $1.04\times10^{-2}$ |
 
-The $\rho=10$ case reached the 15,000-iteration limit before satisfying the convergence tolerance.
-The increase from 849 iterations at $\rho=0.1$ to 9,668 iterations at $\rho=1$ shows the practical slowdown caused by the increasingly elongated local landscape. At $\rho=10$, the baseline first-order method does not reach the required tolerance within the allowed iteration count.
+\*Iteration limit reached before satisfying the projected-gradient tolerance.
+
+All three high-penalty cases reach the iteration budget without converging to the required tolerance. More importantly, the remaining objective gap after the same computational budget increases substantially as $\rho$ is increased. The $\rho=10{,}000$ case retains an objective gap almost twenty times larger than the $\rho=500$ case after the same 15,000 projected-gradient iterations.
+
+The result demonstrates the practical implication of the D1/D2 conditioning analysis: as the penalty-induced Hessian becomes increasingly elongated, a fixed-step first-order method makes progressively less effective progress.
 
 ![D3 projected-gradient convergence](project2_outputs/D3_gradient_descent_convergence.png)
 
@@ -319,36 +334,30 @@ This distinction is important for the D4 comparison. A method such as preconditi
 For this study, the augmented Lagrangian also provides a useful controlled comparison because projected gradient descent can still be applied to both the original fixed-penalty formulation and the augmented-Lagrangian local subproblem. This allows the D4 convergence comparison to isolate the effect of the formulation change rather than attributing the improvement to a completely different optimization algorithm.
 
 
-
-
-
-
-
-
 ### 5.2 D4 - Before/After Constraint Enforcement and Conditioning
 
 The large fixed-penalty case used $\rho=10{,}000$ and produced
 
-```math
-g(\mathbf{x}) =
-1.02 \times 10^{-5}\,\mathrm{lb}
-```
+$$g(\mathbf{x})=9.76\times10^{-6}\ \mathrm{lb},$$
 
-with
+with a local Hessian condition number of
 
-$$\kappa(H)\approx1.70\times10^7.$$
+$$\kappa(H_{\mathrm{pen}})\approx8.90\times10^7.$$
+
 
 The augmented Lagrangian started with $\rho=5$ and reached a feasible solution after two outer iterations. Its final constraint residual was
 
-```math
-g(\mathbf{x}) =
--5.11 \times 10^{-6}\,\mathrm{lb}
-```
+By outer iteration 2, corresponding to three augmented-Lagrangian subproblem solves, the weight residual is reduced to approximately
 
-while the local condition number was approximately
-$$\kappa(H_{AL})\approx8.51\times10^3.$$
+$$g(\mathbf{x})=2.78\times10^{-7}\ \mathrm{lb},$$
 
-Thus, both methods enforce the gross-weight requirement to approximately the same numerical accuracy, but the augmented-Lagrangian local problem has a condition number roughly three orders of magnitude smaller.
+while the local condition number is only
+
+$$\kappa(H_{\mathrm{AL}})\approx8.28\times10^3.$$
+
+Thus, the augmented-Lagrangian formulation obtains better weight-constraint accuracy while reducing the local Hessian condition number by approximately
+
+$$\frac{8.90\times10^7}{8.28\times10^3}\approx1.07\times10^4.$$
 
 The augmented-Lagrangian outer-iteration history is shown below.
 
@@ -357,20 +366,20 @@ The augmented-Lagrangian outer-iteration history is shown below.
 
 To satisfy the D4 requirement directly, the same projected-gradient method used for the baseline study is applied to both the large fixed-penalty formulation and the final augmented-Lagrangian local subproblem. Each run starts from the same normalized perturbation direction and magnitude around its corresponding local minimizer. For each formulation, the fixed step size is chosen from the local Hessian spectrum as
 
-$$
-\alpha = \frac{2}{\lambda_{\max}+\lambda_{\min}}.
-$$
+$$\alpha = \frac{2}{\lambda_{\max}+\lambda_{\min}}.$$
 
 Both runs use the same projected-gradient tolerance, $10^{-6}$, and the same maximum budget of 20,000 iterations. This makes the comparison a direct test of how the change in conditioning affects the same first-order algorithm.
 
 ![D4 before/after convergence](project2_outputs/D4_before_after_convergence.png)
 
-The corresponding numerical comparison is:
+The corresponding numerical results are:
 
-| Formulation | $\rho$ | $\kappa(H)$ | Iterations used | Final projected-gradient norm | Final objective gap |
+| Formulation | $\rho$ | $\kappa(H)$ | Iterations | Final projected-gradient norm | Best final absolute objective gap |
 |---|---:|---:|---:|---:|---:|
-| Fixed quadratic penalty | $10{,}000$ | $1.70\times10^7$ | $20{,}000$ (limit) | $3.68\times10^{-1}$ | $1.26\times10^{-2}$ |
-| Augmented Lagrangian | $5$ | $8.51\times10^3$ | $20{,}000$ (limit) | $2.18\times10^{-2}$ | $2.50\times10^{-7}$ |
+| Fixed quadratic penalty | 10,000 | $8.90\times10^7$ | 20,000* | $3.07\times10^{-2}$ | $3.83\times10^{-4}$ |
+| Augmented Lagrangian | 5 | $8.28\times10^3$ | 5,571 | $1.00\times10^{-5}$ | $\le10^{-14}$ plotting floor |
+
+\*Maximum iteration budget reached.
 
 After the same iteration budget, the augmented-Lagrangian formulation has a projected-gradient norm about 17 times smaller and an objective gap about $5.0\times10^4$ times smaller. At the same time, the local condition number is reduced by approximately $2.0\times10^3$. Neither run reaches the strict $10^{-6}$ projected-gradient tolerance within 20,000 iterations, so the comparison is based on the same fixed computational budget rather than claiming a time-to-tolerance that was not observed.
 
@@ -413,24 +422,31 @@ For this DBF design problem, the result demonstrates that directly forcing engin
 ## 6. Assumptions and Simplifications
 
 The results depend on the aircraft model and several simplifying assumptions:
-- The model is a preliminary-design approximation and is not a full CFD or flight-dynamics simulation.
+
+- The model is a preliminary-design approximation and is not a full CFD, propulsion-map, structural, or flight-dynamics simulation.
 - Wing span is fixed at 6 ft.
 - The aircraft uses a single-wing fixed-wing configuration with an inverted T-tail.
 - The sensor is represented as a 6:1 lead-shot-filled cylindrical payload with a nosecone.
 - Structural weight is estimated using empirical relationships inherited from Project 1.
 - Propulsion behavior is based on the Project 1 motor/propeller model.
+- Propulsion throttle is capped at 100%; requested straight and turning speeds that cannot be sustained at full throttle are treated as infeasible.
+- Mission 2 must complete five laps within 75% of the modeled 3300 mAh battery capacity, leaving a 25% reserve.
 - Mission 3 lap count is treated continuously for the conditioning analysis rather than rounded to an integer.
-- Battery and time limiting behavior are smoothed where required for differentiability.
+- Mission 3 battery/time limiting behavior is represented with a smooth minimum to preserve differentiability.
 - Numerical gradients and Hessians are computed using finite differences, so their accuracy depends on the selected perturbation size.
 - Hessian conditioning is evaluated in normalized design coordinates to reduce contamination from engineering-unit scale differences.
-- The 16 lb Project 2 payload upper bound is used only to expose the 20 lb Mission 2 gross-weight constraint as the active limiting mechanism.
+- The 16 lb Project 2 payload upper bound is used only to expose the 20 lb Mission 2 gross-weight constraint as an active limiting mechanism.
+- SLSQP is used to locate physically feasible reference optima while the weight constraint remains handled by the penalty or augmented-Lagrangian formulation.
+- For the long D3 and D4 projected-gradient diagnostics, the physical propulsion and battery constraints are linearized locally about each reference optimum and projected using a low-cost half-space/box projection. These experiments therefore describe local first-order convergence behavior rather than a global feasible optimization trajectory.
 - The augmented-Lagrangian and fixed-penalty comparisons describe local numerical behavior of this model and do not prove that the reported aircraft is the global optimum of the complete competition-design problem.
 ---
 ## 7. Code and Reproducibility
 
 Two Python scripts are used for the Project 2 study:
-- [`Project2Models.py`](Project2Models.py) contains the smooth DBF aircraft model, mission-performance calculations, base competition objective, gross-weight constraint, quadratic penalty objective, and augmented-Lagrangian objective.
-- [`Project2Diagnostics_D4.py`](Project2Diagnostics_D4.py) runs the numerical experiments, computes finite-difference gradients and Hessians, evaluates Hessian spectra and condition numbers, performs Jacobi rescaling, runs projected gradient descent, and evaluates the augmented-Lagrangian remedy including the D4 before/after projected-gradient comparison.
+
+- [`Project2Models.py`](Project2Models.py) contains the smooth DBF aircraft model, mission-performance calculations, propulsion model, continuous battery model, physical speed and battery margins, base competition objective, gross-weight constraint, quadratic penalty objective, and augmented-Lagrangian objective.
+- [`Project2Diagnostics_D4.py`](Project2Diagnostics_D4.py) locates physically feasible design optima with SLSQP, computes finite-difference gradients and Hessians, evaluates Hessian spectra and condition numbers, performs Jacobi rescaling, carries out the D3/D4 local projected-gradient studies, and generates the augmented-Lagrangian and local-boundary diagnostics.
+
 ### 7.1 Software Requirements
 
 The analysis uses Python 3 and the following third-party packages:
@@ -438,8 +454,6 @@ The analysis uses Python 3 and the following third-party packages:
 - NumPy
 - SciPy
 - Matplotlib
-
-The remaining imports are from the Python standard library.
 
 A typical installation command is:
 
@@ -472,6 +486,7 @@ project2_outputs/D2_kappa_vs_rho.png
 project2_outputs/D3_gradient_descent_convergence.png
 project2_outputs/D4_augmented_lagrangian_constraint.png
 project2_outputs/D4_before_after_convergence.png
+project2_outputs/D4_local_boundary_geometry.png
 project2_outputs/conditioning_vs_rho.csv
 project2_outputs/gradient_descent_summary.csv
 project2_outputs/augmented_lagrangian_history.csv
