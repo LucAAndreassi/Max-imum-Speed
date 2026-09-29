@@ -236,7 +236,7 @@ $$H_J =D^{-1/2} H D^{-1/2}$$
 
 At $\rho=10{,}000$, the rescaled condition number is still approximately
 
-$$\kappa(H_J)\approx1.233\times10^5.$$
+$$\kappa(H_J)\approx1.23\times10^5.$$
 Diagonal scaling reduces the numerical value of the condition number but does not remove its growth with $\rho$. Therefore, the problem passes both parts of the required intrinsic $\kappa$ test: the ill-conditioning grows with a structural parameter and survives per-coordinate rescaling.
 
 ![D2 condition number versus penalty weight](project2_outputs/D2_kappa_vs_rho.png)
@@ -418,7 +418,7 @@ For this study, the augmented Lagrangian also provides a useful controlled compa
 
 The large fixed-penalty case used $\rho=10{,}000$ and produced
 
-$$g(\mathbf{x})=9.76\times10^{-6}\ \mathrm{lb},$$
+$$g(\mathbf{x})=6.35\times10^{-6}\ \mathrm{lb},$$
 
 with a local Hessian condition number of
 
@@ -428,7 +428,7 @@ $$\kappa(H_{\mathrm{pen}})\approx1.65\times10^7.$$
 The augmented Lagrangian started with $\rho=5$. By outer iteration 2,
 corresponding to three augmented-Lagrangian subproblem solves, the weight
 residual was reduced to approximately
-$$g(\mathbf{x})=2.78\times10^{-7}\ \mathrm{lb},$$
+$$g(\mathbf{x})=6.97\times10^{-7}\ \mathrm{lb},$$
 
 while the local condition number is only
 
@@ -549,12 +549,12 @@ $$
 10^{-5}
 $$
 
-after 5,571 iterations, while the fixed quadratic-penalty formulation remains unconverged after the full 20,000-iteration budget.
+after 5,803 iterations, while the fixed quadratic-penalty formulation remains unconverged after the full 20,000-iteration budget.
 
 At the end of the comparison, the fixed-penalty formulation has a projected-gradient norm of approximately
 
 $$
-3.07\times10^{-2},
+8.40\times10^{-2},
 $$
 
 whereas the augmented-Lagrangian formulation reaches approximately
@@ -568,7 +568,7 @@ The local Hessian condition number is also reduced from approximately
 $$
 \kappa(H_{\mathrm{pen}})
 \approx
-8.90\times10^7
+1.65\times10^7
 $$
 
 for the fixed penalty to
@@ -582,9 +582,9 @@ $$
 for the augmented Lagrangian. This corresponds to a reduction in local condition number of approximately
 
 $$
-\frac{8.90\times10^7}{8.28\times10^3}
+\frac{1.65\times10^7}{8.28\times10^3}
 \approx
-1.07\times10^4.
+1.996\times10^3.
 $$
 
 Therefore, the augmented-Lagrangian formulation achieves substantially better conditioning and reaches the prescribed first-order convergence criterion, while the highly ill-conditioned fixed-penalty formulation does not converge within the larger iteration budget.
