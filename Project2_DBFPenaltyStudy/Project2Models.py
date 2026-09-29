@@ -132,6 +132,18 @@ class SmoothPlaneModel:
         term = thrust_static * a / (drag_over_v2 * vmax * throttle)
         return (-term + math.sqrt(term * term + 4.0 * thrust_static * a / drag_over_v2)) / 2.0
 
+    def speed_margin(self, velocity: float, lift: float, sensor_deployed: bool) -> float:
+        """Return propulsion speed margin at 100% throttle [ft/s].
+
+        margin >= 0 means the requested speed is achievable at or below
+        full throttle.  margin < 0 means the requested speed would require
+        more than 100% throttle and should therefore be treated as infeasible.
+        """
+        total_drag = self.drag(velocity, lift, sensor_deployed)
+        drag_over_v2 = total_drag / velocity**2
+        max_available_speed = self._prop_speed(1.0, drag_over_v2)
+        return max_available_speed - velocity
+
     def calculate_current(self, velocity: float, lift: float, sensor_deployed: bool) -> float:
         total_drag = self.drag(velocity, lift, sensor_deployed)
         drag_over_v2 = total_drag / velocity**2
@@ -139,13 +151,13 @@ class SmoothPlaneModel:
         def residual(throttle: float) -> float:
             return self._prop_speed(throttle, drag_over_v2) - velocity
 
-        lo, hi = 0.300001, 0.999999
+        lo, hi = 0.300001, 1.0
         r_lo, r_hi = residual(lo), residual(hi)
 
-        # A design demanding more than full throttle is deliberately made costly,
-        # but the function remains continuous enough for the local analysis region.
+        # Never allow the propulsion model to exceed 100% throttle.
+        # Infeasible requested speeds are identified separately with speed_margin().
         if r_hi < 0.0:
-            throttle = hi + min(0.25, -r_hi / 200.0)
+            throttle = 1.0
         elif r_lo > 0.0:
             throttle = lo
         else:
@@ -202,6 +214,13 @@ class SmoothCourse:
         n2 = self._turn_load_factor(self.v2, lift_m2)
         n3 = self._turn_load_factor(self.v3, lift_m3)
 
+        # Propulsion feasibility margins at 100% throttle.  The turn cases are
+        # checked separately because induced drag increases with load factor.
+        m2_speed_margin_straight = self.aircraft.speed_margin(self.v2, lift_m2, False)
+        m2_speed_margin_turn = self.aircraft.speed_margin(self.v2, n2 * lift_m2, False)
+        m3_speed_margin_straight = self.aircraft.speed_margin(self.v3, lift_m3, True)
+        m3_speed_margin_turn = self.aircraft.speed_margin(self.v3, n3 * lift_m3, True)
+
         amps2 = self.aircraft.calculate_current(self.v2, lift_m2, False)
         amps3 = self.aircraft.calculate_current(self.v3, lift_m3, True)
         amps2_turn = self.aircraft.calculate_current(self.v2, n2 * lift_m2, False)
@@ -219,7 +238,19 @@ class SmoothCourse:
         cap_draw2 = amps2 * straight_time2 + amps2_turn * turn_time2
         cap_draw3 = amps3 * straight_time3 + amps3_turn * turn_time3
 
+        # Usable battery capacity [A*s].  A 3300 mAh pack with 75% usable
+        # capacity leaves a 25% reserve while keeping the model continuous.
         battery_capacity = 3300.0 * 0.75 * 3600.0 / 1000.0
+
+        # Mission 2 is a fixed five-lap mission.  Enforce battery feasibility
+        # with a continuous energy margin rather than a discrete battery-dead
+        # rule.  Positive margin means the five laps fit within usable capacity.
+        m2_energy_required = 5.0 * cap_draw2
+        m2_battery_margin = battery_capacity - m2_energy_required
+
+        # Mission 3 remains continuously battery limited: achievable laps are
+        # the smooth minimum of the five-minute time limit and battery-energy
+        # limit.  No floor()/integer lap count is used.
         laps_time = 300.0 / lap_time3
         laps_energy = battery_capacity / cap_draw3
         laps3_continuous = softmin(laps_time, laps_energy, tau=0.05)
@@ -240,6 +271,17 @@ class SmoothCourse:
             "gm_score": gm_score,
             "n2": n2,
             "n3": n3,
+            "battery_capacity": battery_capacity,
+            "m2_energy_per_lap": cap_draw2,
+            "m2_energy_required": m2_energy_required,
+            "m2_battery_margin": m2_battery_margin,
+            "m3_energy_per_lap": cap_draw3,
+            "m3_laps_time_limit": laps_time,
+            "m3_laps_energy_limit": laps_energy,
+            "m2_speed_margin_straight": m2_speed_margin_straight,
+            "m2_speed_margin_turn": m2_speed_margin_turn,
+            "m3_speed_margin_straight": m3_speed_margin_straight,
+            "m3_speed_margin_turn": m3_speed_margin_turn,
         }
 
 
@@ -254,6 +296,38 @@ def weight_constraint(x: np.ndarray, limit: float = 20.0) -> float:
     """g(x) <= 0 form of the Project 1 team target for M2 gross weight."""
     c = SmoothCourse(*np.asarray(x, dtype=float))
     return c.m2_takeoff_weight - limit
+
+
+def propulsion_margins(x: np.ndarray) -> np.ndarray:
+    """Return propulsion feasibility margins for nonlinear constraints.
+
+    The ordering is [M2 straight, M2 turn, M3 straight, M3 turn].
+    Each entry must be >= 0 for the requested flight condition to be achievable
+    at or below 100% throttle.  This helper is intended for constrained solvers
+    such as SLSQP or trust-constr.
+    """
+    s = state(x)
+    return np.array(
+        [
+            s["m2_speed_margin_straight"],
+            s["m2_speed_margin_turn"],
+            s["m3_speed_margin_straight"],
+            s["m3_speed_margin_turn"],
+        ],
+        dtype=float,
+    )
+
+
+def battery_margins(x: np.ndarray) -> np.ndarray:
+    """Return continuous battery-feasibility margins for nonlinear constraints.
+
+    Mission 2 must complete five laps within the usable battery capacity, so
+    m2_battery_margin >= 0 is required.  Mission 3 does not need a separate
+    inequality because its continuous lap count is already limited by battery
+    energy through laps3_continuous.
+    """
+    s = state(x)
+    return np.array([s["m2_battery_margin"]], dtype=float)
 
 
 def penalized_objective(x: np.ndarray, rho: float, limit: float = 20.0) -> float:
