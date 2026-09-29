@@ -384,12 +384,12 @@ Together with the constraint-residual comparison in Section 5.2, this completes 
 The final augmented-Lagrangian design is approximately:
 | Variable | Final value |
 |---|---:|
-| Wing area, $S_w$ | $5.96\ \mathrm{ft}^2$ |
-| Fuselage length, $L_F$ | $5.06\ \mathrm{ft}$ |
-| Mission 2 sensor weight, $SW_2$ | $12.50\ \mathrm{lb}$ |
-| Mission 3 sensor reduction, $SW_3$ | $0.87\ \mathrm{lb}$ |
-| Mission 2 cruise velocity, $V_2$ | $140.0\ \mathrm{ft/s}$ |
-| Mission 3 cruise velocity, $V_3$ | $85.48\ \mathrm{ft/s}$ |
+| Wing area, $S_w$ | $5.62\ \mathrm{ft}^2$ |
+| Fuselage length, $L_F$ | $5.21\ \mathrm{ft}$ |
+| Mission 2 sensor weight, $SW_2$ | $12.55\ \mathrm{lb}$ |
+| Mission 3 sensor reduction, $SW_3$ | $1.00\ \mathrm{lb}$ |
+| Mission 2 cruise velocity, $V_2$ | $101.27\ \mathrm{ft/s}$ |
+| Mission 3 cruise velocity, $V_3$ | $86.94\ \mathrm{ft/s}$ |
 | Empty-aircraft weight | $6.25\ \mathrm{lb}$ |
 | Mission 2 gross weight | $20.00\ \mathrm{lb}$ |
 | Mission 2 five-lap time | $123.46\ \mathrm{s}$ |
