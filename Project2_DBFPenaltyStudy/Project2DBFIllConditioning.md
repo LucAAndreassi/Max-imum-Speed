@@ -293,6 +293,38 @@ After each inner optimization, the multiplier is updated as
 \right)
 ```
 The multiplier carries information about the active constraint, allowing the method to obtain high constraint accuracy without increasing $\rho$ to the extremely large values required by a pure fixed-penalty method.
+
+#### 5.1.1 Why the Augmented Lagrangian Was Chosen
+
+Several numerical approaches can reduce the effect of ill-conditioning, but they do not all address the same underlying cause. In this problem, the dominant source of ill-conditioning is the large quadratic penalty coefficient required to enforce the active Mission 2 weight constraint. Therefore, the preferred remedy is one that reduces the need for a very large fixed penalty rather than only making the resulting ill-conditioned problem easier to solve.
+
+| Method | Main idea | Advantage | Limitation for this problem |
+|---|---|---|---|
+| Variable scaling / Jacobi preconditioning | Rescale the design variables or Hessian so different directions have more comparable numerical magnitudes | Simple and inexpensive | D2 showed that the condition number remains large after Jacobi rescaling, so scaling does not remove the penalty-induced ill-conditioning |
+| Preconditioned gradient or Newton-type methods | Modify the search direction using curvature information so the optimizer can move more efficiently through an elongated landscape | Can greatly improve convergence on an ill-conditioned objective | Improves the optimizer's response to the bad conditioning, but does not remove the large penalty curvature that caused the problem |
+| Interior-point / barrier methods | Enforce feasibility by adding a barrier that prevents iterates from crossing the constraint boundary | Effective general-purpose constrained optimization method | Barrier parameters can also create increasingly large curvature near active constraints, so they can introduce a conditioning issue similar to the penalty mechanism being studied |
+| Sequential Quadratic Programming (SQP) | Solve a sequence of local quadratic constrained subproblems | Very effective for smooth nonlinear constrained problems | Requires a more complex constrained subproblem framework and would change both the constraint-handling strategy and the optimization algorithm, making the D4 comparison less direct |
+| Augmented Lagrangian | Combine a moderate quadratic penalty with a Lagrange multiplier that is updated using the observed constraint violation | Enforces the active constraint without requiring an extremely large penalty coefficient | Requires outer multiplier updates and inner optimization solves |
+
+The augmented-Lagrangian method was selected because it addresses the specific mechanism identified in Section 3. The fixed quadratic penalty produces a Hessian contribution approximately proportional to
+
+$$
+\rho\,\nabla g\,\nabla g^T,
+$$
+
+so increasing $\rho$ directly creates the large-curvature direction responsible for the observed growth in $\kappa(H)$. The augmented Lagrangian introduces the multiplier $\lambda$, which carries information about the active constraint between outer iterations. This allows the constraint to be enforced accurately while keeping $\rho$ relatively small.
+
+This distinction is important for the D4 comparison. A method such as preconditioning could make projected gradient descent perform better on the original poorly conditioned objective, but the underlying penalty formulation would remain poorly conditioned. The augmented Lagrangian instead changes the constraint-enforcement mechanism itself. Therefore, it provides a direct test of whether removing the need for a very large fixed penalty reduces the conditioning problem identified in D1-D3.
+
+For this study, the augmented Lagrangian also provides a useful controlled comparison because projected gradient descent can still be applied to both the original fixed-penalty formulation and the augmented-Lagrangian local subproblem. This allows the D4 convergence comparison to isolate the effect of the formulation change rather than attributing the improvement to a completely different optimization algorithm.
+
+
+
+
+
+
+
+
 ### 5.2 D4 - Before/After Constraint Enforcement and Conditioning
 
 The large fixed-penalty case used $\rho=10{,}000$ and produced
