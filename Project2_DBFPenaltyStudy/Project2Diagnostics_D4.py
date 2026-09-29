@@ -715,7 +715,7 @@ def main():
     if RUN_EXTRA_D4_SWEEP:
         print("\nRunning optional D4 rho sweep...")
         rho_vals = np.array([0.1, 1, 5, 10, 100, 1000, 10000.0])
-        z_cmp = to_z(np.array([7.0, 6.0, 10.0, 2.0, 100.0, 90.0]))
+        z_cmp = to_z(X0)
         g_fix_vals = []
         g_al_vals = []
 
