@@ -1,9 +1,0 @@
-{
-  "arguments": {
-    "results": "final_results",
-    "rounds": 5
-  },
-  "main_source_sha256": "567777beb993db101a9ade366ad1180b6f76d36a02b9561fd4324d60a24d7f20",
-  "adaptive_source_sha256": "15317b2b2c7f0b90c5ab84829bfeafc566fff588b99a9bb6f49533a578089812",
-  "selection_rule": "five fixed rounds; no oracle-error selection"
-}

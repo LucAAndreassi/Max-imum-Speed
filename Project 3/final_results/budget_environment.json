@@ -1,8 +1,0 @@
-{
-  "arguments": {
-    "results": "final_results",
-    "max_nfev": 6000
-  },
-  "main_source_sha256": "567777beb993db101a9ade366ad1180b6f76d36a02b9561fd4324d60a24d7f20",
-  "control_source_sha256": "2498e96ec5c1148cfd30203edf1cbe56f45e2c239416ef1418c28e76a2bd0ad3"
-}
