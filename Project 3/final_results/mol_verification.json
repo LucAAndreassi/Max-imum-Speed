@@ -1,0 +1,42 @@
+[
+  {
+    "kappa": 0.013888888888888888,
+    "n": 200,
+    "seconds": 0.023046699992846698,
+    "relative_l2_vs_periodic_fd": 1.3105525054314313e-07,
+    "endpoint_max_difference": 6.34454140335805e-08,
+    "nfev": 272
+  },
+  {
+    "kappa": 0.005000000000000001,
+    "n": 200,
+    "seconds": 0.02245389999006875,
+    "relative_l2_vs_periodic_fd": 1.371060201628593e-07,
+    "endpoint_max_difference": 9.487959640175347e-08,
+    "nfev": 274
+  },
+  {
+    "kappa": 0.0012500000000000002,
+    "n": 200,
+    "seconds": 0.022193199998582713,
+    "relative_l2_vs_periodic_fd": 1.348033342353482e-07,
+    "endpoint_max_difference": 8.61241166161264e-08,
+    "nfev": 272
+  },
+  {
+    "kappa": 0.0002,
+    "n": 200,
+    "seconds": 0.022203299988177605,
+    "relative_l2_vs_periodic_fd": 1.2651245075082917e-07,
+    "endpoint_max_difference": 7.028853432622384e-08,
+    "nfev": 272
+  },
+  {
+    "kappa": 5e-05,
+    "n": 200,
+    "seconds": 0.02192930001183413,
+    "relative_l2_vs_periodic_fd": 1.1898245911799447e-07,
+    "endpoint_max_difference": 5.4417102601789225e-08,
+    "nfev": 274
+  }
+]
