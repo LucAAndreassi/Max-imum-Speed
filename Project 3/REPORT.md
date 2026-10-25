@@ -2,7 +2,8 @@
 
 **MAE 598 Project 3 | Technical experiment completed; researcher engagement and submission actions pending.**
 
-Team members: **[TEAM TO COMPLETE]**. Researcher: **[TEAM TO CONFIRM; supplied task card refers to Kiran's lab]**.
+Team members: Luc Andreassi, Micah Kawamura, Nicholas Cheng, Sivan Garteiz, Andrew Coverston. 
+Researcher: Kiran Ramesh, PhD.
 
 ## Executive finding
 
