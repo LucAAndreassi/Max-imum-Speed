@@ -250,6 +250,14 @@ Relative field L2 is the square root of integrated mean-in-time squared error di
 
 ![P3 knob sweeps](final_results/figures/P3_knob_sweeps.png)
 
+P3 shows the main physical difficulty knob, \(L/\delta\), in the first column. Increasing this ratio produces a thinner boundary layer with sharper velocity changes near the wall, which can make the flow more difficult to resolve. The plots compare the conventional numerical baseline (black), vanilla PINN (red), and combined PINN (green). The combined PINN uses coordinate scaling and concentrates more physics collocation points near the wall.
+
+Two additional knobs control the measurement data: the standard deviation of the simulated noise and the number of samples per cycle per probe. Higher noise makes the observations less reliable, while fewer samples provide less information for estimating viscosity and reconstructing the flow. Each knob is varied separately while the other settings remain fixed.
+
+The results show that errors increase with measurement noise and generally decrease with more samples. However, the thickness sweep does not show a uniform increase in error as the boundary layer becomes thinner. Whole-field velocity error decreases partly because the near-wall region occupies a smaller fraction of the domain, potentially concealing localized errors.
+
+The PINNs produce viscosity and wall-shear estimates comparable to the baseline, with occasional improvements, but the baseline generally achieves lower whole-field velocity error. The combined PINN does not show a consistent accuracy advantage. All three methods remain sensitive to measurement noise, indicating that improved near-wall physics enforcement alone does not eliminate uncertainty caused by noisy observations.
+
 | delta/L | kappa true | Baseline kappa error (%) | Vanilla kappa error (%) | Combined kappa error (%) | Vanilla near-wall L2 (%) | Combined near-wall L2 (%) |
 |---|---:|---:|---:|---:|---:|---:|
 | 0.167 | 0.0139 | 2.13 | 2.2 | 2.2 | 0.355 | 0.355 |
@@ -257,8 +265,6 @@ Relative field L2 is the square root of integrated mean-in-time squared error di
 | 0.05 | 0.00125 | 2.12 | 2.06 | 2.16 | 0.502 | 0.476 |
 | 0.02 | 0.0002 | 2.12 | 1.56 | 2.1 | 0.578 | 0.505 |
 | 0.01 | 5e-05 | 2.12 | 1.88 | 2.01 | 0.611 | 0.605 |
-
-The task supplies no researcher acceptance tolerance. These plots report performance without labeling an arbitrary accuracy threshold as researcher-approved. Noise produces an estimation limit shared by both approaches; near-wall training improvements do not remove observation noise.
 
 ### 6.3 Thin-case numerical comparison
 
