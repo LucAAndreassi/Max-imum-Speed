@@ -14,21 +14,31 @@ The thin-layer controls expose a concrete failure mode: **rescaling the network 
 This is an exploratory three-seed study. No researcher has supplied an accuracy or cost target. All numerical findings below are measured; the interview, researcher review and communication status are reported as they are and are not inferred.
 
 ## 1. Outreach log and research problem brief
-
 ### 1.1 Outreach log
 
 | Item | Current evidence/status |
 |---|---|
-| Researcher and contact | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University. Contact details and confirmation: [DATE?] |
-| How identified and course reservation | Background research compiled 18 October 2026 (`ramesh-research-review.md`) |
-| Contact attempts and outcomes | [team to add every message sent, with dates, including any without a reply] |
-| Interview date, attendees and consent | [team to add]. Prepared question list: `Interview_Question.md` |
-| Questions and interview findings | [team to add: scientific objective, solver, hardware, run cost, prior ML experience, useful accuracy] |
-| Researcher review of problem brief | Pending; not to be marked reviewed without a response |
-| Permission to identify researcher publicly | [team to confirm from the actual conversation] |
+| Researcher and contact | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University. Contact details: [team to add] |
+| How identified and course reservation | Background research compiled 18 October 2026 (`ramesh-research-review.md`). Participation-sheet reservation date: [team to add] |
+| Contact attempts and outcomes | Outreach emails to all professors contacted, with dates, including any without a reply: [team to attach]. Fall break slowed email responses and professor availability. |
+| Interview date, attendees and consent | Team preparation meeting, [date]: drafted the interview guide (`Interview_Question.md`), assigned the review of Dr. Ramesh's publications (`ramesh-research-review.md`), and planned notes in case recording was not possible. First interview: 6 PM the same day over Zoom; Micah Kawamura could not attend [team to confirm other attendees]. Second meeting, [date]: Dr. Ramesh, Nicholas Cheng, Sivan Garteiz and Luc Andreassi. Dr. Ramesh consented to the Zoom meetings being recorded and to being reported on in this project. |
+| Questions and interview findings | Summarized below the table |
+| Researcher review of problem brief | Pending. The brief in 1.2 reflects the meeting, but Dr. Ramesh has not yet reviewed the written version |
+| Permission to identify researcher publicly | Given: Dr. Ramesh consented during the Zoom meetings to being recorded and reported on |
 | Final memo sent and response | Draft in Section 9; not yet sent |
 
-These items are graded engagement evidence. Numerical experiments cannot supply them, and this report does not invent an interview.
+**Findings from the meetings with Dr. Ramesh.** Everything below comes from the second meeting unless marked otherwise; notes from the first interview: [team to add].
+
+- *Before the interview (team meeting).* The team learned that Dr. Ramesh is already working on PINNs/PINOs with another student. Choosing a problem that complements that work, rather than overlapping it, was therefore one of the goals of the interview.
+
+- *Research objective.* Dr. Ramesh is developing an unsteady version of XFOIL. Like XFOIL, it uses viscous–inviscid interaction: the problem is split into a potential-flow solution and an integral boundary-layer solution.
+- *Where the difficulty lies.* Integral boundary-layer methods collapse the wall-normal dimension, which leaves more unknowns than equations, so closure models must supply the missing information. Extending these methods to unsteady flow requires new unsteady integral boundary-layer formulations and new unsteady closure models. This is his current research focus.
+- *Data and solvers.* He is using OpenFOAM to generate CFD data for building unsteady closure models. That work is at an early stage and outside this project's scope.
+- *Role of this problem.* He described the oscillating boundary-layer inverse problem (estimating viscosity and wall shear stress from noisy sensor data with a PINN) as a demonstration: it has an exact solution, so it validates the method rather than serving as a production application.
+- *Alternative problem offered.* A Thwaites-type closure problem for 2D laminar boundary layers: use XFOIL data and a PINN to identify the closure coefficients in the integral momentum equation. He also suggested a neural closure term that is not restricted to the linear Thwaites form. He considers this problem more relevant to his research, because it has no exact solution.
+- *Team decision.* Finish and validate the oscillating boundary-layer study first, and attempt the Thwaites problem afterward if time allows.
+- *Not established in the meeting.* A required wall-shear accuracy, the solver's run cost and hardware, and the group's prior ML or PINN experience. [team to add if these were discussed]
+
 
 ### 1.2 Provisional problem brief for researcher review
 
