@@ -29,15 +29,14 @@ This is an exploratory three-seed study. No researcher has supplied an accuracy 
 
 **Findings from the meetings with Dr. Ramesh.** Everything below comes from the second meeting unless marked otherwise; notes from the first interview: [team to add].
 
-- *Before the interview (team meeting).* The team learned that Dr. Ramesh is already working on PINNs/PINOs with another student. Choosing a problem that complements that work, rather than overlapping it, was therefore one of the goals of the interview.
 
-- *Research objective.* Dr. Ramesh is developing an unsteady version of XFOIL. Like XFOIL, it uses viscous–inviscid interaction: the problem is split into a potential-flow solution and an integral boundary-layer solution.
-- *Where the difficulty lies.* Integral boundary-layer methods collapse the wall-normal dimension, which leaves more unknowns than equations, so closure models must supply the missing information. Extending these methods to unsteady flow requires new unsteady integral boundary-layer formulations and new unsteady closure models. This is his current research focus.
-- *Data and solvers.* He is using OpenFOAM to generate CFD data for building unsteady closure models. That work is at an early stage and outside this project's scope.
-- *Role of this problem.* He described the oscillating boundary-layer inverse problem (estimating viscosity and wall shear stress from noisy sensor data with a PINN) as a demonstration: it has an exact solution, so it validates the method rather than serving as a production application.
-- *Alternative problem offered.* A Thwaites-type closure problem for 2D laminar boundary layers: use XFOIL data and a PINN to identify the closure coefficients in the integral momentum equation. He also suggested a neural closure term that is not restricted to the linear Thwaites form. He considers this problem more relevant to his research, because it has no exact solution.
-- *Team decision.* Finish and validate the oscillating boundary-layer study first, and attempt the Thwaites problem afterward if time allows.
-- *Not established in the meeting.* A required wall-shear accuracy, the solver's run cost and hardware, and the group's prior ML or PINN experience. [team to add if these were discussed]
+- **Research objective** Dr. Ramesh is developing an unsteady version of XFOIL. Like XFOIL, it uses viscous–inviscid interaction: the problem is split into a potential-flow solution and an integral boundary-layer solution.
+- **Where the difficulty lies** Integral boundary-layer methods collapse the wall-normal dimension, which leaves more unknowns than equations, so closure models must supply the missing information. Extending these methods to unsteady flow requires new unsteady integral boundary-layer formulations and new unsteady closure models. This is his current research focus.
+- **Data and solvers** He is using OpenFOAM to generate CFD data for building unsteady closure models. That work is at an early stage and outside this project's scope.
+- **Role of this problem** He described the oscillating boundary-layer inverse problem (estimating viscosity and wall shear stress from noisy sensor data with a PINN) as a demonstration: it has an exact solution, so it validates the method rather than serving as a production application.
+- **Alternative problem offered** A Thwaites-type closure problem for 2D laminar boundary layers: use XFOIL data and a PINN to identify the closure coefficients in the integral momentum equation. He also suggested a neural closure term that is not restricted to the linear Thwaites form. He considers this problem more relevant to his research, because it has no exact solution.
+- **Team decision** Focus on the oscillating boundary-layer study
+
 
 
 ### 1.2 Provisional problem brief for researcher review
