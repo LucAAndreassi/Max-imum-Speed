@@ -3,32 +3,32 @@
 **MAE 598 Project 3 | Technical experiment completed; researcher engagement and submission actions pending.**
 
 Team members: Luc Andreassi, Micah Kawamura, Nicholas Cheng, Sivan Garteiz, Andrew Coverston. 
-Researcher: Kiran Ramesh, PhD.
+Researcher: Dr. Kiran Ramesh, PhD.
 
 ## Executive finding
 
-The conventional finite-difference inverse fit is the recommended method for this one-parameter, single-frequency problem. The specialized PINN can recover viscosity and wall shear, but its median training cost is **88.2 times** the baseline inverse-fit cost on this machine. We do not claim that every PINN fails, or that a small neural training loss guarantees correct wall shear.
+For this one-parameter, single-frequency problem we recommend the conventional finite-difference inverse fit. The specialized PINN recovers viscosity and wall shear to accuracy comparable to the baseline, but its median training time is **88.2 times** the baseline's median inverse-fit time on the same machine (0.013 s versus 1.15 s). We do not claim that every PINN fails. We do show that a small neural training loss does not guarantee an accurate wall shear.
 
-The thin-layer controls expose a concrete failure mode: **scaling the network coordinates without adequately sampling the near-wall physics can give a small training objective and an inaccurate wall derivative**. At the initial matched budget, adding near-wall collocation to the scaled network reduces median held-out near-wall PDE RMS by **19.2 times** and median wall-shear amplitude error by **3.75 times** at delta/L=0.01. However, longer training reveals residual overfitting between fixed collocation points, including in the initially improved model. A further **residual-adaptive refinement** reduces median held-out layer PDE RMS by **12 times** relative to the longer-trained vanilla model. Sections 7--8 present the controlled Path B diagnosis, initial remedy, counterexample and final targeted Path C refinement without discarding unfavorable results.
+The thin-layer controls expose a concrete failure mode: **rescaling the network coordinate without sampling the near-wall physics adequately can give a very small training objective and an inaccurate wall derivative.** At delta/L = 0.01 and the original matched budget, adding near-wall collocation to the scaled network reduces the median held-out near-wall PDE residual (RMS) by **19.2 times** and the median wall-shear amplitude error by **3.75 times**. Training ten times longer then exposes residual overfitting between the fixed collocation points, including in the improved model. A residual-adaptive refinement, which adds collocation points where the current PDE residual is largest, reduces the median held-out near-wall PDE residual by **12 times** relative to the longer-trained vanilla PINN. Sections 7–8 present the controlled Path B diagnosis, the initial remedy, the counterexample and the final Path C refinement, with unfavorable results kept.
 
-This is an exploratory, three-seed study. No acceptance accuracy or cost target was supplied by an interviewed researcher. Numerical findings below are measured; the interview, researcher review and communication status are not inferred.
+This is an exploratory three-seed study. No researcher has supplied an accuracy or cost target. All numerical findings below are measured; the interview, researcher review and communication status are reported as they are and are not inferred.
 
 ## 1. Outreach log and research problem brief
 
-### 1.1 Outreach log: team-supplied evidence required
+### 1.1 Outreach log
 
 | Item | Current evidence/status |
 |---|---|
-| Researcher and contact | Task card discusses Kiran's lab; identity/contact must be confirmed by the team |
-| How identified and course reservation | Not supplied; add actual dates and participation-sheet reservation |
-| Contact attempts and outcomes | Not supplied; enter actual correspondence, including nonresponses |
-| Interview date, attendees and consent | No transcript or interview notes were supplied |
-| Questions and interview findings | Add the actual scientific objective, solver, hardware, costs, prior ML experience and useful accuracy |
-| Researcher review of problem brief | Pending; do not mark reviewed without a response |
-| Permission to identify researcher publicly | Team must confirm from the actual conversation |
-| Final memo sent and response | Draft included below; not sent by this analysis |
+| Researcher and contact | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University. Contact details and confirmation: [DATE?] |
+| How identified and course reservation | Background research compiled 18 October 2026 (`ramesh-research-review.md`) |
+| Contact attempts and outcomes | [team to add every message sent, with dates, including any without a reply] |
+| Interview date, attendees and consent | [team to add]. Prepared question list: `Interview_Question.md` |
+| Questions and interview findings | [team to add: scientific objective, solver, hardware, run cost, prior ML experience, useful accuracy] |
+| Researcher review of problem brief | Pending; not to be marked reviewed without a response |
+| Permission to identify researcher publicly | [team to confirm from the actual conversation] |
+| Final memo sent and response | Draft in Section 9; not yet sent |
 
-These gaps matter for the engagement portions of the rubric. They cannot be filled by numerical experiments or by inventing an interview.
+These items are graded engagement evidence. Numerical experiments cannot supply them, and this report does not invent an interview.
 
 ### 1.2 Provisional problem brief for researcher review
 
