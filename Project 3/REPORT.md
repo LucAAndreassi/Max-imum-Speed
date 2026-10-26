@@ -14,25 +14,22 @@ The thin-layer controls expose a concrete failure mode: **rescaling the network 
 This is an exploratory three-seed study. No researcher has supplied an accuracy or cost target. All numerical findings below are measured; the interview, researcher review and communication status are reported as they are and are not inferred.
 
 ## 1. Outreach log and research problem brief
-### 1.1 Outreach log
+
 
 ### 1.1 Outreach log
 
-Researchers contacted, in chronological order (all dates 2026). Copies of the outreach emails: [team to attach].
+Researchers contacted, in chronological order (all dates 2026). 
+Researchers found through previous student work, the Ira A Fulton Researcher website, and personal connections to the professors.
 
-| Date | Researcher | Action | Outcome |
-|---|---|---|---|
-| 8 Oct | Prof. Yulia Peet | Email requesting a research interview | No response |
-| 12 Oct | Prof. Jay Oswald | Email requesting a research interview | Replied 22 Oct, after the team had committed to a project; not pursued |
-| 17 Oct | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University | Email requesting a research interview | Accepted; interview scheduled for 18 Oct |
+| Date | Researcher | Action | Outcome | Reason for Contact |
+|---|---|---|---|---|
+| 8 Oct | Prof. Yulia Peet | Email requesting a research interview | No response | On project recommendation list reaserch in CFD aligned with group interests|
+| 12 Oct | Prof. Jay Oswald | Email requesting a research interview | Replied 22 Oct, after the team had committed to a project; not pursued |  On project recommendation list reaserch aligned with structural interest |
+| 17 Oct | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University | Email requesting a research interview | Accepted; interview scheduled for 18 Oct | Several team members knew of his research and it aligned with the project|
 | 18 Oct | Dr. Ramesh | First interview (Zoom, 6 PM), prepared with the team's interview guide (`Interview_Question.md`) and a review of his publications (`ramesh-research-review.md`). Micah Kawamura could not attend | Research context and candidate problems discussed |
-| 19 Oct | Dr. Ramesh, with Nicholas Cheng, Sivan Garteiz and Luc Andreassi | Second interview (Zoom) to choose the problem | Project secured: oscillating boundary-layer inverse problem with a PINN |
+| 19 Oct | Dr. Ramesh| Second interview (Zoom) to choose the problem | Project secured: oscillating boundary-layer inverse problem with a PINN |
 
 **Consent.** Dr. Ramesh consented during the Zoom meetings to being recorded and to being named and reported on in this project.
-
-**Problem brief review.** Pending: the brief in Section 1.2 was sent for his correction on [date]; response: [pending].
-
-**Recommendation memo.** Draft in Section 9; not yet sent.
 
 **Interview findings.** The points below come mainly from the 19 Oct interview; notes from the 18 Oct interview: [team to add].
 
