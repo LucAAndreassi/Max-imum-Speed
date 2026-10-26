@@ -327,13 +327,23 @@ At delta=0.01, sigma=0.02 and Nt=16, the following values are medians over seeds
 
 ### 6.4 P4: where the errors occur and their spectra
 
-The following plots use seed 17, chosen as the first configured seed before inspecting errors. Field panels have separately labeled color scales to reveal each method's structure, not to claim equal magnitudes. The tables and spectra provide quantitative comparisons. Baseline continuous residuals are not inferred by differentiating interpolated FD values; that panel states it is unavailable. The FD system itself is solved to numerical precision.
+P4 examines where the prediction errors occur and which spatial and temporal scales they contain. The following figures compare the conventional baseline, vanilla PINN, and combined PINN for moderate and thin boundary layers, with $(\delta/L=0.1)$ and $(0.01)$. Both cases use 2% observation noise and 16 samples per probe per cycle. Seed 17 was selected before inspecting the results.
+The left columns show the signed velocity error, $(e(y,t)=u_{\mathrm{pred}}(y,t)-u_{\mathrm{ref}}(y,t))$. The right columns show the PINN’s PDE residual, evaluated at held-out locations. Velocity error measures agreement with the reference; the residual measures satisfaction of the governing equation at the fitted viscosity. These quantities answer different questions.
+The maps display the near-wall region $(y/L\leq\min(6\delta/L,1))$. Each panel has its own color scale, so comparisons of magnitude must use the colorbar values. The baseline’s continuous residual is left unavailable because differentiating its interpolated finite-difference field would introduce a separate approximation. Baseline continuous residuals are not inferred by differentiating interpolated FD values; that panel states it is unavailable. The FD system itself is solved to numerical precision.
 
 ![P4 moderate near-wall fields](final_results/figures/P4_fields_d0.1.png)
 
 ![P4 thin near-wall fields](final_results/figures/P4_fields_d0.01.png)
 
+The largest visible velocity-error bands occur within a few boundary-layer thicknesses of the wall. Their alternating signs over the cycle show that the prediction mismatch depends on both wall distance and forcing phase. The near-wall view is particularly important for the thin case: a whole-domain error norm can conceal local inaccuracies when the boundary layer occupies only a small fraction of the domain.
+At $(\delta/L=0.1)$, the vanilla and combined PINNs have nearly identical error and residual patterns. For the displayed seed, the initial thickness estimate makes the combined method’s sampling region span the entire domain, so this case does not demonstrate the benefit of concentrating constraints in a narrow near-wall region.
+At $(\delta/L=0.01)$, the combined PINN reduces the magnitude of the largest visible near-wall PDE residuals relative to vanilla, while their velocity-error patterns remain similar. Improved physics enforcement therefore does not translate directly into an equally large reduction in velocity error. 
+
 ![P4 thin shear, hysteresis and spatial spectrum](final_results/figures/P4_shear_spectrum_d0.01.png)
+
+The wall-shear and hysteresis plots connect the field reconstruction to the quantity needed for an unsteady boundary-layer closure. All three methods reproduce the overall oscillation and hysteresis loop, but their nearly overlapping curves can conceal amplitude and phase differences. The errors reported in Section 6.3 provide the quantitative comparison. Because wall shear depends on the wall-normal derivative, accurate velocity values alone do not guarantee an equally accurate shear prediction.
+The spatial spectrum shows the time-averaged squared coefficients of a type-II discrete cosine transform of the velocity error over the full wall-normal domain. This Fourier cosine representation accommodates the nonperiodic spatial interval without the artificial endpoint jump introduced by a periodic extension.
+The PINN spectra contain structure across low and intermediate spatial modes, followed by a decaying high-mode tail. The baseline also contains high-mode error. Consequently, the presence of high spatial frequencies alone does not establish neural spectral bias: the plotted error includes the effects of an imperfect viscosity estimate as well as field-approximation errors. The controlled experiments in Section 7 are needed to distinguish candidate explanations.
 
 The spatial error spectrum is a type-II discrete cosine transform, averaged over time. It is a Fourier cosine spectrum appropriate to a nonperiodic wall-normal interval; a periodic spatial FFT would introduce artificial endpoint jumps. The temporal FFT is also saved and plotted:
 
