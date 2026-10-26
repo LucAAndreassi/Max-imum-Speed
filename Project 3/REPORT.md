@@ -21,7 +21,7 @@ This is an exploratory three-seed study. No researcher has supplied an accuracy 
 | Researcher and contact | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University. Contact details: [team to add] |
 | How identified and course reservation | Background research compiled 18 October 2026 (`ramesh-research-review.md`). Participation-sheet reservation date: [team to add] |
 | Contact attempts and outcomes | Outreach emails to all professors contacted, with dates, including any without a reply: [team to attach]. Fall break slowed email responses and professor availability. |
-| Interview date, attendees and consent | Team preparation meeting, [date]: drafted the interview guide (`Interview_Question.md`), assigned the review of Dr. Ramesh's publications (`ramesh-research-review.md`), and planned notes in case recording was not possible. First interview: 6 PM the same day over Zoom; Micah Kawamura could not attend [team to confirm other attendees]. Second meeting, [date]: Dr. Ramesh, Nicholas Cheng, Sivan Garteiz and Luc Andreassi. Dr. Ramesh consented to the Zoom meetings being recorded and to being reported on in this project. |
+| Interview date, attendees and consent | First interview: 6 PM October 18th over Zoom. Second meeting on October 19th. Dr. Ramesh consented to the Zoom meetings being recorded and to being reported on in this project. |
 | Questions and interview findings | Summarized below the table |
 | Researcher review of problem brief | Pending. The brief in 1.2 reflects the meeting, but Dr. Ramesh has not yet reviewed the written version |
 | Permission to identify researcher publicly | Given: Dr. Ramesh consented during the Zoom meetings to being recorded and reported on |
