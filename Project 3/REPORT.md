@@ -38,77 +38,95 @@ Researchers found through previous student work, the Ira A Fulton Researcher web
 - *Data and solvers.* He is using OpenFOAM to generate CFD data for building unsteady closure models. That work is at an early stage and outside this project's scope.
 - *Role of this problem.* He described the oscillating boundary-layer inverse problem (estimating viscosity and wall shear stress from noisy sensor data with a PINN) as a demonstration: it has an exact solution, so it validates the method rather than serving as a production application.
 
-** Research Before Interview in (`ramesh-reaserch-review.md`) **
+**Research Before Interview in** (`ramesh-reaserch-review.md`) 
 
 
 
-### 1.2 Provisional problem brief for researcher review
+### 1.2 Problem brief
 
-Oscillating external flow creates an unsteady viscous layer near an airfoil or rotor-blade surface. Wall shear can lead the external velocity, so a closure based only on instantaneous outer velocity misses part of the dynamics. The supplied task card connects this minimal example to unsteady integral boundary-layer modeling in Kiran's lab. This experiment asks whether sparse noisy velocities can identify viscosity and recover the unsteady wall-shear history.
+*Review status: researcher-supplied and reviewed. The problem, equations, difficulty knobs and objective below come from the task card Dr. Ramesh gave the team (*Task Card: Oscillating boundary layer inverse problem with a PINN*, Reference 1), supplemented by our 18–19 Oct interviews.*
 
-The minimal case is laminar, one-dimensional in wall-normal position, periodic and driven at one frequency. It retains a thin near-wall region and the wall-shear phase relation, while removing streamwise variation, airfoil geometry, separation and nonlinear unsteady closure physics. We compare a neural inverse approach with a conventional solver-based inverse fit. The numerical baseline's cost is measured here; the researcher's production solver, actual computational bottleneck, number of cases and previous PINN attempts remain unknown until the interview evidence is added.
+**The scientific problem.** When the flow outside a boundary layer oscillates, the skin friction at the wall does not follow the outer flow in step: it peaks earlier. This happens on a pitching airfoil, in a gust, and on a rotor blade in forward flight. Dr. Ramesh's group is developing unsteady boundary-layer models for exactly these flows, as part of an unsteady version of XFOIL. Like XFOIL, it couples a potential-flow solution for the outer flow to an integral boundary-layer model of the thin viscous layer. That keeps it fast enough for design, where full CFD is not. The integral equations in (s, t) need closure models, most importantly for the wall shear. Steady closures exist; unsteady ones are the open research problem. As the task card states, predicting the unsteady wall shear, including its phase, is the basic requirement for these models.
 
-**Questions to resolve in the researcher check:** Is viscosity identification representative of the information gap in the lab's closure work? What wall-shear amplitude/phase errors are useful? Are frequency content, probe placement, separation, noisy forcing or model discrepancy the next important difficulty?
+**The physics that makes it hard.** The simplest case is Stokes' oscillating boundary layer: a flat wall under an outer stream U_e(t) = U_0 cos ωt, with no mean flow. The flow is laminar, depends only on the wall distance y and time t, and obeys
+
+$$
+\frac{\partial u}{\partial t}=\frac{dU_e}{dt}+\nu\frac{\partial^2 u}{\partial y^2},\qquad u(0,t)=0,\qquad u\to U_e(t)\ \text{far from the wall}.
+$$
+
+Its exact periodic solution has a layer thickness δ = √(2ν/ω), and its wall shear, τ_w = (√2 μU_0/δ) cos(ωt + π/4), **leads the outer velocity by 45°**, one-eighth of a cycle. The oscillating pressure gradient pushes equally at all heights, so it reverses the slow fluid near the wall before the faster fluid farther out. Plotted against the outer velocity over a cycle, the wall shear traces an ellipse rather than a line. A quasi-steady model, which takes wall shear proportional to the instantaneous outer velocity, misses this loop; an unsteady boundary-layer model must capture it. Integrating the equation across the layer gives d(U_e δ\*)/dt = τ_w/ρ, the x-independent form of the unsteady momentum integral equation used in integral boundary-layer methods. The wall shear recovered here is therefore exactly the quantity an unsteady closure must supply.
+
+**The inverse problem.** Treat the viscosity ν as unknown. From three noisy velocity probes inside the layer (at 0.5δ, δ and 2δ, sampled N_t times per cycle), infer ν and, from it, the wall-shear history and its phase lead. Compare a physics-informed neural network (PINN) against a conventional solver-based fit. The problem is a good PINN test because it is a true inverse problem (an unknown coefficient from sparse, noisy data) and because it has a natural difficulty knob: raising the frequency thins the layer (δ/L from 1/6 down to 1/100), and thin layers are a known weak spot of PINNs. Noise (0–10% of U_0) and samples per cycle (64, 16 or 8) are the secondary knobs. Because the exact solution is known, every error can be measured against the truth.
+
+**Current approach and cost.** The conventional alternative is a finite-difference solver inside a scalar optimizer, which the task card prescribes as the baseline. For Dr. Ramesh's research version, the closure data will come from OpenFOAM CFD, an effort at an early stage. High-fidelity runs are far more expensive than integral boundary-layer solves, and closures must be calibrated across many conditions, so the training data will be expensive and sparse. The per-run cost and hardware were not established in our interviews [team to add if known].
+
+**How this supports Dr. Ramesh's research.** The study answers three questions his unsteady closure work will face:
+
+1. *Can a PINN reliably extract wall shear and its phase from sparse, noisy data?* This is the core quantity of an unsteady closure, and we measure the achievable amplitude and phase accuracy against an exact answer.
+2. *Can the training loss be trusted in thin layers?* We test whether a small physics loss guarantees an accurate wall derivative. If it does not, we identify a check (held-out near-wall residuals) and remedies (near-wall collocation, coordinate scaling by the current δ estimate, residual-adaptive points) that carry over to closure training.
+3. *Where is a neural method worth its cost?* We compare the PINN's training cost and accuracy with a verified conventional fit, to show whether neural methods should replace conventional solvers for known physics or be reserved for unknown closure terms.
 
 ## 2. Complete mathematical formulation
 
 ### 2.1 Dimensional problem
 
-Let y be distance from a stationary wall. The imposed outer velocity is Ue(t)=U0 cos(omega t). Incompressible, unidirectional laminar flow satisfies
+Let y be the distance from a stationary wall, and let the imposed outer velocity be Ue(t) = U0 cos(omega t). For incompressible, unidirectional laminar flow, u = u(y,t) and the streamwise convective terms vanish identically, leaving
 
 $$
 u_t=\frac{dU_e}{dt}+\nu u_{yy},\qquad u(0,t)=0,\qquad u(y,t)\to U_e(t)\text{ as }y\to\infty.
 $$
 
-The pressure gradient is represented by dUe/dt. Viscosity nu is constant but unknown to the inverse methods. Inertia associated with streamwise variation is absent in this minimal problem.
+The streamwise pressure gradient is represented by its outer-flow value, -(1/rho) dp/dx = dUe/dt. The kinematic viscosity nu is constant but unknown to both inverse methods.
+
 
 ### 2.2 Nondimensional variables, domain and unknown
 
-Use yhat=y/L, that=omega t, uhat=u/U0 and kappa=nu/(omega L^2). Hats are omitted below for readability. The computational domain is y in [0,1] and t in [0,2 pi), representing one complete periodic cycle:
+Define yhat = y/L, that = omega t, uhat = u/U0 and kappa = nu/(omega L^2), and drop the hats below. The computational domain is y in [0,1] and t in [0, 2 pi), one complete periodic cycle:
 
 $$
 u_t=-\sin t+\kappa u_{yy},\qquad u(0,t)=0,\quad u(1,t)=\cos t,\quad u(y,t+2\pi)=u(y,t).
 $$
 
-The inverse unknown is the scalar kappa>0. Recover dimensional viscosity by nu=kappa omega L^2 if dimensional frequency and length are known. We study the periodic state after startup, so no independent initial condition is imposed on the PINN. Both inverse methods restrict kappa to [1e-8,0.2]; these broad bounds are shared and contain every tested truth.
+The inverse unknown is the scalar kappa > 0. Dimensional viscosity follows as nu = kappa omega L^2 when the dimensional frequency and length are known. We study the periodic state after startup transients have decayed, so the PINN has no separate initial condition. Both inverse methods restrict kappa to the same broad interval [1e-8, 0.2], which contains every tested truth.
 
 ### 2.3 Exact reference, wall shear and finite-domain consistency
 
-The half-space reference supplied in the task card is
+The half-space (Stokes second problem) reference supplied in the task card is
 
 $$
-u_\infty(y,t)=\cos t-e^{-y/\delta}\cos(t-y/\delta),\qquad \delta=\sqrt{2\kappa}.
+u_\infty(y,t)=\cos t-e^{-y/\delta}\cos(t-y/\delta),\qquad \delta=\sqrt{2\kappa},
 $$
 
-Here delta means delta/L. Its dimensionless wall shear, a velocity gradient rather than dimensional stress, is
+where delta denotes delta/L. Its dimensionless wall shear, a velocity gradient rather than a dimensional stress, is
 
 $$
 g(t)=u_y(0,t)=\frac{\sqrt{2}}{\delta}\cos(t+\pi/4).
 $$
 
-The target shear amplitude is sqrt(2)/delta and the phase lead is 45 degrees. Dimensional stress would be mu U0/L times this gradient. If viscosity is inferred, dimensional stress requires consistently converting the inferred nu into mu=rho nu.
+The target shear amplitude is therefore sqrt(2)/delta, with a 45-degree phase lead over the outer velocity. The dimensional wall stress is mu U0/L times this gradient; if viscosity is inferred, the inferred nu must be converted consistently through mu = rho nu.
 
-The half-space field is not exactly equal to cos(t) at y=1. Its discrepancy is bounded by exp(-1/delta): 0.00248 U0 at delta=1/6, 4.54e-5 U0 at delta=0.1 and negligible in the thinnest cases. We retain the task-card half-space reference for data generation and scoring, while enforcing its approximate far-field condition in both inverse methods. We separately verify discretization against the **boundary-consistent finite-domain analytic amplitude**
+The half-space field does not equal cos t exactly at y = 1. The discrepancy is bounded by exp(-1/delta): 2.48e-3 U0 at delta = 1/6, 4.54e-5 U0 at delta = 0.1, 2.1e-9 U0 at delta = 0.05 and negligible for the thinner cases. We keep the task-card half-space reference for generating data and for scoring, and both inverse methods enforce the approximate far-field condition u(1,t) = cos t. Separately, we verify the discretization against the **boundary-consistent finite-domain analytic amplitude**
 
 $$
 a_F(y)=1-\frac{\sinh[q(1-y)]}{\sinh q},\qquad q=(1+i)/\delta,\qquad u_F=\Re[a_F e^{it}].
 $$
 
-The implementation uses a stable exponential form to avoid overflow. This finite-domain expression is used for solver verification only, not for fitting measurements. The finite-domain approximation is an explicitly bounded model discrepancy, not a coding error or PINN pathology.
-
+The code evaluates this in an equivalent exponential form to avoid overflow for small delta. The finite-domain expression is used only to verify the solver, never to fit measurements. The truncation is an explicitly bounded model discrepancy, not a coding error or a PINN pathology.
 ### 2.4 Difficulty knobs and experimental design
 
-Primary knob: delta in {1/6,1/10,1/20,1/50,1/100}; smaller delta means a thinner layer. Equivalently use L/delta in {6,10,20,50,100}, which increases with difficulty. At fixed dimensional nu and L, increasing omega creates the thinner layers. The corresponding kappa truths are delta^2/2.
+Primary knob: delta in {1/6, 1/10, 1/20, 1/50, 1/100}, so smaller delta means a thinner layer. Equivalently, L/delta in {6, 10, 20, 50, 100} increases with difficulty. At fixed dimensional nu and L, a higher forcing frequency omega produces the thinner layers. The corresponding true values are kappa = delta^2/2.
 
-Secondary knobs: noise sigma in {0,0.01,0.02,0.05,0.10} U0 and Nt in {64,16,8} samples per probe per cycle. We vary one knob at a time about delta=0.1, sigma=0.02, Nt=16. Removing duplicate reference settings gives 11 settings; seeds 17,29,41 give 33 measurement datasets. There are 117 primary method/case runs, including paired diagnosis controls, plus nine longer-budget controls and 15 adaptive continuation fits. These supplementary tests reuse the existing thin-case data. This is not a full factorial sweep and does not characterize every interaction among knobs.
+Secondary knobs: noise sigma in {0, 0.01, 0.02, 0.05, 0.10} U0, and Nt in {64, 16, 8} samples per probe per cycle. Each knob is varied one at a time about the reference setting delta = 0.1, sigma = 0.02, Nt = 16. After removing duplicate reference settings this gives 11 settings, and seeds 17, 29 and 41 give 33 measurement datasets.
 
-The three probes are at y={0.5 delta,delta,2 delta}. Their positions move with the true layer between synthetic experiments, following the task card. Within an inverse fit the supplied physical probe positions are fixed and do not move with candidate kappa. This deliberately maintains measurement coverage inside the layer; it does not test the harder scenario of fixed instruments falling outside a thinning layer.
+The 117 primary method/case runs are: baseline, vanilla PINN and combined PINN on all 33 datasets (99 runs); sampling-only and scaling-only controls at delta = 0.1 and 0.01 (12 runs); and the two oracle controls, supervised and known_kappa, at delta = 0.01 (6 runs). Two supplementary studies reuse the delta = 0.01 data: nine longer-budget controls (vanilla, scaling and combined × three seeds) and 15 adaptive refinement fits (five rounds × three seeds). This is not a full factorial sweep and does not characterize interactions between knobs.
+
+The three probes sit at y = {0.5 delta, delta, 2 delta}. Following the task card, their positions move with the true layer from one synthetic experiment to the next. Within an inverse fit the probe positions are fixed and do not move with the candidate kappa. This keeps measurements inside the layer by design; it does not test the harder case of fixed instruments that end up outside a thinning layer.
 
 ## 3. Reproducibility and implementation map
 
 ### 3.1 Run instructions
 
-Requires Python 3.12 and the pinned packages in requirements.txt. No PyTorch, GPU, XFOIL or experimental data are required.
+Requires Python 3.12 and the pinned packages in requirements.txt (NumPy 1.26.4, SciPy 1.14.1, Matplotlib 3.9.3, threadpoolctl 3.5.0). No PyTorch, GPU, XFOIL or experimental data are needed.
 
 ```bash
 python -m venv .venv
@@ -119,47 +137,53 @@ python oscillating_bl.py --suite full --seeds 17 29 41 --width 16 --collocation 
 python budget_controls.py --results final_results
 python adaptive_fix.py --results final_results --rounds 5
 python audit_submission.py --results final_results
-python make_report.py --results final_results
 ```
 
-For a two-setting smoke run, use --suite pilot --seeds 17 --output pilot_results. For an interrupted full run, repeat the identical command with --resume. Resume refuses changes to code hash or experiment settings. A resumed run retains original per-model training times, while environment.json records the resumed invocation's wall duration.
+`make_report.py --results final_results` generated the first draft of this report from the saved results. **Do not rerun it on the final report:** it overwrites REPORT.md, including the hand-written discussion and the team-supplied engagement sections.
 
-The provided figures and numerical tables come from the completed full command, not the smoke run. Near-identical floating-point results are expected with the pinned versions; wall times and exact optimizer trajectories can differ across machines/BLAS implementations.
+For a two-setting smoke test, use `--suite pilot --seeds 17 --output pilot_results`. To resume an interrupted full run, repeat the identical command with `--resume`; resuming is refused if the code hash or experiment settings have changed. A resumed run keeps the original per-model training times, and environment.json records the resumed invocation's wall time.
+
+All figures and tables come from the completed full run, not the smoke test (the main study took 128 s of wall time on the recorded machine). With the pinned versions, floating-point results should be nearly identical on other machines. Wall times and exact optimizer trajectories can differ across hardware and BLAS builds.
+
 
 ### 3.2 Main functions and data flow
 
 | Stage | Function(s) | Inputs -> outputs |
 |---|---|---|
-| Reference and noise | exact_amplitude, exact_velocity, make_measurements | Truth, probe positions, seed -> clean/noisy samples |
+| Reference and noise | exact_amplitude, exact_velocity, make_measurements | Truth, probe positions, seed -> clean and noisy samples |
 | Numerical forward solver | grid_operator, fd_periodic | Candidate kappa -> numerical periodic velocity amplitude |
-| Time-integration verification | mol_check | Numerical periodic state -> BDF integrated cycle |
-| Conventional inverse estimate | fit_baseline | Fixed noisy probes -> fitted kappa |
-| Neural representation | Jet2, neural_fields | Trainable weights and y -> A,B and spatial derivatives |
-| Physics training | residual_jacobian, train_pinn | Data and collocation -> neural weights and kappa |
-| Scoring | evaluate, field_metrics | Trained method plus withheld exact reference -> errors and timing |
-| Diagnostics | p1_verification, plot_summary, plot_case, plot_diagnosis | Saved results -> P1--P5 figures |
-| Report | make_report.py | Completed numerical CSV/JSON files -> this report |
+| Time-integration check | mol_check | Numerical periodic state -> BDF-integrated cycle |
+| Conventional inverse fit | fit_baseline | Fixed noisy probes -> fitted kappa |
+| Neural representation | Jet2, neural_fields | Weights and y -> A, B and their spatial derivatives |
+| Physics training | residual_jacobian, train_pinn | Data and collocation points -> network weights and kappa |
+| Scoring | evaluate, field_metrics | Trained model plus withheld exact reference -> errors and timings |
+| Diagnostics | p1_verification, plot_summary, plot_case, plot_diagnosis | Saved results -> P1–P5 and Path B figures |
+| Longer-budget control | budget_controls.py | Thin-case data -> 6,000-evaluation vanilla/scaling/combined fits |
+| Residual-adaptive refinement | adaptive_fix.py (refine) | Combined models and PDE residual monitor -> five refinement rounds |
+| Independent audit | audit_submission.py | Saved fields and models -> recomputed error, dense residual audit, supplementary figures |
+| Report draft | make_report.py | Saved CSV/JSON results -> first draft of this report |
 
 ### 3.3 Files and audit trail
 
 - oscillating_bl.py: complete numerical study and figure generation.
 - test_numerics.py: six scientific verification tests.
 - requirements.txt: exact package versions.
-- make_report.py: report generator; tables use measured results.
-- budget_controls.py: nine tenfold-budget controls, retained separately from the primary runs.
+- budget_controls.py: nine tenfold-budget controls, kept separate from the primary runs.
 - adaptive_fix.py: five fixed residual-adaptive refinement rounds for each thin-case seed.
-- audit_submission.py: independent field-error audit and supplementary figures.
-- final_results/data/: all 33 clean/noisy measurement datasets, standard Gaussian draws and probe coordinates.
-- final_results/models/: every fitted model and per-run metrics/optimizer status.
-- final_results/histories/: objective evaluations, elapsed time and separate losses for every neural run.
-- final_results/metrics.csv: all 117 method/case records, including all seeds and negative outcomes.
-- final_results/budget_metrics.csv and adaptive_metrics.csv: longer-budget controls and every refinement round.
-- final_results/baseline_grid_convergence.csv and mol_verification.json: independent baseline evidence.
-- final_results/fields/: representative full fields used for the displayed moderate/thin-case plots; all fields can be regenerated from the code.
-- final_results/figures/: diagnostic PNGs linked below.
-- final_results/environment.json: command, versions, hardware, thread settings and source hash.
+- audit_submission.py: independent field-error audit, dense residual audit and supplementary figures.
+- make_report.py: generated the first draft of this report from measured results.
+- final_results/data/: all 33 clean/noisy measurement datasets, with their standard Gaussian draws and probe coordinates.
+- final_results/models/: every fitted model with its per-run metrics and optimizer status.
+- final_results/histories/: per-evaluation objective components, elapsed time and kappa for every neural run.
+- final_results/metrics.csv: all 117 primary method/case records, including every seed and negative outcomes.
+- final_results/budget_metrics.csv and adaptive_metrics.csv: the longer-budget controls and every refinement round.
+- final_results/baseline_grid_convergence.csv and mol_verification.json: independent baseline verification.
+- final_results/dense_residual_audit.csv and verification_audit.json: audit outputs (Sections 8.3 and 11).
+- final_results/fields/: seven representative full fields used in the plots.
+- final_results/figures/: the diagnostic PNGs linked below.
+- final_results/environment.json (plus budget_ and adaptive_environment.json): command, versions, hardware, thread settings and source hashes.
 
-The archive includes every model, measurement dataset, loss history and summary metric. To keep it compact, it includes full field arrays for the six plotted baseline/vanilla/combined runs (first seed, delta=0.1 and 0.01) and the first-seed final adaptive field; the full commands regenerate every other field array. No input PDF is redistributed.
+To keep the archive compact, full field arrays are included only for the six plotted baseline/vanilla/combined runs (seed 17, delta = 0.1 and 0.01) and the seed-17 final adaptive field. Every model, measurement dataset, loss history and summary metric is included, and the commands above regenerate all other field arrays. The assignment and task-card PDFs are not redistributed.
 
 Source SHA-256 at experiment execution: `567777beb993db101a9ade366ad1180b6f76d36a02b9561fd4324d60a24d7f20`.
 
@@ -167,23 +191,27 @@ Source SHA-256 at experiment execution: `567777beb993db101a9ade366ad1180b6f76d36
 
 ### 4.1 Spatial discretization
 
-Use a fixed grid yj=sinh(6 j/N)/sinh(6), with N=400 intervals for inverse fitting. The grid is chosen without knowing the true kappa. For hm=yj-yj-1 and hp=yj+1-yj,
+The baseline uses a fixed stretched grid y_j = sinh(6 j/N)/sinh(6), with N = 400 intervals for inverse fitting. The grid is chosen without knowledge of the true kappa. With h_m = y_j - y_{j-1} and h_p = y_{j+1} - y_j, the second derivative is approximated by
 
 $$
 (D_2u)_j=\frac{2u_{j-1}}{h_m(h_m+h_p)}-\frac{2u_j}{h_m h_p}+\frac{2u_{j+1}}{h_p(h_m+h_p)}.
 $$
 
-Boundary values are incorporated in the right-hand side. The smooth stretched grid clusters points at the wall while retaining the full domain.
+Boundary values enter through the right-hand side. The smooth stretching clusters points at the wall while still covering the whole domain: the first spacing is 7.4e-5, and 96 of the 400 intervals lie inside y <= 0.01, the thinnest tested layer thickness.
 
 ### 4.2 Periodic solver and time-integration check
 
-Because the PDE and boundary conditions are linear with one known forcing frequency, insert u=Re[a(y) exp(it)] into the discretized PDE:
+Because the PDE and boundary conditions are linear with a single known forcing frequency, substituting u = Re[a(y) e^{it}] into the discretized PDE gives
 
 $$
 (\kappa D_2-iI)a=-i\mathbf1,
 $$
 
-with a(0)=0 and a(1)=1. A tridiagonal complex banded solve produces the numerical periodic state. It does not insert the exact spatial formula. This is an efficient conventional solver for exactly the PDE being compared, not a weakened baseline.
+with a(0) = 0 and a(1) = 1. One complex tridiagonal (banded) solve produces the numerical periodic state; the exact spatial formula is never inserted. This is an efficient conventional solver for exactly the PDE under comparison, not a weakened baseline.
+
+**Departure from the task card's time-marching recipe:** instead of marching from u = 1 for every trial viscosity, the inverse baseline solves the periodic finite-difference system directly. As a separate check, a BDF `solve_ivp` integration of the same method-of-lines system runs over one full cycle, starting from the numerical periodic state (N = 200, all five kappa truths). Its largest relative L2 difference from the periodic solution over the cycle is **1.37e-7**. This shows the time-domain and harmonic solvers agree; it is not a startup-from-uniform-flow validation. The 10–20 startup cycles suggested in the task card do not guarantee convergence, because the slowest error mode decays roughly as exp(-kappa pi^2 t). A 1e-6 decay takes about 17 cycles at delta = 1/6 but about 4,456 cycles at delta = 0.01. Solving for the periodic state directly avoids charging the baseline for an unnecessarily expensive transient.
+
+Grid refinement with N = {100, 200, 400, 800} is checked against the finite-domain exact amplitude. At N = 400 the largest relative L2 amplitude error over the five thicknesses is **1.3e-5** (at delta = 1/6), and each grid doubling reduces the error by a factor of about 4, consistent with second-order convergence. A unit test checks this convergence independently.
 
 **Departure from the task-card time-marching recipe:** the main inverse baseline solves the periodic finite-difference system directly instead of marching from u=1 for each trial viscosity. A separate BDF solve_ivp check integrates that same method-of-lines system for a complete cycle, initialized from the numerical periodic state. The maximum measured relative difference from that state is **1.37e-07**. This confirms the time and harmonic solvers agree; it is not a startup-from-uniform-flow validation. The task card's suggested 10--20 startup cycles are not a convergence guarantee: the slowest error mode decays approximately as exp(-kappa pi^2 t). At delta=0.01, a factor 1e-6 decay can require about 4,456 cycles. Solving the periodic state avoids charging an unnecessarily expensive transient to the baseline.
 
@@ -193,25 +221,27 @@ Grid refinement N={100,200,400,800} is checked against the finite-domain exact a
 
 ### 4.3 Conventional inverse fit
 
-For candidate kappa, solve the finite-difference system, interpolate its complex amplitude to the fixed probes, and minimize the mean squared velocity mismatch to the same noisy measurements used by the PINN. Optimize log(kappa) over the shared broad bounds. A 61-point coarse scan precedes three local bounded scalar refinements. The global scan is necessary because trial layers much thinner than all probes produce almost flat misfit regions; a single broad local scalar search can stop there incorrectly.
+For each candidate kappa, the baseline solves the finite-difference system, interpolates the complex amplitude to the fixed probe heights, and computes the mean squared velocity mismatch against the same noisy measurements the PINN uses. It optimizes log(kappa) over the shared bounds. A 61-point coarse scan in log(kappa) comes first; then bounded scalar minimization refines each of the three best scan points within its neighboring scan interval, and the best of the three is kept. The global scan matters because trial layers much thinner than all three probes produce an almost flat misfit, and a single bounded search over the full range can stall there.
 
-The baseline's measured inverse time includes the scan, every numerical forward solve, interpolation and scalar optimization. Exact reference values never enter its objective. The independent noiseless inverse test recovers kappa within 0.1%; the actual default-grid error is much smaller.
+The reported inverse time includes the scan, every numerical forward solve, the interpolation and the scalar optimization. Exact reference values never enter the objective. A unit test with noiseless data recovers kappa to within 0.1% on an N = 800 grid; rerunning that noiseless case on the default N = 400 grid gives a relative error of about 3e-6.
 
 ## 5. Synthetic measurements and the PINN
 
 ### 5.1 Measurement generation
 
-At each of the three heights, sample one cycle at t=2 pi j/Nt, j=0,...,Nt-1. The duplicate cycle endpoint is omitted. Generate
+At each of the three probe heights, one cycle is sampled at t = 2 pi j/Nt, j = 0, ..., Nt-1; the duplicate endpoint at 2 pi is omitted. The observations are
 
 $$
 u^{obs}_{ij}=u_\infty(y_i,t_j;\kappa_{true})+\sigma\epsilon_{ij},\qquad\epsilon_{ij}\sim\mathcal N(0,1).
 $$
 
-Sigma is a fraction of U0, not a percentage of the instantaneous velocity. Zero crossings therefore do not create a relative-noise singularity. Noise is added only to observations. The reference, PDE and boundary conditions remain clean. Save the clean samples and standard Gaussian draws. The same dataset is reused for every paired method. Seeds also change neural initialization; these three replications therefore combine measurement and initialization variability rather than independently estimating each contribution.
+Sigma is a fraction of U0, not of the instantaneous velocity, so zero crossings do not create a relative-noise singularity. Noise is added only to the observations; the reference, PDE and boundary conditions stay clean. The clean samples and the standard Gaussian draws are saved, and every method in a pairing uses the identical dataset.
+
+The standard Gaussian draws depend only on the seed, so a given seed reuses the same draws at every thickness and noise level. Because the probes also scale with delta, the baseline faces an almost self-similar problem across the thickness sweep, which is why its kappa error barely changes (Section 6.2). The seed also sets the neural initialization and the collocation points. The three replications therefore combine measurement and initialization variability rather than estimating either one independently.
 
 ### 5.2 Trainable neural representation and its scope
 
-The network is a fully trainable, single-hidden-layer, 16-unit tanh MLP with two outputs:
+The network is a fully trainable multilayer perceptron with one hidden layer of 16 tanh units and two outputs:
 
 $$
 z_j(y)=\tanh(w_j y/s+b_j),\quad A(y)=\sum_jv^A_jz_j+c_A,\quad B(y)=\sum_jv^B_jz_j+c_B,
@@ -219,39 +249,39 @@ $$
 
 $$u_\theta(y,t)=A(y)\cos t+B(y)\sin t.$$
 
-All hidden weights, hidden biases, output weights and output biases are optimized together with log(kappa): 67 trainable parameters. Time periodicity is exact. Neither A(y) nor B(y) is supplied as the Stokes exponential; their spatial shapes must be learned from sparse probes and physics.
+Here s is the coordinate scale: s = 1 for the raw-coordinate variants, and s = delta0 (Section 8.1) for the scaled variants. All hidden weights and biases and all output weights and biases are optimized together with log(kappa), 67 trainable parameters in total (4 × 16 + 2 + 1). Time periodicity is exact by construction. Neither A(y) nor B(y) is given the Stokes exponential form; their spatial shapes must be learned from the sparse probes and the physics.
 
-**Departure from a generic MLP taking (y,cos t,sin t):** the harmonic output form uses the known single-frequency linear response to restrict time dependence. This is a specialized PINN and gives it useful physics information beyond a generic space-time network. Both neural variants and the strong numerical baseline exploit the same known forcing frequency. Conclusions do not establish how a generic PyTorch space-time PINN would train, or how nonlinear/multifrequency airfoil flows would behave.
+**Departure from a generic MLP with inputs (y, cos t, sin t):** the harmonic output form builds in the known single-frequency linear response, restricting the time dependence. This makes it a specialized PINN that has more physical information than a generic space-time network. Both neural variants and the numerical baseline use the same known forcing frequency. Our conclusions therefore say nothing about how a generic space-time PINN (for example in PyTorch) would train, or how nonlinear or multi-frequency airfoil flows would behave.
 
-Spatial first/second derivatives are propagated with a minimal forward-mode automatic differentiator (Jet2) using affine and tanh primitive rules. Optimizer parameter Jacobians are analytic. Complex-step checks independently verify every Jacobian column and the second spatial derivatives in both raw/scaled coordinates. No finite differences of noisy observations are used by the PINN.
+First and second spatial derivatives are propagated with a minimal forward-mode automatic differentiator (Jet2) built from affine and tanh rules. The Jacobians with respect to the optimizer parameters are analytic. Unit tests verify, by complex-step differentiation, every column of the residual Jacobian and the second spatial derivatives, in both raw and scaled coordinates. The PINN never takes finite differences of noisy observations.
 
 ### 5.3 Loss, optimizer and initialization
 
-For the harmonic trial function the residual is
+For the harmonic trial function, the PDE residual is
 
 $$
 r(y,t)=[B-\kappa A'']\cos t+[1-A-\kappa B'']\sin t.
 $$
 
-The PDE loss integrates its squared value **exactly in time**, giving
+The PDE loss integrates its square **exactly in time**, which gives
 
 $$
 L_{PDE}=\frac1{2N_c}\sum_{j=1}^{N_c}\left[(B_j-\kappa A_j'')^2+(1-A_j-\kappa B_j'')^2\right].
 $$
 
-The data loss is ordinary mean squared velocity error. The boundary loss is the mean of A(0)^2, B(0)^2, [A(1)-1]^2 and B(1)^2. Train with L=Ldata+LPDE+LBC, equal component weights and no separate initial-condition term. Boundary conditions are soft rather than embedded exactly in the spatial network.
+The data loss is the ordinary mean squared velocity error at the probes. The boundary loss is the mean of A(0)^2, B(0)^2, [A(1)-1]^2 and B(1)^2. The training objective is L = L_data + L_PDE + L_BC with equal weights and no initial-condition term. The boundary conditions are therefore soft penalties, not built exactly into the network.
 
-SciPy's trust-region reflective nonlinear least-squares method uses the supplied full Jacobian, float64 arithmetic, ftol=xtol=gtol=1e-9 and at most 600 function evaluations. This is an optimization choice suited to a small residual-based inverse problem; it is not an Adam experiment. Wall time is also reported because equal evaluation counts do not imply identical compute cost.
+Training uses SciPy's trust-region reflective nonlinear least-squares method with the full analytic Jacobian, float64 arithmetic, ftol = xtol = gtol = 1e-9 and at most 600 function evaluations. This choice suits a small residual-based inverse problem; it is not an Adam experiment. Wall time is reported as well, because equal evaluation counts do not imply equal compute cost.
 
-Initialization is away from truth: seeds 17 and 41 start kappa at 5 times true, and seed 29 at 0.2 times true, following the task card's synthetic initialization check. This is a controlled benchmark initialization, not a procedure for selecting a starting viscosity from unknown real data. Each matched method uses the same initial weights and estimate. An additional experiment with data-selected initialization would be needed for a deployment claim.
+Initialization deliberately starts away from the truth: seeds 17 and 41 start with kappa at 5 times the true value and seed 29 at 0.2 times, following the task card's synthetic initialization check. This is a controlled benchmark, not a procedure for choosing a starting viscosity from unknown real data; a deployment claim would need an extra experiment with a data-selected starting value. Within each seed, every PINN variant starts from the same initial weights and kappa estimate. The two oracle controls are the exception: they are given the true kappa.
 
-**Stopping status:** 84 of 84 neural runs reached the 600-evaluation budget rather than a convergence tolerance. Their measured errors are valid finite-budget results; no claim of fully converged global optima is made. Status, final objective and optimality are retained per run.
+**Stopping status:** all 84 primary neural runs (vanilla and combined on 33 datasets, plus 6 sampling, 6 scaling and 6 oracle runs) stopped at the 600-evaluation limit rather than at a convergence tolerance. Their errors are valid finite-budget results, and we make no claim of fully converged or globally optimal fits. Each run's status, final objective and optimality measure are saved.
 
 ## 6. P2--P5 diagnostics and measured results
 
 ### 6.1 P2: separate loss histories
 
-Every neural run records data, PDE and boundary losses separately on each objective evaluation. Histories include rejected trust-region trial steps, so curves need not be monotone. The supervised oracle control's optimized history is its supervised field loss, not a physics-training history; its final physics residual is scored separately.
+Every neural run records its data, PDE and boundary losses separately at every objective evaluation. These histories include trust-region trial steps that were rejected, so the curves need not decrease monotonically. For the supervised oracle control, the optimized history is its supervised field loss, not a physics-training history; its final physics residual is scored separately.
 
 ![P2 moderate case](final_results/figures/P2_losses_d0.1.png)
 
@@ -259,25 +289,27 @@ Every neural run records data, PDE and boundary losses separately on each object
 
 ### 6.2 P3: errors against each knob
 
-Relative field L2 is the square root of integrated mean-in-time squared error divided by integrated mean-in-time squared reference, evaluated on an independent uniform grid with 1,201 heights and 128 times. Also score the region y<=min(6 delta,1) separately: a whole-domain norm can conceal errors in a very thin layer. Parameter error is abs(kappa_hat/kappa_true-1). Shear amplitude and phase are derived from the learned wall derivative, not imposed as targets. Three-seed medians and full observed ranges are shown; the ranges are not confidence intervals.
+Relative field L2 error is the square root of the time-averaged squared error integrated over y, divided by the same integral of the reference, evaluated on an independent uniform grid of 1,201 heights × 128 times. The near-wall region y <= min(6 delta, 1) is also scored separately, because a whole-domain norm can hide errors in a very thin layer (at delta = 1/6 this region is the entire domain, so the two norms coincide). Parameter error is |kappa_hat/kappa_true - 1|. Shear amplitude and phase come from the learned wall derivative; they are never training targets. The figure shows three-seed medians and the full range over seeds; the ranges are not confidence intervals.
 
 ![P3 knob sweeps](final_results/figures/P3_knob_sweeps.png)
 
-P3 shows the main physical difficulty knob, \(L/\delta\), in the first column. Increasing this ratio produces a thinner boundary layer with sharper velocity changes near the wall, which can make the flow more difficult to resolve. The plots compare the conventional numerical baseline (black), vanilla PINN (red), and combined PINN (green). The combined PINN uses coordinate scaling and concentrates more physics collocation points near the wall.
+The columns of P3 correspond to the three knobs. The first column is the main physical difficulty knob, L/delta: a larger ratio means a thinner boundary layer with sharper near-wall gradients. The other two columns are measurement knobs, the noise standard deviation and the number of samples per cycle per probe, each varied one at a time about the reference setting. The rows show viscosity error, whole-field L2 error and wall-shear amplitude error for the conventional baseline (black), the vanilla PINN (red) and the combined PINN (green), which rescales the network coordinate and concentrates half its collocation points near the wall.
 
-Two additional knobs control the measurement data: the standard deviation of the simulated noise and the number of samples per cycle per probe. Higher noise makes the observations less reliable, while fewer samples provide less information for estimating viscosity and reconstructing the flow. Each knob is varied separately while the other settings remain fixed.
+**Measurement knobs.** The viscosity error of all three methods grows almost linearly with noise, from essentially zero at sigma = 0 to about 10% at sigma = 0.10, and falls with more samples (baseline: 2.67% at Nt = 8, 2.12% at Nt = 16, 0.69% at Nt = 64). The three methods track each other closely along both knobs. This error is set mainly by the information in the noisy probes, and better physics enforcement in the network does not remove it.
 
-The results show that errors increase with measurement noise and generally decrease with more samples. However, the thickness sweep does not show a uniform increase in error as the boundary layer becomes thinner. Whole-field velocity error decreases partly because the near-wall region occupies a smaller fraction of the domain, potentially concealing localized errors.
+**Thickness knob.** Errors do not grow steadily as the layer thins. The baseline's viscosity and shear-amplitude errors stay at 2.12% and 1.08% at every thickness, because the probes and the standardized noise draws scale with delta (Section 5.1). The whole-field L2 error of every method falls as the layer thins, partly because the near-wall region becomes a smaller fraction of the domain; the near-wall norm in the table below is the fairer comparison. Two thin-layer trends do appear. The PINNs' near-wall L2 error rises from 0.36% at delta = 1/6 to about 0.61% at delta = 0.01, while the baseline's stays near 0.32%. The PINNs' wall-shear phase error also rises, from about 0.1 degrees to 0.3–0.8 degrees, while the baseline's stays below 0.003 degrees.
 
-The PINNs produce viscosity and wall-shear estimates comparable to the baseline, with occasional improvements, but the baseline generally achieves lower whole-field velocity error. The combined PINN does not show a consistent accuracy advantage. All three methods remain sensitive to measurement noise, indicating that improved near-wall physics enforcement alone does not eliminate uncertainty caused by noisy observations.
+**Method comparison.** The PINNs estimate viscosity and shear amplitude about as well as the baseline, sometimes slightly better for a given seed, but the baseline has lower whole-field and near-wall velocity errors at every thickness. The combined PINN has no consistent advantage over the vanilla PINN along this sweep. At delta >= 0.1 its near-wall sampling is mostly inactive: when the initial layer estimate gives 6 delta0 >= 1 (seeds 17 and 41 at delta = 0.1), the "near-wall" region is the whole domain. Its benefit appears in the controlled thin-layer comparison of Section 7, not in this sweep.
 
-| delta/L | kappa true | Baseline kappa error (%) | Vanilla kappa error (%) | Combined kappa error (%) | Vanilla near-wall L2 (%) | Combined near-wall L2 (%) |
-|---|---:|---:|---:|---:|---:|---:|
-| 0.167 | 0.0139 | 2.13 | 2.2 | 2.2 | 0.355 | 0.355 |
-| 0.1 | 0.005 | 2.12 | 2.16 | 2.19 | 0.422 | 0.421 |
-| 0.05 | 0.00125 | 2.12 | 2.06 | 2.16 | 0.502 | 0.476 |
-| 0.02 | 0.0002 | 2.12 | 1.56 | 2.1 | 0.578 | 0.505 |
-| 0.01 | 5e-05 | 2.12 | 1.88 | 2.01 | 0.611 | 0.605 |
+| delta/L | kappa true | Baseline kappa error (%) | Vanilla kappa error (%) | Combined kappa error (%) | Baseline near-wall L2 (%) | Vanilla near-wall L2 (%) | Combined near-wall L2 (%) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 0.167 | 0.0139 | 2.13 | 2.20 | 2.20 | 0.330 | 0.355 | 0.355 |
+| 0.1 | 0.005 | 2.12 | 2.16 | 2.19 | 0.323 | 0.422 | 0.421 |
+| 0.05 | 0.00125 | 2.12 | 2.06 | 2.16 | 0.323 | 0.502 | 0.476 |
+| 0.02 | 0.0002 | 2.12 | 1.56 | 2.10 | 0.324 | 0.578 | 0.505 |
+| 0.01 | 5e-05 | 2.12 | 1.88 | 2.01 | 0.325 | 0.611 | 0.605 |
+
+Values are three-seed medians at sigma = 0.02 and Nt = 16.
 
 ### 6.3 Thin-case numerical comparison
 
