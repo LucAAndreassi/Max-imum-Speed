@@ -280,11 +280,11 @@ Initialization deliberately starts away from the truth: seeds 17 and 41 start wi
 
 Every neural run records its data, PDE and boundary losses separately at every objective evaluation. These histories include trust-region trial steps that were rejected, so the curves need not decrease monotonically. For the supervised oracle control, the optimized history is its supervised field loss, not a physics-training history; its final physics residual is scored separately.
 
-![P2 moderate-case losses](report_figures/P2_losses_d0.1.png)
+![P2 moderate-case losses](final_results/figures/P2_losses_d0.1.png)
 
 *Figure 2. P2: vanilla and combined loss components at $\delta/L=0.1$, $\sigma/U_0=0.02$, $N_t=16$, seed 17. The logarithmic curves include rejected trust-region trial evaluations.*
 
-![P2 thin-case losses](report_figures/P2_losses_d0.01.png)
+![P2 thin-case losses](final_results/figures/P2_losses_d0.01.png)
 
 *Figure 3. P2: the same losses at $\delta/L=0.01$, with identical noise level, sample count and seed. No initial-condition loss is needed for the periodic ansatz.*
 
@@ -292,15 +292,15 @@ Every neural run records its data, PDE and boundary losses separately at every o
 
 Relative field $L^2$ error integrates time-averaged squared error over an independent grid of 1,201 heights and 128 times, normalized by the reference norm. The near-wall region $y\leq\min(6\delta,1)$ is scored separately. Parameter error is $|\widehat\kappa/\kappa_{\mathrm{true}}-1|$. Gradient amplitude and phase come from the learned wall derivative, not training targets. Lines are three-seed medians and bands are full seed ranges, not confidence intervals.
 
-![P3 thickness sweep](report_figures/P3_delta.png)
+![P3 thickness sweep](final_results/figures/P3_delta.png)
 
 *Figure 4. P3: viscosity, whole-field and wall-gradient amplitude errors against inverse thickness. Larger $L/\delta$ means a thinner layer.*
 
-![P3 noise sweep](report_figures/P3_noise.png)
+![P3 noise sweep](final_results/figures/P3_noise.png)
 
 *Figure 5. P3: the same errors against observation-noise standard deviation at $\delta/L=0.1$ and $N_t=16$.*
 
-![P3 sampling sweep](report_figures/P3_nt.png)
+![P3 sampling sweep](final_results/figures/P3_nt.png)
 
 *Figure 6. P3: the same errors against samples per probe per cycle at $\delta/L=0.1$ and $\sigma/U_0=0.02$.*
 
@@ -312,7 +312,7 @@ The compared methods are baseline, vanilla PINN and combined PINN. The combined 
 
 **Method comparison.** The PINNs estimate viscosity and gradient amplitude with errors of similar order to the baseline, but the baseline has lower whole-field and near-wall velocity error at every thickness. Gradient accuracy alone does not determine physical-stress accuracy (Section 6.3). The combined method has no consistent advantage over vanilla across this sweep. At $\delta/L\geq0.1$, its near-wall allocation is often inactive: when $6\delta_0\geq1$, that region spans the whole domain. The controlled thin-layer comparisons in Section 7 provide the stronger evidence for its mechanism.
 
-![P3 near-wall and phase errors](report_figures/P3_layer_phase.png)
+![P3 near-wall and phase errors](final_results/figures/P3_layer_phase.png)
 
 *Figure 7. P3: near-wall relative $L^2$ and wall-gradient/stress phase error across thickness, using three-seed medians and full seed ranges. These reveal local behavior hidden by the whole-domain norm.*
 
@@ -346,21 +346,21 @@ At $\delta/L=0.01$, $\sigma/U_0=0.02$ and $N_t=16$, the following values are med
 
 P4 compares baseline, vanilla and combined for $\delta/L=0.1$ and $0.01$, at $\sigma/U_0=0.02$, $N_t=16$ and seed 17, which was selected before inspecting results. The left column is signed velocity error $e=u_{\mathrm{pred}}-u_{\mathrm{ref}}$; the right is the PDE residual at the fitted viscosity. The maps show $y\leq\min(6\delta,1)$. Within each figure, velocity-error panels share one color scale and available residual panels share another. The baseline's continuous residual is unavailable because differentiating its interpolated field introduces a separate approximation; its discrete FD equations are solved to numerical precision.
 
-![P4 moderate near-wall fields](report_figures/P4_fields_d0.1.png)
+![P4 moderate near-wall fields](final_results/figures/P4_fields_d0.1.png)
 
 *Figure 8. P4: moderate-layer error and held-out PDE-residual maps. Scales are shared within each column.*
 
-![P4 thin near-wall fields](report_figures/P4_fields_d0.01.png)
+![P4 thin near-wall fields](final_results/figures/P4_fields_d0.01.png)
 
 *Figure 9. P4: thin-layer error and residual maps, using the same within-column scaling rule.*
 
 The error bands lie mainly within a few layer thicknesses and vary with forcing phase. At $\delta/L=0.1$, vanilla and combined are similar because the initial near-wall allocation spans the full domain for this seed. At $0.01$, combined reduces the largest near-wall residuals, although velocity-error patterns remain similar. Better physics enforcement does not automatically yield a comparable reduction in velocity error.
 
-![P4 wall-gradient, hysteresis and spatial spectrum](report_figures/P4_gradient_spectrum_d0.01.png)
+![P4 wall-gradient, hysteresis and spatial spectrum](final_results/figures/P4_gradient_spectrum_d0.01.png)
 
 *Figure 10. P4: dimensionless wall-gradient history $g$ and the spatial velocity-error spectrum. This figure plots the gradient; physical stress and its hysteresis loop are shown separately below.*
 
-![P4 physical wall stress](report_figures/P4_stress_d0.01.png)
+![P4 physical wall stress](final_results/figures/P4_stress_d0.01.png)
 
 *Figure 11. P4: inferred physical stress, normalized by $\rho\omega L U_0$, and its hysteresis loop at the thin setting. Each fitted curve uses that method's inferred viscosity.*
 
@@ -397,7 +397,7 @@ Vanilla does not catastrophically collapse over the thickness sweep. The diagnos
 | 0.1 | 2.92e-6 | 0.00221 | 1.22 | 0.965 | 0.153 |
 | 0.01 | 2.31e-9 | 0.1009 | 4.32 | 5.96 | 1.68 |
 
-![Scaling-only failure versus thickness](report_figures/P3_scaling_failure.png)
+![Scaling-only failure versus thickness](final_results/figures/P3_scaling_failure.png)
 
 *Figure 14. Path B/P3: scaling-only sampled physics loss and held-out errors across its two tested thicknesses. Values are three-seed medians at $\sigma/U_0=0.02$ and $N_t=16$. Two settings show deterioration but do not identify a precise threshold or establish a monotonic trend between them.*
 
@@ -419,7 +419,7 @@ The sampling intervention changes both where residual constraints are evaluated 
 | 29 | 1.82 | 2.01 | 12.8 | 1.15 | 0.165 | 0.00834 |
 | 41 | 1.88 | 1.05 | 4.32 | 0.206 | 0.101 | 0.00526 |
 
-![B/C controlled experiments](report_figures/BC_controlled_diagnosis.png)
+![B/C controlled experiments](final_results/figures/BC_controlled_diagnosis.png)
 
 *Figure 15. Matched thin-layer ablations: dots are individual seeds, bars are medians; amplitude error refers to the wall gradient. Oracle controls are not viscosity estimators.*
 
@@ -463,7 +463,7 @@ Starting from each original combined model, evaluate the current PDE residual on
 
 All entries are three-seed medians at $\delta/L=0.01$, $\sigma/U_0=0.02$ and $N_t=16$. Inference uses the same warmed 153,728-value velocity query as P5. Adaptive is the fifth predetermined round, not the checkpoint with lowest exact error. Stress errors are computed per seed using fitted viscosity.
 
-![Longer training and adaptive refinement](report_figures/BC_budget_and_adaptive.png)
+![Longer training and adaptive refinement](final_results/figures/BC_budget_and_adaptive.png)
 
 *Figure 16. Longer fixed-point training versus adaptive constraint enrichment. Gradient-amplitude error and held-out residual are distinct diagnostics. Adaptive uses additional points and monitoring work.*
 
@@ -481,7 +481,7 @@ Losses across refinement boundaries use a changing point set and should not be r
 
 *Figure 18. P4: independent spatial amplitude-error and PDE-residual profiles at the thin setting, seed 17.*
 
-![Adaptive spatial error spectrum](report_figures/BC_adaptive_spectrum.png)
+![Adaptive spatial error spectrum](final_results/figures/BC_adaptive_spectrum.png)
 
 *Figure 19. P4: spatial velocity-error cosine spectra for baseline, vanilla, combined and final adaptive fields, seed 17. Spectra describe error scales; they do not alone prove spectral bias.*
 
