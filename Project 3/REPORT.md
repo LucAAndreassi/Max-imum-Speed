@@ -49,7 +49,7 @@ $$
 \frac{\partial u}{\partial t}=\frac{dU_e}{dt}+\nu\frac{\partial^2 u}{\partial y^2},\qquad u(0,t)=0,\qquad u\to U_e(t)\ \text{far from the wall}.
 $$
 
-Its exact periodic solution has thickness $\delta=\sqrt{2\nu/\omega}$ and wall stress $\tau_w=(\sqrt{2}\mu U_0/\delta)\cos(\omega t+\pi/4)$, which **leads the outer velocity by $45^\circ$**. The stress traces a hysteresis loop against outer velocity over a cycle. A quasi-steady relation proportional to instantaneous outer velocity misses this phase behavior. Integrating the equation across the half-space gives $d(U_e\delta^*)/dt=\tau_w/\rho$, where $\delta^*$ is displacement thickness. This identifies wall stress as a quantity an unsteady closure must supply.
+Its exact periodic solution has thickness $\delta=\sqrt{2\nu/\omega}$ and wall stress $\tau_w=(\sqrt{2}\mu U_0/\delta)\cos(\omega t+\pi/4)$, which **leads the outer velocity by $45^\circ$**. The stress traces a hysteresis loop against outer velocity over a cycle. A quasi-steady relation proportional to instantaneous outer velocity misses this phase behavior. Integrating the equation across the half-space gives $d(U_e\delta^{\ast})/dt=\tau_w/\rho$, where $\delta^{\ast}$ is displacement thickness. This identifies wall stress as a quantity an unsteady closure must supply.
 
 **The inverse problem.** Treat $\nu$ as unknown. From three noisy velocity probes at $y=\{0.5\delta,\delta,2\delta\}$, sampled $N_t$ times per cycle, infer viscosity and the wall gradient, then reconstruct physical stress using the inferred viscosity. Compare the PINN with a conventional solver-based fit. Raising frequency thins the layer, with $\delta/L$ ranging from $1/6$ to $1/100$. Observation noise from 0–10% of $U_0$ and $N_t\in\{64,16,8\}$ are secondary knobs. The known exact solution permits independent scoring.
 
@@ -105,7 +105,7 @@ $$
 
 The saved `shear_amplitude_relative_error` metric scores **wall-gradient amplitude**, not physical stress. We retain its original meaning and report physical stress error separately. Positive viscosity leaves gradient and stress phase identical, but their amplitude errors and method rankings can differ.
 
-The half-space field does not equal cos t exactly at y = 1. The discrepancy is bounded by exp(-1/delta): 2.48e-3 U0 at delta = 1/6, 4.54e-5 U0 at delta = 0.1, 2.1e-9 U0 at delta = 0.05 and negligible for the thinner cases. We keep the task-card half-space reference for generating data and for scoring, and both inverse methods enforce the approximate far-field condition u(1,t) = cos t. Separately, we verify the discretization against the **boundary-consistent finite-domain analytic amplitude**
+The half-space field does not equal $\cos t$ exactly at $y=1$. The discrepancy is bounded by $e^{-1/\delta}$: $2.48\times10^{-3}U_0$ at $\delta=1/6$, $4.54\times10^{-5}U_0$ at $\delta=0.1$, $2.1\times10^{-9}U_0$ at $\delta=0.05$, and negligible for the thinner cases. We keep the task-card half-space reference for generating data and scoring, and both inverse methods enforce the approximate far-field condition $u(1,t)=\cos t$. Separately, we verify the discretization against the **boundary-consistent finite-domain analytic amplitude**:
 
 $$
 a_F(y)=1-\frac{\sinh[q(1-y)]}{\sinh q},\qquad q=(1+i)/\delta,\qquad u_F=\Re[a_F e^{it}].
@@ -209,7 +209,7 @@ with a(0) = 0 and a(1) = 1. One complex tridiagonal (banded) solve produces the 
 
 Grid refinement with $N\in\{100,200,400,800\}$ is checked against the finite-domain analytic amplitude. At $N=400$, the largest tested relative $L^2$ amplitude error is **$1.3\times10^{-5}$**. Each grid doubling reduces error by approximately four, consistent with second-order convergence, which is also checked by a unit test.
 
-*Figure 1. P1: finite-domain forward-solver verification for all five thicknesses. Errors decrease approximately quadratically under grid refinement.*
+Figure 1. P1: finite-domain forward-solver verification for all five thicknesses. Errors decrease approximately quadratically under grid refinement.
 ![P1 grid convergence](final_results/figures/P1_grid_convergence.png)
 
 ### 4.3 Conventional inverse fit
@@ -278,11 +278,11 @@ Every neural run records its data, PDE and boundary losses separately at every o
 
 ![P2 moderate-case losses](final_results/figures/P2_losses_d0.1.png)
 
-*Figure 2. P2: vanilla and combined loss components at $\delta/L=0.1$, $\sigma/U_0=0.02$, $N_t=16$, seed 17. The logarithmic curves include rejected trust-region trial evaluations.*
+Figure 2. P2: vanilla and combined loss components at $\delta/L=0.1$, $\sigma/U_0=0.02$, $N_t=16$, seed 17. The logarithmic curves include rejected trust-region trial evaluations.
 
 ![P2 thin-case losses](final_results/figures/P2_losses_d0.01.png)
 
-*Figure 3. P2: the same losses at $\delta/L=0.01$, with identical noise level, sample count and seed. No initial-condition loss is needed for the periodic ansatz.*
+Figure 3. P2: the same losses at $\delta/L=0.01$, with identical noise level, sample count and seed. No initial-condition loss is needed for the periodic ansatz.
 
 ### 6.2 P3: errors against each knob
 
@@ -290,13 +290,13 @@ Relative field $L^2$ error integrates time-averaged squared error over an indepe
 
 ![P3 knob sweeps](final_results/figures/P3_knob_sweeps.png)
 
-*Figure 4. P3: the three columns vary inverse thickness, observation-noise standard deviation and samples per probe per cycle. Rows show viscosity error, whole-field relative $L^2$ error and wall-gradient amplitude error. The existing figure labels the last quantity as wall shear; it measures $g=u_y(0,t)$ rather than physical stress. Lines are three-seed medians and bands are full seed ranges.*
+Figure 4. P3: the three columns vary inverse thickness, observation-noise standard deviation and samples per probe per cycle. Rows show viscosity error, whole-field relative $L^2$ error and wall-gradient amplitude error. The existing figure labels the last quantity as wall shear; it measures $g=u_y(0,t)$ rather than physical stress. Lines are three-seed medians and bands are full seed ranges.
 
 The compared methods are baseline, vanilla PINN and combined PINN. The combined method rescales coordinates and allocates half its collocation points to the initially estimated near-wall region. Near-wall errors are tabulated below; the scaling-only failure is quantified in Section 7.1.
 
 **Measurement knobs.** The viscosity error of all three methods grows almost linearly with noise, from essentially zero at sigma = 0 to about 10% at sigma = 0.10, and falls with more samples (baseline: 2.67% at Nt = 8, 2.12% at Nt = 16, 0.69% at Nt = 64). The three methods track each other closely along both knobs. This error is set mainly by the information in the noisy probes, and better physics enforcement in the network does not remove it.
 
-**Thickness knob.** Errors do not increase steadily as the layer thins. The baseline's median viscosity and gradient-amplitude errors remain approximately 2.12% and 1.08%, since probe coordinates and standardized noise scale with thickness. Whole-field error falls partly because the layer occupies less of the domain. Near-wall PINN errors rise from approximately 0.36% at $\delta/L=1/6$ to 0.61% at $0.01$; the baseline remains near 0.32%. PINN phase errors also rise to approximately $0.3$–$0.8^\circ$, while the baseline stays below $0.003^\circ$.
+**Thickness knob.** Errors do not increase steadily as the layer thins. The baseline's median viscosity and gradient-amplitude errors remain approximately 2.12% and 1.08%, since probe coordinates and standardized noise scale with thickness. Whole-field error falls partly because the layer occupies less of the domain. Near-wall PINN errors rise from approximately 0.36% at $\delta/L=1/6$ to 0.61% at $0.01$; the baseline remains near 0.32%. PINN phase errors also rise to approximately $0.3^\circ \text{ to } 0.8^\circ$, while the baseline stays below $0.003^\circ$.
 
 **Method comparison.** The PINNs estimate viscosity and gradient amplitude with errors of similar order to the baseline, but the baseline has lower whole-field and near-wall velocity error at every thickness. Gradient accuracy alone does not determine physical-stress accuracy (Section 6.3). The combined method has no consistent advantage over vanilla across this sweep. At $\delta/L\geq0.1$, its near-wall allocation is often inactive: when $6\delta_0\geq1$, that region spans the whole domain. The controlled thin-layer comparisons in Section 7 provide the stronger evidence for its mechanism.
 
@@ -332,23 +332,23 @@ P4 compares baseline, vanilla and combined for $\delta/L=0.1$ and $0.01$, at $\s
 
 ![P4 moderate near-wall fields](final_results/figures/P4_fields_d0.1.png)
 
-*Figure 5. P4: moderate-layer error and held-out PDE-residual maps. Panels use separate color scales; compare their colorbar values.*
+Figure 5. P4: moderate-layer error and held-out PDE-residual maps. Panels use separate color scales; compare their colorbar values.
 
 ![P4 thin near-wall fields](final_results/figures/P4_fields_d0.01.png)
 
-*Figure 6. P4: thin-layer error and residual maps, using separate panel color scales.*
+Figure 6. P4: thin-layer error and residual maps, using separate panel color scales.
 
 The error bands lie mainly within a few layer thicknesses and vary with forcing phase. At $\delta/L=0.1$, vanilla and combined are similar because the initial near-wall allocation spans the full domain for this seed. At $0.01$, combined reduces the largest near-wall residuals, although velocity-error patterns remain similar. Better physics enforcement does not automatically yield a comparable reduction in velocity error.
 
 ![P4 wall-gradient, hysteresis and spatial spectrum](final_results/figures/P4_shear_spectrum_d0.01.png)
 
-*Figure 7. P4: dimensionless wall-gradient history $g$, its hysteresis loop against outer velocity, and the spatial velocity-error spectrum. The existing shear label refers to the gradient. Physical stress additionally uses fitted viscosity; its amplitude errors are reported in Section 6.3, rather than plotted here.*
+Figure 7. P4: dimensionless wall-gradient history $g$, its hysteresis loop against outer velocity, and the spatial velocity-error spectrum. The existing shear label refers to the gradient. Physical stress additionally uses fitted viscosity; its amplitude errors are reported in Section 6.3, rather than plotted here.
 
 The spatial spectrum is the time-averaged squared type-II discrete cosine transform of velocity error over the full wall-normal domain. It is a Fourier cosine representation suited to this nonperiodic interval. High-mode error appears in both conventional and neural predictions; it can include viscosity-estimation and field-approximation error, so the spectrum alone does not prove spectral bias.
 
 ![P4 temporal error spectrum](final_results/figures/P4_temporal_spectrum_d0.01.png)
 
-*Figure 8. P4: temporal error spectrum at the thin setting. The first harmonic dominates because single-frequency time dependence is imposed.*
+Figure 8. P4: temporal error spectrum at the thin setting. The first harmonic dominates because single-frequency time dependence is imposed.
 
 This experiment cannot diagnose broadband temporal spectral bias or temporal causality violations. Supplemental moderate-case [gradient/spatial spectrum](final_results/figures/P4_shear_spectrum_d0.1.png) and [temporal spectrum](final_results/figures/P4_temporal_spectrum_d0.1.png) figures are also available; the former uses the original gradient-based shear label.
 
@@ -360,7 +360,7 @@ The right panel measures inference time after each method has already been fitte
 
 ![P5 costs](final_results/figures/P5_cost.png)
 
-*Figure 9. P5: inverse fit/training cost and warmed field-evaluation cost on the recorded hardware. Lower values indicate lower cost.*
+Figure 9. P5: inverse fit/training cost and warmed field-evaluation cost on the recorded hardware. Lower values indicate lower cost.
 
 Lower values indicate lower computational cost in both panels. The left panel compares the cost of obtaining each inverse solution, while the right panel compares the cost of evaluating the resulting fitted models.
 
@@ -401,7 +401,7 @@ The sampling intervention changes both where residual constraints are evaluated 
 
 ![B/C controlled experiments](final_results/figures/BC_controlled_diagnosis.png)
 
-*Figure 10. Matched thin-layer ablations: dots are individual seeds, bars are medians; amplitude error refers to the wall gradient. Oracle controls are not viscosity estimators.*
+Figure 10. Matched thin-layer ablations: dots are individual seeds, bars are medians; amplitude error refers to the wall gradient. Oracle controls are not viscosity estimators.
 
 Near-wall sampling improves the scaled network's held-out layer residual and gradient-amplitude error in every tested seed. Combined does not improve every vanilla metric for every seed. Noise, initialization and limited optimization remain possible contributors; three seeds do not support a broad superiority claim.
 
@@ -409,7 +409,7 @@ Near-wall sampling improves the scaled network's held-out layer residual and gra
 
 ### 8.1 Initial matched-budget remedy
 
-Define $\delta_0=\sqrt{2\kappa_0}$ from the initial estimate. Combined uses $y/\delta_0$ as its network coordinate and places half of 160 collocation points in $[0,\min(6\delta_0,1)]$, leaving the other half across the whole domain. The scale remains fixed during each fit. Neither true thickness nor an exact-error map determines this allocation.
+Define $\delta_0=\sqrt{2\kappa_0}$ from the initial estimate. Combined uses $y/\delta_0$ as its network coordinate and places half of 160 collocation points in $\left[0,\min(6\delta_0,1)\right]$, leaving the other half across the whole domain. The scale remains fixed during each fit. Neither true thickness nor an exact-error map determines this allocation.
 
 The mechanism is direct: coordinate scaling supplies useful spatial scales, while near-wall residual points constrain the derivatives at those scales. The far field remains represented by the uniform half. No analytic exponential spatial basis or fitted reference solution is inserted. The remedy is inexpensive to implement and the all-seed before/after evidence appears in the paired table and diagnosis plot.
 
@@ -433,7 +433,7 @@ Starting from each original combined model, evaluate the current PDE residual on
 | residual-adaptive, final round | 2.20 | 0.141 | 0.597 | 1.21 | 1.01 | 0.106 |
 
 | Method | Max evaluations | Collocation points | Held-out layer PDE RMS | Fit/refinement time (s) | Inference time (ms) |
-|---|---:|---:|---:|---:|---:|---:|
+|---|---:|---:|---:|---:|---:|
 | vanilla | 600 | 160 | 0.00857 | 1.09 | 1.30 |
 | combined | 600 | 160 | 0.00526 | 1.17 | 1.21 |
 | vanilla, longer | 6000 | 160 | 0.0384 | 10.7 | 1.30 |
@@ -445,7 +445,7 @@ All entries are three-seed medians at $\delta/L=0.01$, $\sigma/U_0=0.02$ and $N_
 
 ![Longer training and adaptive refinement](final_results/figures/BC_budget_and_adaptive.png)
 
-*Figure 11. Longer fixed-point training versus adaptive constraint enrichment. Gradient-amplitude error and held-out residual are distinct diagnostics. Adaptive uses additional points and monitoring work.*
+Figure 11. Longer fixed-point training versus adaptive constraint enrichment. Gradient-amplitude error and held-out residual are distinct diagnostics. Adaptive uses additional points and monitoring work.
 
 Compared with the longer-trained vanilla control, the final adaptive model reduces median held-out layer PDE RMS by 12 times. All three seeds improve that residual relative to their longer-trained vanilla counterparts. The final refinement is not uniformly better than the original 600-evaluation combined model on every seed/metric, and residuals remain nonzero. The increased point count and monitoring also cost work; this is a targeted remedy, not an equal-compute superiority claim.
 
@@ -453,13 +453,13 @@ An independent residual-resolution audit uses 24,001 heights inside y in [0,0.06
 
 ![Adaptive histories and every refinement round](final_results/figures/BC_adaptive_losses.png)
 
-*Figure 12. P2: seed-17 loss histories across all refinement rounds. The second panel retains the held-out residual at every round for all seeds, including reversals.*
+Figure 12. P2: seed-17 loss histories across all refinement rounds. The second panel retains the held-out residual at every round for all seeds, including reversals.
 
 Losses across refinement boundaries use a changing point set and should not be read as a single unchanged quadrature objective. Adaptive timing includes the initial fit, residual monitoring, point selection and refinement optimization, but excludes subsequent scoring and plotting. In the following first-seed spatial profiles, residuals are evaluated at independent plotted locations, not just at training points.
 
 ![Near-wall error and residual before/after](final_results/figures/BC_near_wall_profiles.png)
 
-*Figure 13. P4: independent spatial amplitude-error and PDE-residual profiles at the thin setting, seed 17.*
+Figure 13. P4: independent spatial amplitude-error and PDE-residual profiles at the thin setting, seed 17.
 
 Before/after coverage is as follows: **P2** uses the initial and adaptive loss histories; **P3** uses the knob-sweep plot and near-wall table in Section 6.2, plus the two-thickness failure table in Section 7.1; **P4** uses the original error maps/spectra, adaptive spatial profiles and dense residual audit; **P5** uses the fit/refinement and inference table above. Refinement itself was tested only at the thinnest setting. It addresses residual enforcement rather than establishing a generally superior inverse solver.
 
