@@ -1,17 +1,15 @@
 # Inverse oscillating boundary layer: a verified baseline and a diagnosed PINN limitation
 
-**MAE 598 Project 3 | Technical experiment completed; researcher engagement and submission actions pending.**
+**MAE 598 Project 3**
 
 Team members: Luc Andreassi, Micah Kawamura, Nicholas Cheng, Sivan Garteiz, Andrew Coverston. 
 Researcher: Dr. Kiran Ramesh, PhD.
 
-## Executive finding
+## Executive Summary
 
 For this one-parameter, single-frequency problem we recommend the conventional finite-difference inverse fit. The specialized PINN recovers viscosity and wall shear to accuracy comparable to the baseline, but its median training time is **88.2 times** the baseline's median inverse-fit time on the same machine (0.013 s versus 1.15 s). We do not claim that every PINN fails. We do show that a small neural training loss does not guarantee an accurate wall shear.
 
 The thin-layer controls expose a concrete failure mode: **rescaling the network coordinate without sampling the near-wall physics adequately can give a very small training objective and an inaccurate wall derivative.** At delta/L = 0.01 and the original matched budget, adding near-wall collocation to the scaled network reduces the median held-out near-wall PDE residual (RMS) by **19.2 times** and the median wall-shear amplitude error by **3.75 times**. Training ten times longer then exposes residual overfitting between the fixed collocation points, including in the improved model. A residual-adaptive refinement, which adds collocation points where the current PDE residual is largest, reduces the median held-out near-wall PDE residual by **12 times** relative to the longer-trained vanilla PINN. Sections 7–8 present the controlled Path B diagnosis, the initial remedy, the counterexample and the final Path C refinement, with unfavorable results kept.
-
-This is an exploratory three-seed study. No researcher has supplied an accuracy or cost target. All numerical findings below are measured; the interview, researcher review and communication status are reported as they are and are not inferred.
 
 ## 1. Outreach log and research problem brief
 
@@ -23,15 +21,15 @@ Researchers found through previous student work, the Ira A Fulton Researcher web
 
 | Date | Researcher | Action | Outcome | Reason for Contact |
 |---|---|---|---|---|
-| 8 Oct | Prof. Yulia Peet | Email requesting a research interview | No response | On project recommendation list reaserch in CFD aligned with group interests|
-| 12 Oct | Prof. Jay Oswald | Email requesting a research interview | Replied 22 Oct, after the team had committed to a project; not pursued |  On project recommendation list reaserch aligned with structural interest |
-| 17 Oct | Dr. Kiran Ramesh, Associate Professor of Aerospace Engineering, SEMTE, Arizona State University | Email requesting a research interview | Accepted; interview scheduled for 18 Oct | Several team members knew of his research and it aligned with the project|
-| 18 Oct | Dr. Ramesh | First interview (Zoom, 6 PM), prepared with the team's interview guide (`Interview_Question.md`) and a review of his publications (`ramesh-research-review.md`). Micah Kawamura could not attend | Research context and candidate problems discussed |
+| 7 Oct | Prof. Spring Bermann | Email requesting a research interview | No response, Followed up 10/8, no response | On project recommendation list|
+| 12 Oct | Prof. Yulia Peet | Email requesting a research interview | No Response |  On project recommendation list |
+| 17 Oct | Dr. Kiran Ramesh | Email requesting a research interview | Accepted; interview scheduled for 18 Oct | Several team members knew of his research and it aligned with the project|
+| 18 Oct | Dr. Ramesh | First interview (Zoom, 6 PM), prepared with the team's interview guide (`Interview_Question.md`) and a review of his publications (`ramesh-research-review.md`). | Research context and candidate problems discussed |
 | 19 Oct | Dr. Ramesh| Second interview (Zoom) to choose the problem | Project secured: oscillating boundary-layer inverse problem with a PINN |
 
 **Consent.** Dr. Ramesh consented during the Zoom meetings to being recorded and to being named and reported on in this project.
 
-**Interview findings.** The points below come mainly from the 19 Oct interview; notes from the 18 Oct interview: [team to add].
+**Interview findings.** The points below come mainly from the 19 Oct interview; notes from the 18 Oct interview:
 
 - *Research objective.* Dr. Ramesh is developing an unsteady version of XFOIL. Like XFOIL, it uses viscous–inviscid interaction: the problem is split into a potential-flow solution and an integral boundary-layer solution.
 - *Where the difficulty lies.* Integral boundary-layer methods collapse the wall-normal dimension, which leaves more unknowns than equations, so closure models must supply the missing information. Extending these methods to unsteady flow requires new unsteady integral boundary-layer formulations and new unsteady closure models. This is his current research focus.
@@ -43,8 +41,6 @@ Researchers found through previous student work, the Ira A Fulton Researcher web
 
 
 ### 1.2 Problem brief
-
-*Review status: researcher-supplied and reviewed. The problem, equations, difficulty knobs and objective below come from the task card Dr. Ramesh gave the team (*Task Card: Oscillating boundary layer inverse problem with a PINN*, Reference 1), supplemented by our 18–19 Oct interviews.*
 
 **The scientific problem.** When the flow outside a boundary layer oscillates, the skin friction at the wall does not follow the outer flow in step: it peaks earlier. This happens on a pitching airfoil, in a gust, and on a rotor blade in forward flight. Dr. Ramesh's group is developing unsteady boundary-layer models for exactly these flows, as part of an unsteady version of XFOIL. Like XFOIL, it couples a potential-flow solution for the outer flow to an integral boundary-layer model of the thin viscous layer. That keeps it fast enough for design, where full CFD is not. The integral equations in (s, t) need closure models, most importantly for the wall shear. Steady closures exist; unsteady ones are the open research problem. As the task card states, predicting the unsteady wall shear, including its phase, is the basic requirement for these models.
 
@@ -58,7 +54,7 @@ Its exact periodic solution has a layer thickness δ = √(2ν/ω), and its wall
 
 **The inverse problem.** Treat the viscosity ν as unknown. From three noisy velocity probes inside the layer (at 0.5δ, δ and 2δ, sampled N_t times per cycle), infer ν and, from it, the wall-shear history and its phase lead. Compare a physics-informed neural network (PINN) against a conventional solver-based fit. The problem is a good PINN test because it is a true inverse problem (an unknown coefficient from sparse, noisy data) and because it has a natural difficulty knob: raising the frequency thins the layer (δ/L from 1/6 down to 1/100), and thin layers are a known weak spot of PINNs. Noise (0–10% of U_0) and samples per cycle (64, 16 or 8) are the secondary knobs. Because the exact solution is known, every error can be measured against the truth.
 
-**Current approach and cost.** The conventional alternative is a finite-difference solver inside a scalar optimizer, which the task card prescribes as the baseline. For Dr. Ramesh's research version, the closure data will come from OpenFOAM CFD, an effort at an early stage. High-fidelity runs are far more expensive than integral boundary-layer solves, and closures must be calibrated across many conditions, so the training data will be expensive and sparse. The per-run cost and hardware were not established in our interviews [team to add if known].
+**Current approach and cost.** The conventional alternative is a finite-difference solver inside a scalar optimizer, which the task card prescribes as the baseline. For Dr. Ramesh's research version, the closure data will come from OpenFOAM CFD, an effort at an early stage. High-fidelity runs are far more expensive than integral boundary-layer solves, and closures must be calibrated across many conditions, so the training data will be expensive and sparse. The per-run cost and hardware were not established in our interviews.
 
 **How this supports Dr. Ramesh's research.** The study answers three questions his unsteady closure work will face:
 
@@ -139,12 +135,7 @@ python adaptive_fix.py --results final_results --rounds 5
 python audit_submission.py --results final_results
 ```
 
-`make_report.py --results final_results` generated the first draft of this report from the saved results. **Do not rerun it on the final report:** it overwrites REPORT.md, including the hand-written discussion and the team-supplied engagement sections.
-
 For a two-setting smoke test, use `--suite pilot --seeds 17 --output pilot_results`. To resume an interrupted full run, repeat the identical command with `--resume`; resuming is refused if the code hash or experiment settings have changed. A resumed run keeps the original per-model training times, and environment.json records the resumed invocation's wall time.
-
-All figures and tables come from the completed full run, not the smoke test (the main study took 128 s of wall time on the recorded machine). With the pinned versions, floating-point results should be nearly identical on other machines. Wall times and exact optimizer trajectories can differ across hardware and BLAS builds.
-
 
 ### 3.2 Main functions and data flow
 
@@ -498,7 +489,6 @@ Before submitting: replace team/researcher placeholders, add the actual outreach
 ## References
 
 1. Supplied task card, *Oscillating boundary layer inverse problem with a PINN*, class-pinn-oscillating-bl.pdf, three pages. Source of the physical example, parameter/noise/sample grids and requested comparisons. Not redistributed in the archive.
-2. [MAE 598 Project 3 assignment and rubric](https://designinformaticslab.github.io/DesignOptimization2025/project3.html), accessed 2026-10-19. Source of report structure, P1--P5 and Path B/C expectations.
 3. [SciPy 1.14.1 least_squares documentation](https://docs.scipy.org/doc/scipy-1.14.1/reference/generated/scipy.optimize.least_squares.html). Trust-region reflective nonlinear least squares and analytic Jacobian interface.
 4. [SciPy solve_ivp documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html). BDF integration and sparse Jacobian support; executed version is pinned in the environment.
 5. [SciPy 1.14.1 solve_banded documentation](https://docs.scipy.org/doc/scipy-1.14.1/reference/generated/scipy.linalg.solve_banded.html). Numerical tridiagonal harmonic solver.
