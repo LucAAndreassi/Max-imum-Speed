@@ -201,7 +201,7 @@ Boundary values enter through the right-hand side. The smooth stretching cluster
 
 ### 4.2 Periodic solver and time-integration check
 
-Because the PDE and boundary conditions are linear with a known forcing frequency, substituting $u=\operatorname{Re}[a(y)e^{it}]$ into the discretized PDE gives
+Because the PDE and boundary conditions are linear with a known forcing frequency, substituting $u=\mathrm{Re}[a(y)e^{it}]$ into the discretized PDE gives
 
 $$
 (\kappa D_2-iI)a=-i\mathbf1,
