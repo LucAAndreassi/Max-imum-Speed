@@ -3,6 +3,7 @@
 **MAE 598 Project 3**
 
 Team members: Luc Andreassi, Micah Kawamura, Nicholas Cheng, Sivan Garteiz, Andrew Coverston. 
+
 Researcher: Dr. Kiran Ramesh, PhD.
 
 ## Executive Summary
