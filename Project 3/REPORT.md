@@ -347,6 +347,8 @@ The error bands lie mainly within a few layer thicknesses and vary with forcing 
 
 Figure 7. P4: dimensionless wall-gradient history $g$, its hysteresis loop against outer velocity, and the spatial velocity-error spectrum. The existing shear label refers to the gradient. Physical stress additionally uses fitted viscosity; its amplitude errors are reported in Section 6.3, rather than plotted here.
 
+The wall-gradient history and hysteresis loop show that all three methods recover the expected oscillatory response and phase-leading behavior, but they differ in how accurately they reproduce the wall derivative. In the thin case, the baseline has essentially negligible phase error, while the neural predictions show larger phase deviations even when their gradient-amplitude errors remain small. The hysteresis loop makes this phase behavior visible: departures from the reference loop reflect errors in the amplitude and/or timing of the predicted wall response. These derivative errors are important because a model can reproduce the velocity field reasonably well while still misrepresenting the near-wall gradient needed to reconstruct physical wall stress.
+
 The spatial spectrum is the time-averaged squared type-II discrete cosine transform of velocity error over the full wall-normal domain. It is a Fourier cosine representation suited to this nonperiodic interval. High-mode error appears in both conventional and neural predictions; it can include viscosity-estimation and field-approximation error, so the spectrum alone does not prove spectral bias.
 
 ![P4 temporal error spectrum](final_results/figures/P4_temporal_spectrum_d0.01.png)
