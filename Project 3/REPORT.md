@@ -311,7 +311,7 @@ The compared methods are baseline, vanilla PINN and combined PINN. The combined 
 | 0.02 | 0.0002 | 2.12 | 1.56 | 2.10 | 0.324 | 0.578 | 0.505 |
 | 0.01 | 5e-05 | 2.12 | 1.88 | 2.01 | 0.325 | 0.611 | 0.605 |
 
-Values are three-seed medians at sigma = 0.02 and Nt = 16.
+Values are three-seed medians at $\\sigma$ = 0.02 and $N_t$ = 16.
 
 ### 6.3 Thin-case numerical comparison
 
