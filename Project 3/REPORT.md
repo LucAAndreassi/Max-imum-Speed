@@ -488,7 +488,7 @@ Confidence is strongest in our numerical verification and paired controls. Gener
 
 The next experiment should hold physical probe positions fixed while varying frequency, then introduce two-harmonic forcing. Before extending the model, please identify which wall-stress amplitude and phase errors would affect a modeling decision, and which unknown closure quantity should be learned. Those requirements would connect the demonstrator to your unsteady boundary-layer workflow.
 
-**Delivery status:** Prepared; not yet sent.
+**Delivery status:** sent.
 
 ## 10. Assumptions, limitations and interpretation
 
