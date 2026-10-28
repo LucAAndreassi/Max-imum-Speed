@@ -285,6 +285,8 @@ Figure 2. P2: vanilla and combined loss components at $\delta/L=0.1$, $\sigma/U_
 
 Figure 3. P2: the same losses at $\delta/L=0.01$, with identical noise level, sample count and seed. No initial-condition loss is needed for the periodic ansatz.
 
+In both the moderate and thin cases, the data, PDE and boundary-loss components decrease substantially during optimization, showing that the PINN is able to reduce all three parts of its training objective rather than improving one term while leaving another obviously unresolved. The loss histories therefore do not show a simple persistent imbalance among the three objective components. However, low sampled training losses are not sufficient to establish that the learned solution satisfies the physics between collocation points. This distinction becomes important in the thin-layer case: the controlled experiments in Section 7 show that a model can achieve a very small sampled PDE loss while still having a much larger held-out near-wall PDE residual and inaccurate wall derivatives. P2 should therefore be interpreted as evidence that the optimization reduces the sampled objective, not as proof that the resulting field and its derivatives are accurate throughout the domain.
+
 ### 6.2 P3: errors against each knob
 
 Relative field $L^2$ error integrates time-averaged squared error over an independent grid of 1,201 heights and 128 times, normalized by the reference norm. The near-wall region $y\leq\min(6\delta,1)$ is scored separately. Parameter error is $|\widehat\kappa/\kappa_{\mathrm{true}}-1|$. Gradient amplitude and phase come from the learned wall derivative, not training targets. Lines are three-seed medians and bands are full seed ranges, not confidence intervals.
