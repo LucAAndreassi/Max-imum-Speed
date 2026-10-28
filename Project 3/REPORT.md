@@ -22,7 +22,7 @@ Researchers found through previous student work, the Ira A Fulton Researcher web
 
 | Date | Researcher | Action | Outcome | Reason for Contact |
 |---|---|---|---|---|
-| 7 Oct | Prof. Spring Bermann | Email requesting a research interview | No response, Followed up 10/10, no response | On project recommendation list|
+| 7 Oct | Prof. Spring Berman | Email requesting a research interview | No response, Followed up 10/10, no response | On project recommendation list|
 | 12 Oct | Prof. Yulia Peet | Email requesting a research interview | No Response |  On project recommendation list |
 | 17 Oct | Dr. Kiran Ramesh | Email requesting a research interview | Accepted; interview scheduled for 18 Oct | Several team members knew of his research and it aligned with the project|
 | 18 Oct | Dr. Ramesh | First interview (Zoom, 6 PM), prepared with the team's interview guide (`Interview_Question.md`) and a review of his publications (`ramesh-research-review.md`). | Research context and candidate problems discussed |
