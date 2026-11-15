@@ -463,26 +463,54 @@ The vibration constraint is the only active system-level inequality. Its normali
 
 Two radius variables are on their lower bound. SciPy's reported `multipliers` array covers the nonlinear inequality constraints but not simple variable-bound multipliers, so bound activity is reported separately rather than inventing bound multipliers.
 
-## 7. Nonlinear/stability component: with and without buckling
+## 7. Nonlinear/stability component: N1 with and without buckling
 
-The N1 buckling constraint was removed and the design was re-optimized from the same starting point. The resulting mass changed by only **0.000000 g**. With buckling included, the optimized load factor is **2876.9**, far above the required value of 3. Therefore buckling is inactive for this particular load case and geometry; the vibration requirement and minimum tube-size bounds prevent the design from approaching instability.
+The required N1 study re-optimizes the same problem with the buckling constraint removed. This isolates the design effect of stability rather than merely evaluating buckling after the fact.
 
-This is still an engineering result: adding the N1 physics does not alter the optimum because another requirement governs first. A future load case with greater in-plane thrust, a longer arm, or a thinner-wall tube could make the stability constraint relevant.
+| Quantity | Without N1 buckling constraint | With N1 buckling constraint | Change |
+|---|---:|---:|---:|
+| Arm mass | 85.626305 g | 85.626305 g | -0.000000 g |
+| Peak von Mises stress | 4.1346 MPa | 4.1346 MPa | +0.0000 MPa |
+| Tip displacement | 0.138210 mm | 0.138210 mm | -0.000001 mm |
+| First natural frequency | 139.999999 Hz | 139.999999 Hz | -0.000000 Hz |
+| Buckling factor | 7921.030 | 7921.245 | +0.215 |
 
-## 8. Results
+The maximum tube-radius difference between the two optimized designs is **0.000678 mm**, and the RMS difference over all 24 design variables is **0.000224 mm**.
+
+![Optimized radius profile with and without N1 buckling](assets/figures/radius_n1_comparison.png)
+
+The result is physically clear: $\alpha_{cr}=7921.2$ at the optimum, compared with a required value of 3. The arm is therefore vibration-dominated, not stability-dominated. The axial maneuver load is small compared with the bending/vibration stiffness demanded by the 140 Hz requirement, and the lower tube-size bounds also prevent the tip members from vanishing. The N1 component is correctly implemented and differentiated, but it does not alter this optimum. The first buckling mode remains available in the interactive viewer to show the instability pattern that the N1 analysis predicts.
+
+## 8. Initial-versus-optimized results
 
 | Metric | Initial | Optimized | Requirement | Status |
 |---|---:|---:|---:|---|
 | Arm mass | 116.42 g | 85.63 g | Minimize | - |
-| True max von Mises stress | 2.880 MPa | 3.783 MPa | <= 138 MPa | PASS |
-| KS stress utilization | 0.1226 | 0.1275 | <= 1 | PASS |
-| Tip displacement | 0.0785 mm | 0.1240 mm | <= 3 mm | PASS |
+| True max von Mises stress | 3.196 MPa | 4.135 MPa | <= 138 MPa | PASS |
+| KS stress utilization | 0.1235 | 0.1289 | <= 1 | PASS |
+| Tip displacement | 0.0877 mm | 0.1382 mm | <= 3 mm | PASS |
 | First natural frequency | 160.183 Hz | 140.000 Hz | >= 140 Hz | PASS |
-| Buckling factor | 5919.4 | 2876.9 | >= 3 | PASS |
+| Buckling factor | 16297.9 | 7921.2 | >= 3 | PASS |
 
-## 9. Website and 3D comparison
+The optimized arm is **26.5% lighter** while the governing frequency is driven directly to its allowable boundary. The very low stress and deflection utilization values explain why adding material solely for static strength or stiffness would be inefficient for this particular requirement set.
 
-The GitHub Pages viewer reads `assets/results.json` and presents the initial and optimized arms side by side under one linked camera. It renders the actual tube radii in 3D; uses a single-hue stress-utilization scale with a color bar and black over-limit markers; applies beam-interpolated static deformation with an exaggeration slider; animates both the first vibration mode and the first buckling mode; identifies members and key values on hover; displays the objective and every constraint with PASS/FAIL status for both designs; draws the applied thrust direction; and uses a responsive layout for narrow screens. Geometry is exported from the beam shape functions rather than drawn as straight lines between displaced nodes.
+## 9. Website and live 3D comparison
+
+The GitHub Pages viewer is designed explicitly around the eight project requirements:
+
+| Viewer requirement | Implementation |
+|---|---|
+| 1. Initial and optimized comparison | Both designs are shown simultaneously under one linked camera |
+| 2. True 3D geometry | Tube geometry uses the actual optimized radii and 3D centerline |
+| 3. Field behind the most important constraint | First-mode amplitude is the default sequential field because vibration governs; stress utilization is available as a toggle with over-limit markers |
+| 4. State on geometry | Static deformation uses beam-interpolated curves and an exaggeration slider |
+| 5. Explanatory animation | First vibration mode is the default animation; the first buckling mode is also available |
+| 6. Hover/click inspection | Hover reports design, element, radius, mode amplitude, and stress utilization |
+| 7. Metrics panel | Objective and every constraint are shown for both designs with PASS/FAIL status |
+| 8. Data/responsiveness | The viewer reads `assets/results.json`, uses relative paths, and the layout collapses for phone width |
+
+Math is rendered with MathJax on the same GitHub Pages report page as the Three.js viewer.
+
 
 ## 10. Reproducibility
 
@@ -493,20 +521,25 @@ python -m pip install -r requirements.txt
 python run_all.py
 ```
 
-This regenerates verification results, optimization history, `assets/results.json`, all figures, `REPORT.md`, and `index.md`. The solver source is entirely in `src/`.
+That command regenerates the verification ladder, detailed convergence data, gradient checks, Taylor test, adjoint-scaling benchmark, multiple-start study, optimization history, N1 comparison, every plotted figure, `assets/results.json`, `REPORT.md`, and the GitHub Pages `index.md`. The calculations are deterministic; no random starting design or unrecorded manual number is required.
+
 
 ## 11. Limitations and AI-use statement
 
-### Limitations
+### 11.1 Limitations
 
-The largest modeling limitation is the use of isotropic aluminum rather than a composite layup typical of many production drone arms. The root is idealized as perfectly clamped, local shell buckling and fastener stresses are omitted, and the load model uses a single tilted full-thrust case. The rotor-frequency constraint considers shaft rotational frequency but not blade-passing harmonics, motor electromagnetic forcing, gyroscopic coupling, or controller-induced excitation. Motor reaction torque is omitted because the selected test table does not provide a shaft-torque value. These effects should be added before treating the design as flight hardware.
+The model is a design study rather than flight certification. Important omissions include composite anisotropy, root-joint/fastener compliance, local tube-shell buckling, motor torque, rotor gyroscopic effects, blade-passing and motor electromagnetic excitation, aerodynamic distributed loads, controller coupling, manufacturing tolerances, and multiple flight/load cases. The 2g axial maneuver load and 3 mm serviceability requirement are team-selected design requirements rather than externally certified limits. The frequency constraint considers the 7600 RPM shaft frequency but not blade-passing harmonics, so a hardware design would require a broader excitation map and Campbell-style separation study.
 
-### AI-use statement
+### 11.2 AI-use statement
 
-A coding assistant was used to draft the finite-element implementation, optimization workflow, verification scripts, website viewer, and report structure. The physics was not accepted solely because the code executed: the frame implementation was checked against exact cantilever bending, torsion, natural-frequency, and Euler-buckling solutions; global force balance was checked; and adjoint directional derivatives were independently compared against central finite differences for both radius and shape variables. One important issue caught during verification was an initially inaccurate stress sensitivity caused by an overly large state-perturbation step in the numerical partial derivative. Reducing that local perturbation and re-running the independent directional checks reduced the worst gradient discrepancy to approximately **1.57e-04**.
+A coding assistant was used to draft and revise the 3D frame solver, sensitivity implementation, optimization workflow, verification scripts, Three.js viewer, and report structure. The code was not accepted solely because it executed: independent analytical targets are shown in Section 4; the solver is checked for exact bending, torsion, vibration and Euler buckling behavior; mesh convergence, arbitrary 3D rotation invariance, six free-free rigid-body modes, and global force/moment balance are checked; and every PDE-based constraint gradient is compared with central differences for both radius and shape variables.
+
+One concrete bug/improvement was exposed by gradient verification. An early stress-adjoint implementation numerically perturbed every displacement DOF, which produced an avoidable sensitivity discrepancy and obscured the computational advantage of the adjoint method. The stress and tip-displacement state derivatives were replaced by analytical response derivatives, after which the worst directional gradient error is **2.30e-05** and the measured adjoint advantage increases with design dimension as shown in Section 5.7.
+
+**Team-action before submission:** the course specification asks the team to state which derivations/checks were performed by the students themselves. The analytical formulas and verification evidence are included above, but the team should independently reproduce/check those formulas and replace this sentence with an accurate description of each member's human contribution. This report intentionally does not invent human work that has not been documented.
 
 ## References
 
-1. Project 4: PDE-Constrained Design Optimization, course project specification.
-2. T-MOTOR. "MN3110 Multirotor Fixed Wing UAV Motor KV470/KV700/KV780." https://store.tmotor.com/product/mn3110-motor-navigator-type.html
-3. MatWeb. "Aluminum 6061-T6; 6061-T651." https://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6
+1. Course Project 4 specification, *PDE-Constrained Design Optimization - An Introduction to Optimization for Mechanical Engineers*.
+2. T-MOTOR. *MN3110 Multirotor Fixed Wing UAV Motor KV470/KV700/KV780*, manufacturer product and propeller test data.
+3. MatWeb. *Aluminum 6061-T6; 6061-T651*, material-property database.
