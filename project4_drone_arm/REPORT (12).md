@@ -2,9 +2,9 @@
 
 ## 1. Summary
 
-This project minimizes the structural mass of a 0.30 m cantilevered multirotor arm while enforcing strength, tip-deflection, vibration, and linear-buckling requirements. The arm is modeled with 20 three-dimensional Euler-Bernoulli frame elements. Each element has its own outer-radius design variable, and four additional centerline control-point offsets provide shape variables, for **24 total design variables**.
+This project minimizes the structural mass of a **0.30 m cantilevered multirotor arm** using a custom three-dimensional finite-element solver and gradient-based PDE-constrained optimization. The model contains 20 Euler-Bernoulli frame elements, one independent tube-radius variable per element, and four centerline shape-control variables, giving **24 design variables**. The design must satisfy strength, tip-deflection, vibration, and N1 linear-buckling requirements.
 
-The baseline design uses uniform 16 mm outer radii. The optimized design reduces arm mass from **116.4 g** to **85.6 g**, a **26.5% reduction**, while remaining feasible. The first natural frequency is the active system-level constraint at **140.00 Hz**. Stress, deflection, and buckling retain large margins.
+The baseline arm has a mass of **116.42 g**. The converged design has a mass of **85.63 g**, a **26.5% reduction**, while satisfying every requirement. The active system-level constraint is the first natural frequency at **140.000 Hz**; stress, static displacement, and buckling retain substantial margin. The optimization converged from multiple radius profiles, and a separate shape-perturbation restart returned to essentially the same design basin.
 
 <div id="viewer" style="height:560px"></div>
 <div id="viewer-controls"></div>
@@ -13,35 +13,51 @@ The baseline design uses uniform 16 mm outer radii. The optimized design reduces
 
 ![Optimization history](assets/figures/optimization_history.png)
 
+The viewer defaults to the **first vibration-mode amplitude**, because vibration is the governing constraint. Stress utilization remains available as a selectable field.
+
 ## 2. Structure and formulation
 
-### 2.1 Engineering motivation
+### 2.1 Engineering motivation and physical model
 
-Multirotor arms should be light because arm mass directly increases vehicle mass and inertial load, but they also must remain stiff enough to keep structural modes separated from rotor excitation. The selected reference propulsion unit is the T-MOTOR MN3110 KV700. T-MOTOR lists a motor mass of 99 g including cables and, with the 12x4 carbon-fiber propeller at 14.8 V and full throttle, 1290 g thrust at 7600 RPM. The structural model therefore uses a 99 g tip mass and 12.65 N rotor thrust. A 25 degree inward tilt is applied as the maneuver load case so the arm carries simultaneous bending and axial compression.
+A multirotor arm should be light because structural mass reduces payload and endurance, but excessive mass reduction can lower stiffness, shift structural modes toward rotor excitation, increase deflection, or create instability. The reference propulsion unit is the T-MOTOR MN3110 KV700. The manufacturer's test table lists a **99 g motor mass** and **1290 g thrust at 7600 RPM** for the 14.8 V / 12x4 propeller test point. These values define the motor point mass and full-throttle rotor thrust used in the model.
 
-**Source:** T-MOTOR MN3110 product/test data: https://store.tmotor.com/product/mn3110-motor-navigator-type.html
+Rather than artificially tilting the thrust vector relative to the arm, the static design load separates two physical effects: (1) vertical rotor thrust and gravity, and (2) a team-selected **2g axial maneuver acceleration** of the motor mass. The latter produces an inward compressive inertia load of **1.942 N**, allowing the N1 stability model to be exercised without implying that vehicle bank angle changes the rotor-thrust direction relative to its own arm.
+
+**Propulsion source:** T-MOTOR, "MN3110 Multirotor Fixed Wing UAV Motor KV470/KV700/KV780," manufacturer product/test data.
+
+![Drone-arm finite-element and load schematic](assets/figures/model_schematic.png)
 
 ### 2.2 Material
 
-The baseline material is isotropic 6061-T6 aluminum with $E=68.9$ GPa, $\nu=0.33$, $\rho=2700$ kg/m^3, and tensile yield strength $S_y=276$ MPa. These are typical values reported by MatWeb for 6061-T6/6061-T651. The allowable stress is defined with a design factor of 2:
+The baseline material is isotropic 6061-T6 aluminum with $E=68.9$ GPa, $\nu=0.33$, $\rho=2700$ kg/m$^3$, and tensile yield strength $S_y=276$ MPa. The strength limit uses a design factor of 2:
 
 $$
 \sigma_{allow}=\frac{S_y}{2}=138\ \text{MPa}.
 $$
 
-**Source:** MatWeb 6061-T6 material data: https://asm.matweb.com/search/SpecificMaterial.asp?bassnum=MA6061T6
+**Material source:** MatWeb, "Aluminum 6061-T6; 6061-T651."
 
 ### 2.3 Design variables
 
-For element $i=1,\ldots,20$, the outer radius is $r_i$ with fixed wall thickness $t=1.5$ mm:
+The design vector is
 
-$$6\ \text{mm} \le r_i \le 18\ \text{mm}.$$
+$$
+\mathbf d=[r_1,\ldots,r_{20},z_1,z_2,z_3,z_4]^T.
+$$
 
-Four additional variables $z_1,\ldots,z_4$ move centerline control points at normalized arm positions 0.2, 0.4, 0.6, and 0.8. Piecewise-linear interpolation defines the nodal centerline, with
+Each element has an independent outer radius $r_i$ and a fixed wall thickness $t=1.5$ mm:
 
-$$-20\ \text{mm} \le z_j \le 20\ \text{mm}.$$
+$$
+6\ \text{mm}\le r_i\le18\ \text{mm}.
+$$
 
-The root and motor-mount locations remain fixed. In the present optimum the shape variables return essentially to zero, indicating that a straight centerline is preferred for this load case.
+The four shape variables move centerline control points at normalized arm locations $x/L=0.2,0.4,0.6,0.8$:
+
+$$
+-20\ \text{mm}\le z_j\le20\ \text{mm}.
+$$
+
+Piecewise-linear interpolation defines all intermediate nodal $z$ coordinates, while the clamped root and motor location remain fixed. The size bounds are team-selected geometric/manufacturing bounds: with the fixed wall thickness they prevent invalid or vanishing tubes while allowing a broad range of 12-36 mm outside diameters. The shape bounds prevent extreme centerline curvature and very short elements.
 
 ### 2.4 Objective
 
