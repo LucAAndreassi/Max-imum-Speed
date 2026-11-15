@@ -59,103 +59,124 @@ $$
 
 Piecewise-linear interpolation defines all intermediate nodal $z$ coordinates, while the clamped root and motor location remain fixed. The size bounds are team-selected geometric/manufacturing bounds: with the fixed wall thickness they prevent invalid or vanishing tubes while allowing a broad range of 12-36 mm outside diameters. The shape bounds prevent extreme centerline curvature and very short elements.
 
-### 2.4 Objective
+### 2.4 Objective and requirements
 
-The objective is arm structural mass:
+The objective is structural arm mass; the motor is included in the vibration mass matrix but not in the arm-mass objective:
 
 $$
-\min_{\mathbf d} m(\mathbf d)=\sum_{e=1}^{20} \rho A_e L_e,
+\min_{\mathbf d}\;m(\mathbf d)=\sum_{e=1}^{20}\rho A_eL_e,
+\qquad
+A_e=\pi\left[r_e^2-(r_e-t)^2\right].
 $$
 
-where
+| Requirement | Explicit mathematical constraint | Limit | Basis for the limit |
+|---|---|---:|---|
+| Strength | $KS_\rho(\sigma_{vM}/\sigma_{allow})\le1$ | $\sigma_{allow}=138$ MPa | 6061-T6 yield divided by design factor 2 |
+| Tip displacement | $\|\mathbf u_{tip}\|\le\delta_{max}$ | $\delta_{max}=3$ mm | Team-selected serviceability limit equal to 1% of arm span |
+| Vibration | $f_1\ge f_{min}$ | $f_{min}=140$ Hz | 7600 RPM = 126.7 Hz shaft frequency; 140 Hz gives a 10.5% separation margin |
+| Stability (N1) | $\alpha_{cr}\ge\alpha_{min}$ | $\alpha_{min}=3$ | Team-selected stability factor following the course project's worked-example convention |
+| Geometry | bounds on $r_i$ and $z_j$ | above | Prevent invalid tubes and extreme geometry |
 
-$$A_e=\pi\left(r_e^2-(r_e-t)^2\right).$$
-
-The constant motor mass is included in vibration analysis but not the structural-mass objective.
-
-### 2.5 Constraints
-
-The design is subject to:
-
-1. **Strength:** a KS aggregate of sampled von Mises stress must remain below 138 MPa. The true maximum stress is reported alongside the aggregate.
-2. **Tip displacement:** $\|\mathbf u_{tip}\| \le 3$ mm. This is a team-selected serviceability limit equal to 1% of arm length.
-3. **Vibration:** $f_1 \ge 140$ Hz. The reference rotor speed is 7600 RPM = 126.7 Hz, so 140 Hz provides approximately 10.5% separation above the rotational excitation frequency.
-4. **Stability:** the smallest positive linear-buckling load factor must satisfy $\alpha_{cr} \ge 3$.
-5. **Bounds:** all radius and shape-variable bounds above.
-
-The reduced optimization problem is
+The reduced problem is therefore
 
 $$
 \begin{aligned}
 \min_{\mathbf d}\quad &m(\mathbf d)\\
-\text{s.t.}\quad &\mathbf K(\mathbf d)\mathbf u-\mathbf F(\mathbf d)=0,\\
-&KS_\rho(\sigma_{vM}/\sigma_{allow})\le 1,\\
-&\|\mathbf u_{tip}\|/0.003-1\le0,\\
-&1-f_1/140\le0,\\
-&1-\alpha_{cr}/3\le0.
+\text{s.t.}\quad
+&\mathbf K(\mathbf d)\mathbf u-\mathbf F(\mathbf d)=0,\\
+&KS_\rho(\sigma_{vM}/\sigma_{allow})-1\le0,\\
+&\|\mathbf u_{tip}\|/\delta_{max}-1\le0,\\
+&1-f_1/f_{min}\le0,\\
+&1-\alpha_{cr}/\alpha_{min}\le0,\\
+&\mathbf d_{min}\le\mathbf d\le\mathbf d_{max}.
 \end{aligned}
 $$
 
 ## 3. Analysis model
 
-### 3.1 Governing equations and finite elements
+### 3.1 Governing PDE reduction, finite elements, mesh, and boundary conditions
 
-Small-displacement 3D linear elasticity is reduced to Euler-Bernoulli frame theory. Each node has six degrees of freedom: three translations and three rotations. The assembled static equilibrium equation is
-
-$$\mathbf K(\mathbf d)\mathbf u=\mathbf F(\mathbf d).$$
-
-Circular hollow-section properties are
+The arm is governed by small-strain three-dimensional elasticity. Euler-Bernoulli frame theory reduces that continuum problem to beam equations along the arm centerline, and the finite-element discretization produces
 
 $$
-A=\pi(r^2-r_i^2),\qquad I_y=I_z=\frac{\pi}{4}(r^4-r_i^4),\qquad J=2I,
+\mathbf K(\mathbf d)\mathbf u=\mathbf F(\mathbf d).
 $$
 
-with $r_i=r-t$. The root node is fully clamped. Twenty elements are used, and the motor is represented by a concentrated 99 g translational mass at the tip.
+Each node has six degrees of freedom: three translations and three rotations. The 0.30 m arm is discretized with 20 frame elements. The root node is fully clamped ($u_x=u_y=u_z=\theta_x=\theta_y=\theta_z=0$). Element orientation is handled with a three-dimensional local-to-global transformation matrix, and the global matrices are assembled from the element matrices.
 
-The static load combines arm self-weight, motor weight, and 12.65 N rotor thrust tilted 25 degrees inward from vertical. Motor reaction torque is omitted because the selected manufacturer table does not provide shaft torque; this omission is listed as a limitation.
-
-### 3.2 Stress recovery
-
-Element local end forces provide axial force $N$, torsion $T$, and bending moments $M_y,M_z$. Normal stress is sampled at eight points around the tube perimeter at each end:
+For a circular hollow section with inner radius $r_i=r-t$,
 
 $$
-\sigma(\theta)=\frac{N}{A}-\frac{M_z y}{I_z}+\frac{M_y z}{I_y},
+A=\pi(r^2-r_i^2),\qquad
+I_y=I_z=\frac{\pi}{4}(r^4-r_i^4),\qquad
+J=2I.
+$$
+
+The mass model uses the consistent Euler-Bernoulli beam mass matrix plus a 99 g translational point mass at the motor node..
+
+### 3.2 Loads
+
+The static load vector contains:
+
+- distributed arm self-weight;
+- motor weight $m_mg$ at the tip;
+- vertical rotor thrust $T=12.65$ N at the tip; and
+- an inward axial maneuver inertia load $F_x=-m_m(2g)=-1.942$ N.
+
+Thus the tip translational components are
+
+$$
+F_x=-m_ma_x,\qquad F_z=T-m_mg,\qquad a_x=2g.
+$$
+
+Motor reaction torque is omitted because the selected manufacturer test table does not report shaft torque. This omission is retained as a stated model limitation rather than inserting an unsupported value.
+
+
+### 3.3 Stress recovery and KS aggregation
+
+Element local end forces provide axial force $N$, torsion $T_q$, and bending moments $M_y,M_z$. At eight perimeter locations at both ends of every element,
+
+$$
+\sigma(\theta)=\frac{N}{A}-\frac{M_zy}{I_z}+\frac{M_yz}{I_y},
+\qquad
+\tau=\frac{T_qr}{J},
 $$
 
 and
 
 $$
-\tau=\frac{Tr}{J},\qquad
 \sigma_{vM}=\sqrt{\sigma^2+3\tau^2}.
 $$
 
-A KS function with $\rho=50$ smooths the collection of local stress-utilization values for optimization. With $a_i=\sigma_{vM,i}/\sigma_{allow}$,
+The many local stress constraints are replaced by a smooth Kreisselmeier-Steinhauser (KS) upper bound. With $a_i=\sigma_{vM,i}/\sigma_{allow}$,
 
 $$
-KS_\rho(\mathbf a)=a_{max}+\frac{1}{\rho}\ln\left(\sum_i e^{\rho(a_i-a_{max})}\right).
+KS_\rho(\mathbf a)=a_{max}+\frac{1}{\rho}\ln\left(\sum_i e^{\rho(a_i-a_{max})}\right),\qquad \rho=50.
 $$
 
-The true maximum von Mises stress is reported separately so the smoothing approximation cannot hide a local exceedance.
+The true maximum stress is always reported beside the KS quantity.
 
-### 3.3 Vibration
+### 3.4 Vibration
 
-Free vibration is computed from
+Free vibration is obtained from
 
 $$
-\mathbf K\boldsymbol\phi=\omega^2\mathbf M\boldsymbol\phi,\qquad f=\frac{\omega}{2\pi}.
+\mathbf K\boldsymbol\phi=\omega^2\mathbf M\boldsymbol\phi,
+\qquad
+f=\frac{\omega}{2\pi}.
 $$
 
-The mass matrix contains consistent beam mass plus the motor tip mass. The lowest eigenfrequency is constrained rather than attempting to classify a particular bending direction.
+The constraint uses the lowest eigenfrequency of any mode, avoiding a discrete mode-classification rule that can become nonsmooth when modes exchange order.
 
-### 3.4 Linear buckling (N1 component)
+### 3.5 Linear buckling: N1 component
 
-Axial forces from the static state are used to assemble the geometric stiffness $\mathbf K_G(\mathbf u,\mathbf d)$. The linearized buckling problem is
+Axial forces from the computed static state are used to assemble the geometric stiffness $\mathbf K_G(\mathbf u,\mathbf d)$. Linearized buckling is defined by
 
 $$
 (\mathbf K+\alpha\mathbf K_G)\boldsymbol\phi_b=0.
 $$
 
-The smallest positive $\alpha$ is the critical load factor. Because $\mathbf K_G$ depends on the pre-buckling state, the stability constraint is an N1 nonlinear component in the sense of the project specification.
+The smallest positive $\alpha$ is the critical load factor $\alpha_{cr}$. Because $\mathbf K_G$ depends on the static stress state, this is an N1 component: an eigenvalue problem linearized about a computed PDE state.
 
 ### 3.5 Assumptions
 
