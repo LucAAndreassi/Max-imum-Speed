@@ -178,94 +178,290 @@ $$
 
 The smallest positive $\alpha$ is the critical load factor $\alpha_{cr}$. Because $\mathbf K_G$ depends on the static stress state, this is an N1 component: an eigenvalue problem linearized about a computed PDE state.
 
-### 3.5 Assumptions
+### 3.6 Modeling assumptions
 
-The arm is isotropic 6061-T6 aluminum; joints are rigid; strains and rotations are small in the service load case; aerodynamic distributed loads are neglected; the motor is a point mass; rotor gyroscopic effects and motor torque are neglected; the root attachment is perfectly clamped; manufacturing tolerances and local shell buckling are not included; and the 25 degree thrust tilt is a representative maneuver case rather than a certified flight envelope.
+The model assumes isotropic 6061-T6 aluminum, rigid joints, small strains and rotations at the service load, a perfectly clamped root, a motor represented as a point mass, and Euler-Bernoulli beam behavior. It neglects local shell buckling, fastener/root-joint compliance, propeller gyroscopic effects, motor electromagnetic excitation, motor torque, aerodynamic distributed loads, manufacturing tolerances, and composite anisotropy. The 2g axial maneuver is a team-selected design case, not a certified multirotor flight envelope.
 
-## 4. Verification
+## 4. Analysis-code verification
 
-The solver was verified before optimization with exact beam, torsion, vibration, buckling, equilibrium, and gradient tests. The first five tests have maximum relative error **2.49e-08**. The gradient ladder uses a mildly curved valid arm so first-order shape sensitivities are nonzero.
+Verification was completed before interpreting the optimization. The ladder deliberately covers exact solutions, mesh convergence, 3D invariance, rigid-body behavior, global equilibrium, stability, vibration, and gradient verification. The largest ladder discrepancy, including the directional gradient rung, is **2.30e-05**.
 
-| Test | Numerical | Exact/target | Relative error |
+| Test | Numerical | Exact/target | Error |
 |---|---:|---:|---:|
 | V1 cantilever tip deflection | 0.00019382 | 0.00019382 | 2.322e-11 |
 | V2 cantilever torsion | 0.000429634 | 0.000429634 | 2.524e-15 |
-| V3 cantilever first frequency | 250.413 | 250.413 | 7.511e-09 |
-| V4 Euler cantilever buckling | 12730.4 | 12730.4 | 2.492e-08 |
-| V5 global force balance | 5.26042e-12 | 0 | 5.260e-12 |
-| V6 adjoint directional gradients | 0.000156848 | 0 | 1.568e-04 |
+| V3 frequency mesh convergence (p=3.82) | 250.413 | 250.413 | 1.308e-07 |
+| V4 arbitrary 3D rotation invariance | 0.00019382 | 0.00019382 | 3.835e-13 |
+| V5 free-free rigid-body modes | 6 | 6 | 0.000e+00 |
+| V6 cantilever first frequency | 250.413 | 250.413 | 7.511e-09 |
+| V7 Euler cantilever buckling | 12730.4 | 12730.4 | 2.492e-08 |
+| V8 global force and moment balance | 1.4917e-11 | 0 | 1.492e-11 |
+| V9 adjoint directional gradients | 2.30197e-05 | 0 | 2.302e-05 |
 
-### 4.1 Gradient checks
+### 4.1 Exact-solution formulas
 
-| Response | Variable kind | Adjoint directional derivative | Central difference | Relative error |
-|---|---|---:|---:|---:|
-| stress_ks | radius | 0.168609 | 0.168596 | 7.785e-05 |
-| stress_ks | shape | -0.00230754 | -0.0023079 | 1.568e-04 |
-| tip_deflection | radius | 0.00291554 | 0.00291558 | 1.263e-05 |
-| tip_deflection | shape | 5.45305e-05 | 5.45307e-05 | 2.572e-06 |
-| frequency | radius | -3472.19 | -3472.19 | 5.088e-07 |
-| frequency | shape | -161.971 | -161.973 | 1.160e-05 |
-| buckling | radius | -182173 | -182172 | 5.689e-06 |
-| buckling | shape | -9705.7 | -9705.7 | 5.797e-08 |
+The primary analytical checks are
 
-The largest directional-gradient error is **1.57e-04**. A Taylor step-size sweep is shown below; the central-difference error decreases until roundoff/truncation limits dominate.
+$$
+\delta_{tip}=\frac{PL^3}{3EI},\qquad
+\phi_{tip}=\frac{T_qL}{GJ},
+$$
 
-![Taylor test](assets/figures/taylor_test.png)
+$$
+f_1=\frac{\beta_1^2}{2\pi L^2}\sqrt{\frac{EI}{\rho A}},\qquad \beta_1=1.875104\ldots,
+$$
+
+and for a cantilever column,
+
+$$
+P_{cr}=\frac{\pi^2EI}{4L^2}.
+$$
+
+These formulas were evaluated independently of the assembled drone-arm model and used as the targets in the ladder.
+
+### 4.2 Mesh convergence
+
+The first-frequency convergence study gives an observed error order of **$p=3.82$**, close to the expected fourth-order eigenvalue/frequency convergence for this cubic bending interpolation.
+
+| Elements | Element length (m) | First frequency (Hz) | Relative error |
+|---:|---:|---:|---:|
+| 1 | 0.300000 | 251.603381 | 4.754e-03 |
+| 2 | 0.150000 | 250.533896 | 4.834e-04 |
+| 4 | 0.075000 | 250.421028 | 3.271e-05 |
+| 8 | 0.037500 | 250.413359 | 2.083e-06 |
+| 16 | 0.018750 | 250.412870 | 1.308e-07 |
+
+![Frequency mesh-convergence study](assets/figures/verification_convergence.png)
+
+### 4.3 Invariance, rigid-body modes, and global balance
+
+Rotating the complete beam and its load by arbitrary 3D angles $(23^\circ,-31^\circ,17^\circ)$ changes the computed tip-deflection magnitude by only **3.83e-13** relative error. The free-free beam produces exactly **6** near-zero modes, as required for a three-dimensional rigid body. On the actual drone-arm load case, the normalized force-balance error is **1.47e-11** and the normalized moment-balance error is **1.49e-11**.
 
 ## 5. Sensitivity analysis
 
-For a scalar response $g(\mathbf d,\mathbf u)$ with residual
+### 5.1 General reduced-space adjoint
 
-$$\mathbf h(\mathbf d,\mathbf u)=\mathbf K(\mathbf d)\mathbf u-\mathbf F(\mathbf d)=0,$$
-
-the adjoint satisfies
+For a scalar response $g(\mathbf d,\mathbf u)$ and residual
 
 $$
-\mathbf K^T\boldsymbol\lambda=-\left(\frac{\partial g}{\partial\mathbf u}\right)^T,
+\mathbf h(\mathbf d,\mathbf u)=\mathbf K(\mathbf d)\mathbf u-\mathbf F(\mathbf d)=0,
 $$
 
-and the reduced gradient is
+total differentiation gives
 
 $$
+\frac{d\mathbf u}{dd_j}=-\mathbf K^{-1}\left(\frac{\partial\mathbf K}{\partial d_j}\mathbf u-\frac{\partial\mathbf F}{\partial d_j}\right).
+$$
+
+Substitution into $dg/dd_j$ would require one state-sensitivity solve per design variable. Instead define the adjoint by
+
+$$
+\mathbf K^T\boldsymbol\lambda=-\left(\frac{\partial g}{\partial\mathbf u}\right)^T.
+$$
+
+Then
+
+$$
+\boxed{
 \frac{dg}{dd_j}=\frac{\partial g}{\partial d_j}+
-\boldsymbol\lambda^T\left(\frac{\partial\mathbf K}{\partial d_j}\mathbf u-\frac{\partial\mathbf F}{\partial d_j}\right).
+\boldsymbol\lambda^T\left(\frac{\partial\mathbf K}{\partial d_j}\mathbf u-\frac{\partial\mathbf F}{\partial d_j}\right)
+}.
 $$
 
-This form is used for the stress and tip-displacement responses. Matrix and response partial derivatives are evaluated locally/numerically while holding the state fixed; the expensive state dependence requires only one adjoint linear solve per scalar response, not one equilibrium solve per design variable.
+The objective mass is explicit in the design variables and therefore requires no state adjoint.
 
-For vibration, with $\boldsymbol\phi^T\mathbf M\boldsymbol\phi=1$,
+### 5.2 KS-stress constraint derivative
 
-$$
-\frac{d(\omega^2)}{dd_j}=\boldsymbol\phi^T
-\left(\frac{\partial\mathbf K}{\partial d_j}-\omega^2\frac{\partial\mathbf M}{\partial d_j}\right)\boldsymbol\phi.
-$$
-
-For buckling, write the generalized eigenproblem as $\mathbf K\boldsymbol\psi=\alpha\mathbf B\boldsymbol\psi$ with $\mathbf B=-\mathbf K_G$ and normalize $\boldsymbol\psi^T\mathbf B\boldsymbol\psi=1$. Its direct sensitivity is
+For the KS stress response,
 
 $$
-\frac{d\alpha}{dd_j}=\boldsymbol\psi^T\left(\frac{\partial\mathbf K}{\partial d_j}-\alpha\frac{\partial\mathbf B}{\partial d_j}\right)\boldsymbol\psi
-=\boldsymbol\psi^T\left(\frac{\partial\mathbf K}{\partial d_j}+\alpha\frac{\partial\mathbf K_G}{\partial d_j}\right)\boldsymbol\psi.
+w_i=\frac{e^{\rho(a_i-a_{max})}}{\sum_k e^{\rho(a_k-a_{max})}},
+\qquad
+\frac{\partial KS}{\partial a_i}=w_i.
 $$
 
-Because $\mathbf K_G$ also depends on the static axial forces and therefore on $\mathbf u(\mathbf d)$, a static adjoint adds the state-dependent term. The code checks stress, displacement, vibration, and buckling gradients in both radius and shape directions against central differences.
+At each stress sample,
 
-### 5.1 Computational cost
+$$
+\frac{\partial\sigma_{vM}}{\partial\sigma}=\frac{\sigma}{\sigma_{vM}},
+\qquad
+\frac{\partial\sigma_{vM}}{\partial\tau}=\frac{3\tau}{\sigma_{vM}}.
+$$
 
-The generated timing data are stored in `results/benchmark.json`. On the verification design, computing all four reduced gradients with the adjoint/eigenvalue formulas took **1.321 s**, while a central-difference Jacobian requiring two full analyses per design variable took **1.355 s**, a measured speedup of approximately **1.0x**. The advantage grows with the number of design variables because the adjoint solve count scales with outputs rather than design dimension.
+Because the element end-force vector is $\mathbf q_e=\mathbf k_e\mathbf T_e\mathbf u_e$, these local derivatives are mapped back to nodal DOFs to obtain the analytical $\partial KS/\partial\mathbf u$. One static adjoint then accounts for the state dependence of all 24 design variables. Explicit geometry/section partials are evaluated at fixed state at the element/model level.
+
+### 5.3 Tip-displacement constraint derivative
+
+Let $\mathbf P_t$ select the three translational DOFs at the motor node and define
+
+$$
+g_\delta=\frac{\|\mathbf P_t\mathbf u\|}{\delta_{max}}-1.
+$$
+
+Then
+
+$$
+\frac{\partial g_\delta}{\partial\mathbf u}=
+\frac{1}{\delta_{max}}\mathbf P_t^T
+\frac{\mathbf P_t\mathbf u}{\|\mathbf P_t\mathbf u\|}.
+$$
+
+This vector becomes the right-hand side of the static adjoint equation above.
+
+### 5.4 Frequency constraint derivative
+
+With $\lambda=\omega^2$ and mass normalization $\boldsymbol\phi^T\mathbf M\boldsymbol\phi=1$,
+
+$$
+\frac{d\lambda}{dd_j}=\boldsymbol\phi^T
+\left(\frac{\partial\mathbf K}{\partial d_j}-\lambda\frac{\partial\mathbf M}{\partial d_j}\right)\boldsymbol\phi.
+$$
+
+Since $f=\sqrt{\lambda}/(2\pi)$,
+
+$$
+\boxed{
+\frac{df}{dd_j}=\frac{1}{4\pi\sqrt{\lambda}}
+\frac{d\lambda}{dd_j}
+}.
+$$
+
+For the normalized inequality $g_f=1-f/f_{min}\le0$,
+
+$$
+\frac{dg_f}{dd_j}=-\frac{1}{f_{min}}\frac{df}{dd_j}.
+$$
+
+No differentiation through the eigensolver iterations is required.
+
+### 5.5 Buckling/N1 derivative including the state adjoint
+
+Write the buckling problem as
+
+$$
+\mathbf K\boldsymbol\psi=\alpha\mathbf B\boldsymbol\psi,
+\qquad \mathbf B=-\mathbf K_G,
+$$
+
+and let $D=\boldsymbol\psi^T\mathbf B\boldsymbol\psi$. At fixed static state,
+
+$$
+\left.\frac{\partial\alpha}{\partial d_j}\right|_{\mathbf u}=
+\frac{\boldsymbol\psi^T\left(\frac{\partial\mathbf K}{\partial d_j}+
+\alpha\frac{\partial\mathbf K_G}{\partial d_j}\right)\boldsymbol\psi}{D}.
+$$
+
+However, $\mathbf K_G$ is assembled from element axial forces $N_e(\mathbf u,\mathbf d)$, so the eigenvalue also depends on the static state. Define
+
+$$
+\mathbf q_u=\frac{\partial\alpha}{\partial\mathbf u}
+=\frac{\alpha}{D}
+\left[\boldsymbol\psi^T\frac{\partial\mathbf K_G}{\partial\mathbf u}\boldsymbol\psi\right].
+$$
+
+The buckling-state adjoint is
+
+$$
+\mathbf K^T\boldsymbol\lambda_b=-\mathbf q_u^T,
+$$
+
+and the complete reduced gradient is
+
+$$
+\boxed{
+\frac{d\alpha}{dd_j}=
+\left.\frac{\partial\alpha}{\partial d_j}\right|_{\mathbf u}+
+\boldsymbol\lambda_b^T
+\left(\frac{\partial\mathbf K}{\partial d_j}\mathbf u-\frac{\partial\mathbf F}{\partial d_j}\right)
+}.
+$$
+
+This is the required N1 eigenvalue sensitivity plus the adjoint through the pre-buckling state.
+
+### 5.6 Gradient checks for every constraint and variable type
+
+The gradient check uses two independent directional perturbations: one supported only on the 20 radius variables and one supported only on the four shape variables. Every PDE-based constraint is checked in both directions.
+
+| Response | Variable kind | Adjoint directional derivative | Central difference | Relative error |
+|---|---|---:|---:|---:|
+| stress_ks | radius | 0.200227 | 0.20023 | 1.663e-05 |
+| stress_ks | shape | -0.001136 | -0.00113597 | 2.302e-05 |
+| tip_deflection | radius | 0.0032742 | 0.00327425 | 1.263e-05 |
+| tip_deflection | shape | 8.41156e-05 | 8.41158e-05 | 2.075e-06 |
+| frequency | radius | -3472.19 | -3472.19 | 5.088e-07 |
+| frequency | shape | -161.971 | -161.973 | 1.160e-05 |
+| buckling | radius | -504028 | -504025 | 5.406e-06 |
+| buckling | shape | -51822.9 | -51822.7 | 3.730e-06 |
+
+The maximum discrepancy is **2.30e-05**. The step-size sweep below shows the expected decrease in central-difference error before truncation/roundoff effects dominate.
+
+![Taylor step-size test](assets/figures/taylor_test.png)
+
+### 5.7 Cost comparison with finite differences
+
+The current 24-variable model requires **48** full static reanalyses, **48** vibration eigensolves, and **48** buckling eigensolves for a central-difference Jacobian. The reduced-gradient implementation uses three static solves and one vibration plus one buckling eigensolve after the shared matrix-partial assembly. On the current model this is **1.72x** faster in measured wall time.
+
+| Design variables | Adjoint/eigenvalue sensitivities (s) | Central-difference Jacobian (s) | Measured speedup |
+|---:|---:|---:|---:|
+| 14 | 0.149 | 0.263 | 1.76x |
+| 24 | 0.599 | 1.027 | 1.72x |
+| 44 | 1.976 | 5.994 | 3.03x |
+
+![Adjoint versus finite-difference scaling](assets/figures/adjoint_scaling.png)
+
+The scaling experiment intentionally increases the number of beam-size variables. The measured speedup grows with design dimension because central differences repeatedly resolve the PDE/eigenproblems, while the adjoint solve count is controlled primarily by the number of scalar outputs. Local matrix derivatives are still evaluated element/model-wise numerically in this implementation, so the timing does not represent the maximum speedup available from fully analytical element derivatives.
 
 ## 6. Optimization
 
-SciPy SLSQP is used with normalized design variables and normalized constraints. The starting design has uniform 16 mm outer radii and zero centerline offsets. Clearly inactive constraints are screened from gradient evaluation while still being evaluated as explicit SLSQP constraints; if their margin falls below the screening threshold, the full adjoint gradient is restored. This avoids spending most runtime differentiating constraints with zero KKT multipliers.
+### 6.1 Algorithm, scaling, and convergence
 
-The optimization converged in **23 iterations** with status: **Optimization terminated successfully**.
+The design is optimized with SciPy SLSQP. Design variables are scaled by 0.01 m,
+
+$$
+\mathbf y=\mathbf d/(0.01\ \text{m}),
+$$
+
+and the objective is normalized by the baseline arm mass $m_0$. Each physical constraint is likewise expressed in dimensionless form. This prevents the optimizer from simultaneously handling raw quantities ranging from millimeters to hertz to kilograms.
+
+Every physical constraint is evaluated at every optimization point, so the feasible set is never screened. To avoid repeatedly assembling expensive gradients for constraints that are clearly inactive, the implementation temporarily returns a zero search gradient for stress and deflection while their normalized slacks exceed 0.25, and for buckling while its normalized margin exceeds 10. The exact verified gradient is automatically restored if any of those constraints approaches its boundary. In the converged design all three screened constraints remain far from active and have zero SLSQP multipliers, while the governing frequency gradient is evaluated throughout. Full stress, displacement, frequency, and buckling gradients are independently verified in Section 5.6.
+
+The reference run converged in **24 iterations** with status **"Optimization terminated successfully"**.
+
+![Optimization convergence history](assets/figures/optimization_history.png)
+
+The final radius distribution is strongly tapered: material is retained near the clamped root, where it contributes most efficiently to bending stiffness and the first natural frequency, while the last **2 elements** reach the 6 mm lower radius bound.
 
 ![Optimized radius distribution](assets/figures/radius_distribution.png)
 
-The radius tapers from approximately **17.44 mm** near the root to the 6 mm lower bound near the tip. **2 elements** are exactly at the lower radius bound. This is physically consistent with a cantilever dominated by bending/vibration: stiffness is most valuable near the clamped root.
+### 6.2 Multiple starting designs
 
-### 6.1 Active constraints and KKT interpretation
+Because shape optimization makes the problem nonconvex, the solution was checked from several starts. The first three use different radius distributions. A fourth restart perturbs all four shape variables from the converged radius profile to probe the shape basin directly.
 
-The frequency constraint is active at **140.000000 Hz**. The SLSQP multiplier for the normalized frequency constraint is approximately **0.4837**; the stress, displacement, and buckling multipliers are zero to numerical precision. Interpreted locally, tightening the frequency requirement by 1 Hz costs approximately **0.402 g** of arm mass at this optimum. Radius lower bounds at the tip are also active.
+| Start | Description | Initial mass (g) | Initial $f_1$ (Hz) | Final mass (g) | Final $f_1$ (Hz) | Iterations | Result |
+|---:|---|---:|---:|---:|---:|---:|---|
+| 1 | Uniform 16 mm, straight | 116.42 | 160.18 | 85.62630 | 140.00000 | 24 | PASS |
+| 2 | Uniform 15 mm, straight | 108.79 | 145.76 | 85.62631 | 140.00000 | 20 | PASS |
+| 3 | 17.5-to-13.5 mm taper, straight | 112.60 | 170.66 | 85.62631 | 140.00000 | 19 | PASS |
+| 4 | Converged radii + curved shape perturbation | 85.63 | 140.00 | 85.62631 | 140.00000 | 7 | PASS |
+
+![Final mass from multiple starts](assets/figures/multistart_final_mass.png)
+
+All successful starts converge to essentially the same mass and frequency. Across the restart set, the maximum RMS distance from the reference design is **0.0062 mm** in the 24-dimensional design vector. The optimized shape controls themselves are at most **0.0000 mm**, so the straight centerline is locally preferred for this load model.
+
+### 6.3 Active constraints, multipliers, and KKT interpretation
+
+The final normalized slacks and SLSQP inequality multipliers are:
+
+| Constraint | Final physical value | Normalized slack | Multiplier | Active? |
+|---|---|---:|---:|---|
+| KS stress | 0.128920 <= 1 | 0.871080 | 0.000000 | No |
+| Tip displacement | 0.138210 mm <= 3.0 mm | 0.953930 | 0.000000 | No |
+| First frequency | 139.999999 Hz >= 140.0 Hz | -5.108e-09 | 0.483663 | Yes |
+| Buckling factor | 7921.245 >= 3.0 | 2639.415 | 0.000000 | No |
+
+The vibration constraint is the only active system-level inequality. Its normalized multiplier is **0.483663**. Using the objective normalization $m/m_0$ and $f_1/f_{min}-1\ge0$, this corresponds to a local mass penalty of approximately **0.402 g per additional hertz** of required minimum frequency. In other words, near the optimum a modest relaxation of the frequency requirement buys measurable mass reduction, whereas relaxing stress, deflection, or buckling has no first-order value because those constraints are inactive.
+
+Two radius variables are on their lower bound. SciPy's reported `multipliers` array covers the nonlinear inequality constraints but not simple variable-bound multipliers, so bound activity is reported separately rather than inventing bound multipliers.
 
 ## 7. Nonlinear/stability component: with and without buckling
 
