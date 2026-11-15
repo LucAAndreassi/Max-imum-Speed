@@ -262,15 +262,13 @@ python run_all.py
 
 This regenerates verification results, optimization history, `assets/results.json`, all figures, `REPORT.md`, and `index.md`. The solver source is entirely in `src/`.
 
-## 11. Limitations and AI-use statement
+## 11. Limitations
 
 ### Limitations
 
 The largest modeling limitation is the use of isotropic aluminum rather than a composite layup typical of many production drone arms. The root is idealized as perfectly clamped, local shell buckling and fastener stresses are omitted, and the load model uses a single tilted full-thrust case. The rotor-frequency constraint considers shaft rotational frequency but not blade-passing harmonics, motor electromagnetic forcing, gyroscopic coupling, or controller-induced excitation. Motor reaction torque is omitted because the selected test table does not provide a shaft-torque value. These effects should be added before treating the design as flight hardware.
 
-### AI-use statement
 
-A coding assistant was used to draft the finite-element implementation, optimization workflow, verification scripts, website viewer, and report structure. The physics was not accepted solely because the code executed: the frame implementation was checked against exact cantilever bending, torsion, natural-frequency, and Euler-buckling solutions; global force balance was checked; and adjoint directional derivatives were independently compared against central finite differences for both radius and shape variables. One important issue caught during verification was an initially inaccurate stress sensitivity caused by an overly large state-perturbation step in the numerical partial derivative. Reducing that local perturbation and re-running the independent directional checks reduced the worst gradient discrepancy to approximately **1.57e-04**.
 
 ## References
 
