@@ -2,9 +2,9 @@
 
 ## 1. Summary
 
-This project minimizes the structural mass of a **0.30 m cantilevered multirotor arm** using a custom three-dimensional finite-element solver and gradient-based PDE-constrained optimization. The model contains 20 Euler-Bernoulli frame elements, one independent tube-radius variable per element, and four centerline shape-control variables, giving **24 design variables**. The design must satisfy strength, tip-deflection, vibration, and N1 linear-buckling requirements.
+This project minimizes the structural mass of a 0.6096 m (2 ft) cantilevered arm for an industrial multirotor used for heavy-lift or professional filming applications using a custom three-dimensional finite-element solver and gradient-based PDE-constrained optimization. The full vehicle uses six coaxial propulsion stations; one representative arm is modeled because the six arms are structurally equivalent. The model contains 20 Euler-Bernoulli frame elements, one independent hollow-tube radius variable per element, and four centerline shape-control variables, giving 24 design variables. The arm must satisfy strength, tip-deflection, vibration, and nonlinear/stability requirements.
 
-The baseline arm has a mass of **116.42 g**. The converged design has a mass of **85.63 g**, a **26.5% reduction**, while satisfying every requirement. The active system-level constraint is the first natural frequency at **140.000 Hz**; stress, static displacement, and buckling retain substantial margin. The optimization converged from multiple radius profiles, and a separate shape-perturbation restart returned to essentially the same design basin.
+The baseline and optimized results reported in this study are obtained using the 2 ft industrial-drone arm and the 15 lbf maximum-thrust load case defined below. The final optimized mass, governing constraint, and percentage mass reduction are reported after regeneration of the updated finite-element and optimization model.
 
 <div id="viewer" style="height:560px"></div>
 <div id="viewer-controls"></div>
@@ -19,11 +19,12 @@ The viewer defaults to the **first vibration-mode amplitude**, because vibration
 
 ### 2.1 Engineering motivation and physical model
 
-A multirotor arm should be light because structural mass reduces payload and endurance, but excessive mass reduction can lower stiffness, shift structural modes toward rotor excitation, increase deflection, or create instability. The reference propulsion unit is the T-MOTOR MN3110 KV700. The manufacturer's test table lists a **99 g motor mass** and **1290 g thrust at 7600 RPM** for the 14.8 V / 12x4 propeller test point. These values define the motor point mass and full-throttle rotor thrust used in the model.
+The case study represents an industrial multirotor intended for heavy-lift or professional filming applications. The aircraft uses six identical coaxial propulsion stations. Each structural arm extends 2 ft (0.6096 m) from the main vehicle frame to its coaxial motor station and is modeled as fully fixed at the main-frame attachment.
 
-Rather than artificially tilting the thrust vector relative to the arm, the static design load separates two physical effects: (1) vertical rotor thrust and gravity, and (2) a team-selected **2g axial maneuver acceleration** of the motor mass. The latter produces an inward compressive inertia load of **1.942 N**, allowing the N1 stability model to be exercised without implying that vehicle bank angle changes the rotor-thrust direction relative to its own arm.
+Each coaxial propulsion station can generate a maximum total thrust of 15 lbf (66.7 N). The two counter-rotating motors in the coaxial pair are assumed to cancel their reaction torques to first order, so no net motor torque is applied to the arm. The principal structural load from the propulsion system is therefore the transverse thrust force acting at the end of the cantilevered arm.
 
-**Propulsion source:** T-MOTOR, "MN3110 Multirotor Fixed Wing UAV Motor KV470/KV700/KV780," manufacturer product/test data.
+The arm is modeled as a hollow circular tube made from an isotropic structural metal, with 6061-T6 aluminum used as the baseline material.
+
 
 ![Drone-arm finite-element and load schematic](assets/figures/model_schematic.png)
 
