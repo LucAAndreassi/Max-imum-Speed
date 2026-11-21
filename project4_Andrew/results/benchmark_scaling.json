@@ -1,0 +1,59 @@
+[
+  {
+    "n_elements": 10,
+    "n_design_variables": 14,
+    "adjoint_all_constraints_s": 0.2739993590002996,
+    "central_difference_jacobian_s": 0.6667516459997387,
+    "speedup": 2.433405860628344,
+    "relative_gradient_errors": [
+      0.00012759364738952893,
+      2.8355426035748664e-05,
+      1.4541189966638704e-05,
+      1.39524264430285e-05
+    ],
+    "adjoint_static_solves": 3,
+    "adjoint_vibration_eigensolves": 1,
+    "adjoint_buckling_eigensolves": 1,
+    "central_difference_static_solves": 28,
+    "central_difference_vibration_eigensolves": 28,
+    "central_difference_buckling_eigensolves": 28
+  },
+  {
+    "n_elements": 20,
+    "n_design_variables": 24,
+    "adjoint_all_constraints_s": 0.7691610950000722,
+    "central_difference_jacobian_s": 1.7327008960000967,
+    "speedup": 2.2527152078589388,
+    "relative_gradient_errors": [
+      0.00017523873530171123,
+      2.8319675905386745e-05,
+      2.093538782675697e-05,
+      1.82225401427697e-05
+    ],
+    "adjoint_static_solves": 3,
+    "adjoint_vibration_eigensolves": 1,
+    "adjoint_buckling_eigensolves": 1,
+    "central_difference_static_solves": 48,
+    "central_difference_vibration_eigensolves": 48,
+    "central_difference_buckling_eigensolves": 48
+  },
+  {
+    "n_elements": 40,
+    "n_design_variables": 44,
+    "adjoint_all_constraints_s": 2.876400540999839,
+    "central_difference_jacobian_s": 7.8626654590002545,
+    "speedup": 2.7335085454639727,
+    "relative_gradient_errors": [
+      0.00021001635176787727,
+      4.425289206028375e-05,
+      5.557959093828757e-05,
+      3.475176937593184e-05
+    ],
+    "adjoint_static_solves": 3,
+    "adjoint_vibration_eigensolves": 1,
+    "adjoint_buckling_eigensolves": 1,
+    "central_difference_static_solves": 88,
+    "central_difference_vibration_eigensolves": 88,
+    "central_difference_buckling_eigensolves": 88
+  }
+]

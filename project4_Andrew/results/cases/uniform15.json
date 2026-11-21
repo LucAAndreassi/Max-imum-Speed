@@ -1,0 +1,454 @@
+{
+  "case": "uniform15",
+  "initial_design": [
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.032,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "final_design": [
+    0.03898626589861389,
+    0.037970607210858424,
+    0.03689780049925964,
+    0.03582112295986085,
+    0.03468802765044545,
+    0.03352294271612644,
+    0.03231916486131793,
+    0.031070237765909958,
+    0.029769536846804813,
+    0.028409871994975435,
+    0.02698308998759151,
+    0.025479625775455778,
+    0.023887935559576516,
+    0.0221935333930032,
+    0.0203768696212816,
+    0.018407820944541468,
+    0.01623142678593118,
+    0.013739522782413477,
+    0.010773367673011873,
+    0.008,
+    -1.743636636819446e-11,
+    -4.2101882975241235e-10,
+    2.812026658927295e-10,
+    2.7024924019799848e-09
+  ],
+  "initial_metrics": {
+    "mass_kg": 0.4847634544121727,
+    "max_stress_pa": 16909467.281720374,
+    "stress_ks_util": 0.18182634259227215,
+    "tip_deflection_m": 0.0009519818331762397,
+    "frequency_hz": 64.67315650266677,
+    "buckling_factor": 4932.904295387041
+  },
+  "final_metrics": {
+    "mass_kg": 0.3959771049141819,
+    "max_stress_pa": 17579943.181502406,
+    "stress_ks_util": 0.18646707194910211,
+    "tip_deflection_m": 0.0010554259371607366,
+    "frequency_hz": 64.99999967737214,
+    "buckling_factor": 3265.8671154614135
+  },
+  "history": [
+    {
+      "iteration": 1,
+      "mass_kg": 0.4844367716671707,
+      "max_stress_pa": 16645478.55185542,
+      "stress_ks_util": 0.18091435859365484,
+      "tip_deflection_m": 0.0009436513456240596,
+      "frequency_hz": 64.99787428432002,
+      "buckling_factor": 4963.839555021498
+    },
+    {
+      "iteration": 2,
+      "mass_kg": 0.4820328436671652,
+      "max_stress_pa": 16479619.668926405,
+      "stress_ks_util": 0.1806199807877955,
+      "tip_deflection_m": 0.0009457037942597094,
+      "frequency_hz": 64.99647166072549,
+      "buckling_factor": 4938.26754405629
+    },
+    {
+      "iteration": 3,
+      "mass_kg": 0.4700483331118152,
+      "max_stress_pa": 15672668.342748946,
+      "stress_ks_util": 0.17947980550961756,
+      "tip_deflection_m": 0.0009584818779048123,
+      "frequency_hz": 64.90786037127039,
+      "buckling_factor": 4795.009258654474
+    },
+    {
+      "iteration": 4,
+      "mass_kg": 0.41422099181481936,
+      "max_stress_pa": 14104415.561725866,
+      "stress_ks_util": 0.18262201064976386,
+      "tip_deflection_m": 0.0010978954227865343,
+      "frequency_hz": 62.25012117174082,
+      "buckling_factor": 3740.9417387829694
+    },
+    {
+      "iteration": 5,
+      "mass_kg": 0.4298654155163798,
+      "max_stress_pa": 13152179.453910235,
+      "stress_ks_util": 0.17756957387730782,
+      "tip_deflection_m": 0.0010003468919232634,
+      "frequency_hz": 64.9450778181911,
+      "buckling_factor": 4184.3935174012095
+    },
+    {
+      "iteration": 6,
+      "mass_kg": 0.41232388927052993,
+      "max_stress_pa": 13783747.016739735,
+      "stress_ks_util": 0.18051341488620226,
+      "tip_deflection_m": 0.0010462917571656956,
+      "frequency_hz": 64.24535751483546,
+      "buckling_factor": 3719.8076595776074
+    },
+    {
+      "iteration": 7,
+      "mass_kg": 0.41248649815964533,
+      "max_stress_pa": 13652196.938994609,
+      "stress_ks_util": 0.17973686675083006,
+      "tip_deflection_m": 0.0010275226366266,
+      "frequency_hz": 64.96565735697612,
+      "buckling_factor": 3729.290719760578
+    },
+    {
+      "iteration": 8,
+      "mass_kg": 0.4073167621638057,
+      "max_stress_pa": 14048867.891489375,
+      "stress_ks_util": 0.18125407601389776,
+      "tip_deflection_m": 0.001040839359192475,
+      "frequency_hz": 64.8519256964509,
+      "buckling_factor": 3550.3945730875917
+    },
+    {
+      "iteration": 9,
+      "mass_kg": 0.3995680753017914,
+      "max_stress_pa": 15657760.566176038,
+      "stress_ks_util": 0.18583184465277325,
+      "tip_deflection_m": 0.0010712475618867906,
+      "frequency_hz": 64.42444743087144,
+      "buckling_factor": 3195.743485836475
+    },
+    {
+      "iteration": 10,
+      "mass_kg": 0.4004641485324761,
+      "max_stress_pa": 15783001.686184306,
+      "stress_ks_util": 0.18540547651743286,
+      "tip_deflection_m": 0.001055917069688941,
+      "frequency_hz": 64.94363747900731,
+      "buckling_factor": 3216.6730200675925
+    },
+    {
+      "iteration": 11,
+      "mass_kg": 0.3984793067171532,
+      "max_stress_pa": 17378473.862911772,
+      "stress_ks_util": 0.18842384696257247,
+      "tip_deflection_m": 0.0010654800004633533,
+      "frequency_hz": 64.7736393376271,
+      "buckling_factor": 3114.734290963908
+    },
+    {
+      "iteration": 12,
+      "mass_kg": 0.39892008295886416,
+      "max_stress_pa": 16994066.850976143,
+      "stress_ks_util": 0.18716606387593687,
+      "tip_deflection_m": 0.0010574219972860235,
+      "frequency_hz": 64.98078844704459,
+      "buckling_factor": 3180.881762776066
+    },
+    {
+      "iteration": 13,
+      "mass_kg": 0.39730848927417467,
+      "max_stress_pa": 17061616.60234671,
+      "stress_ks_util": 0.18611814376051664,
+      "tip_deflection_m": 0.0010582310685923017,
+      "frequency_hz": 64.8902632572701,
+      "buckling_factor": 3266.4986142053826
+    },
+    {
+      "iteration": 14,
+      "mass_kg": 0.3964410003960903,
+      "max_stress_pa": 17223293.243285622,
+      "stress_ks_util": 0.18524446721762589,
+      "tip_deflection_m": 0.0010556133614337082,
+      "frequency_hz": 64.91036394783087,
+      "buckling_factor": 3346.435497310356
+    },
+    {
+      "iteration": 15,
+      "mass_kg": 0.3961854820574429,
+      "max_stress_pa": 17223293.243290696,
+      "stress_ks_util": 0.18464578450739252,
+      "tip_deflection_m": 0.0010543546973448535,
+      "frequency_hz": 64.95200400917795,
+      "buckling_factor": 3353.3139641341095
+    },
+    {
+      "iteration": 16,
+      "mass_kg": 0.396133445370769,
+      "max_stress_pa": 17223293.243259154,
+      "stress_ks_util": 0.1849862129166238,
+      "tip_deflection_m": 0.0010547573089558252,
+      "frequency_hz": 64.97790383547202,
+      "buckling_factor": 3317.680607815973
+    },
+    {
+      "iteration": 17,
+      "mass_kg": 0.39617236268171396,
+      "max_stress_pa": 17223293.2432591,
+      "stress_ks_util": 0.18536087064353987,
+      "tip_deflection_m": 0.001054971385449289,
+      "frequency_hz": 64.99610781677836,
+      "buckling_factor": 3293.1717435356163
+    },
+    {
+      "iteration": 18,
+      "mass_kg": 0.396154018503604,
+      "max_stress_pa": 17223293.243251186,
+      "stress_ks_util": 0.18574240399927133,
+      "tip_deflection_m": 0.001055472966048498,
+      "frequency_hz": 64.99828911403687,
+      "buckling_factor": 3273.961375967843
+    },
+    {
+      "iteration": 19,
+      "mass_kg": 0.3960918196226414,
+      "max_stress_pa": 17441291.397876315,
+      "stress_ks_util": 0.18651376993260227,
+      "tip_deflection_m": 0.001056311095881523,
+      "frequency_hz": 64.9954245304641,
+      "buckling_factor": 3246.462233505359
+    },
+    {
+      "iteration": 20,
+      "mass_kg": 0.39604205612880655,
+      "max_stress_pa": 18262025.17309106,
+      "stress_ks_util": 0.18729202233231687,
+      "tip_deflection_m": 0.0010565711282673417,
+      "frequency_hz": 64.99496358878557,
+      "buckling_factor": 3233.7689349744087
+    },
+    {
+      "iteration": 21,
+      "mass_kg": 0.3960189330017878,
+      "max_stress_pa": 18593401.384708486,
+      "stress_ks_util": 0.18749596580966332,
+      "tip_deflection_m": 0.0010561282630069172,
+      "frequency_hz": 64.99628289787948,
+      "buckling_factor": 3243.9495891049023
+    },
+    {
+      "iteration": 22,
+      "mass_kg": 0.3960199902897783,
+      "max_stress_pa": 18465885.24059029,
+      "stress_ks_util": 0.18721757390908778,
+      "tip_deflection_m": 0.001055606302749791,
+      "frequency_hz": 64.99885149227464,
+      "buckling_factor": 3258.4622020333436
+    },
+    {
+      "iteration": 23,
+      "mass_kg": 0.3960173009944328,
+      "max_stress_pa": 18284650.329855293,
+      "stress_ks_util": 0.1869651598022284,
+      "tip_deflection_m": 0.0010553402617781323,
+      "frequency_hz": 64.99964068976074,
+      "buckling_factor": 3266.8799534922596
+    },
+    {
+      "iteration": 24,
+      "mass_kg": 0.39600272873186565,
+      "max_stress_pa": 17913280.452259142,
+      "stress_ks_util": 0.1865619718152946,
+      "tip_deflection_m": 0.0010550729512080633,
+      "frequency_hz": 64.99901833503878,
+      "buckling_factor": 3277.2119489235956
+    },
+    {
+      "iteration": 25,
+      "mass_kg": 0.39598748230236774,
+      "max_stress_pa": 17503584.989322476,
+      "stress_ks_util": 0.18626110082380853,
+      "tip_deflection_m": 0.001055001252178013,
+      "frequency_hz": 64.99865635901801,
+      "buckling_factor": 3280.826800110811
+    },
+    {
+      "iteration": 26,
+      "mass_kg": 0.39597962361931394,
+      "max_stress_pa": 17284593.850971363,
+      "stress_ks_util": 0.18623026666555317,
+      "tip_deflection_m": 0.001055203749209434,
+      "frequency_hz": 64.99883354830949,
+      "buckling_factor": 3274.3976572566744
+    },
+    {
+      "iteration": 27,
+      "mass_kg": 0.39598097554715084,
+      "max_stress_pa": 17316301.49640633,
+      "stress_ks_util": 0.18634059455732827,
+      "tip_deflection_m": 0.0010553932171926085,
+      "frequency_hz": 64.99968937165353,
+      "buckling_factor": 3267.2708519974176
+    },
+    {
+      "iteration": 28,
+      "mass_kg": 0.39598142053114627,
+      "max_stress_pa": 17387642.209004983,
+      "stress_ks_util": 0.18641850481164376,
+      "tip_deflection_m": 0.0010554802248093906,
+      "frequency_hz": 64.99994513171315,
+      "buckling_factor": 3264.036700405543
+    },
+    {
+      "iteration": 29,
+      "mass_kg": 0.3959807796796563,
+      "max_stress_pa": 17471253.33793135,
+      "stress_ks_util": 0.1864905187775774,
+      "tip_deflection_m": 0.0010555484466365204,
+      "frequency_hz": 64.99995474539729,
+      "buckling_factor": 3261.658286524045
+    },
+    {
+      "iteration": 30,
+      "mass_kg": 0.39597931830758554,
+      "max_stress_pa": 17589497.431926623,
+      "stress_ks_util": 0.18657298890843912,
+      "tip_deflection_m": 0.0010556077030788682,
+      "frequency_hz": 64.99989945277959,
+      "buckling_factor": 3259.638948171601
+    },
+    {
+      "iteration": 31,
+      "mass_kg": 0.39597778457601085,
+      "max_stress_pa": 17671145.05662179,
+      "stress_ks_util": 0.18659924171172565,
+      "tip_deflection_m": 0.001055592675384547,
+      "frequency_hz": 64.9998578091511,
+      "buckling_factor": 3260.1890172681724
+    },
+    {
+      "iteration": 32,
+      "mass_kg": 0.39597718071622495,
+      "max_stress_pa": 17655207.441129982,
+      "stress_ks_util": 0.18653888486056808,
+      "tip_deflection_m": 0.0010555015866974208,
+      "frequency_hz": 64.99989404524537,
+      "buckling_factor": 3263.335450934863
+    },
+    {
+      "iteration": 33,
+      "mass_kg": 0.39597735448482196,
+      "max_stress_pa": 17607688.156668954,
+      "stress_ks_util": 0.18648072312665392,
+      "tip_deflection_m": 0.0010554367805952216,
+      "frequency_hz": 64.99997490990809,
+      "buckling_factor": 3265.5248672716016
+    },
+    {
+      "iteration": 34,
+      "mass_kg": 0.3959774114603872,
+      "max_stress_pa": 17586705.907888822,
+      "stress_ks_util": 0.18646107612155835,
+      "tip_deflection_m": 0.0010554183625688307,
+      "frequency_hz": 64.99999688851952,
+      "buckling_factor": 3266.1485398814348
+    },
+    {
+      "iteration": 35,
+      "mass_kg": 0.39597736493630553,
+      "max_stress_pa": 17566415.33636147,
+      "stress_ks_util": 0.1864440867899753,
+      "tip_deflection_m": 0.0010554040031221625,
+      "frequency_hz": 64.99999733766573,
+      "buckling_factor": 3266.652200254128
+    },
+    {
+      "iteration": 36,
+      "mass_kg": 0.39597726215485535,
+      "max_stress_pa": 17544038.044782482,
+      "stress_ks_util": 0.18642744731536398,
+      "tip_deflection_m": 0.0010553905859065585,
+      "frequency_hz": 64.99999267725188,
+      "buckling_factor": 3267.124568061444
+    },
+    {
+      "iteration": 37,
+      "mass_kg": 0.3959771456240745,
+      "max_stress_pa": 17537029.75459321,
+      "stress_ks_util": 0.18642599031913434,
+      "tip_deflection_m": 0.0010553904523595307,
+      "frequency_hz": 64.99999051528211,
+      "buckling_factor": 3267.1276191086163
+    },
+    {
+      "iteration": 38,
+      "mass_kg": 0.39597708879023474,
+      "max_stress_pa": 17554616.259281497,
+      "stress_ks_util": 0.186444739045821,
+      "tip_deflection_m": 0.001055407148470386,
+      "frequency_hz": 64.99999253388313,
+      "buckling_factor": 3266.5361762265534
+    },
+    {
+      "iteration": 39,
+      "mass_kg": 0.3959770971074621,
+      "max_stress_pa": 17573496.088840954,
+      "stress_ks_util": 0.18646174351332045,
+      "tip_deflection_m": 0.001055421528579058,
+      "frequency_hz": 64.9999979359811,
+      "buckling_factor": 3266.024360775885
+    },
+    {
+      "iteration": 40,
+      "mass_kg": 0.3959771049141819,
+      "max_stress_pa": 17579943.181502406,
+      "stress_ks_util": 0.18646707194910211,
+      "tip_deflection_m": 0.0010554259371607366,
+      "frequency_hz": 64.99999967737214,
+      "buckling_factor": 3265.8671154614135
+    },
+    {
+      "iteration": 41,
+      "mass_kg": 0.3959771049141819,
+      "max_stress_pa": 17579943.181502406,
+      "stress_ks_util": 0.18646707194910211,
+      "tip_deflection_m": 0.0010554259371607366,
+      "frequency_hz": 64.99999967737214,
+      "buckling_factor": 3265.8671154614135
+    }
+  ],
+  "success": true,
+  "message": "Optimization terminated successfully",
+  "iterations": 41,
+  "function_evaluations": 41,
+  "gradient_evaluations": 41,
+  "elapsed_s": 11.57894147099978,
+  "multipliers": [
+    0.0,
+    0.0,
+    0.5014180535646351,
+    0.0
+  ]
+}

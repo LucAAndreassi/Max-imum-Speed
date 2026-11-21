@@ -1,0 +1,56 @@
+[
+  {
+    "test": "V1 cantilever tip deflection",
+    "numerical": 0.0001938200348815143,
+    "exact": 0.00019382003488601474,
+    "relative_error": 2.3219694008780337e-11
+  },
+  {
+    "test": "V2 cantilever torsion",
+    "numerical": 0.0004296344106640005,
+    "exact": 0.0004296344106639994,
+    "relative_error": 2.523545939464838e-15
+  },
+  {
+    "test": "V3 frequency mesh convergence (p=3.82)",
+    "numerical": 250.4128697866089,
+    "exact": 250.4128370389611,
+    "relative_error": 1.3077463671876387e-07
+  },
+  {
+    "test": "V4 arbitrary 3D rotation invariance",
+    "numerical": 0.00019382003488608906,
+    "exact": 0.00019382003488601474,
+    "relative_error": 3.834591143665309e-13
+  },
+  {
+    "test": "V5 free-free rigid-body modes",
+    "numerical": 6.0,
+    "exact": 6.0,
+    "relative_error": 0.0
+  },
+  {
+    "test": "V6 cantilever first frequency",
+    "numerical": 250.41283891980612,
+    "exact": 250.4128370389611,
+    "relative_error": 7.510976839393381e-09
+  },
+  {
+    "test": "V7 Euler cantilever buckling",
+    "numerical": 12730.372085696896,
+    "exact": 12730.371768447023,
+    "relative_error": 2.4920707621214802e-08
+  },
+  {
+    "test": "V8 global force and moment balance",
+    "numerical": 1.3255411856014353e-11,
+    "exact": 0.0,
+    "relative_error": 1.3255411856014353e-11
+  },
+  {
+    "test": "V9 adjoint directional gradients",
+    "numerical": 0.0002175232279385375,
+    "exact": 0.0,
+    "relative_error": 0.0002175232279385375
+  }
+]

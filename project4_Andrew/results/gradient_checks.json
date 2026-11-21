@@ -1,0 +1,58 @@
+[
+  {
+    "response": "stress_ks",
+    "variable_kind": "radius",
+    "adjoint_directional": 1.0713520315766905,
+    "finite_difference": 1.0713564982262058,
+    "relative_error": 4.16915333295864e-06
+  },
+  {
+    "response": "stress_ks",
+    "variable_kind": "shape",
+    "adjoint_directional": -0.003366307209180625,
+    "finite_difference": -0.0033670396185070395,
+    "relative_error": 0.0002175232279385375
+  },
+  {
+    "response": "tip_deflection",
+    "variable_kind": "radius",
+    "adjoint_directional": 0.012138202802432654,
+    "finite_difference": 0.01213822042693644,
+    "relative_error": 1.4519841595646473e-06
+  },
+  {
+    "response": "tip_deflection",
+    "variable_kind": "shape",
+    "adjoint_directional": 0.00016665974925930975,
+    "finite_difference": 0.0001666529538977765,
+    "relative_error": 4.077386149589402e-05
+  },
+  {
+    "response": "frequency",
+    "variable_kind": "radius",
+    "adjoint_directional": -688.7410879356414,
+    "finite_difference": -688.7397845466836,
+    "relative_error": 1.892422247836086e-06
+  },
+  {
+    "response": "frequency",
+    "variable_kind": "shape",
+    "adjoint_directional": -17.87609727969215,
+    "finite_difference": -17.877101401850837,
+    "relative_error": 5.616806304979445e-05
+  },
+  {
+    "response": "buckling",
+    "variable_kind": "radius",
+    "adjoint_directional": -89792.90384610185,
+    "finite_difference": -89792.7001678454,
+    "relative_error": 2.268311277724154e-06
+  },
+  {
+    "response": "buckling",
+    "variable_kind": "shape",
+    "adjoint_directional": -12715.39132584327,
+    "finite_difference": -12715.316078401884,
+    "relative_error": 5.9178234831665174e-06
+  }
+]
