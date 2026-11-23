@@ -1,0 +1,421 @@
+{
+  "parameters_si": {
+    "length": 0.6096,
+    "outer_diameter": 0.0552848162289841,
+    "wall": 0.0020099999999999996,
+    "young": 64000000000.0,
+    "poisson": 0.3,
+    "density": 1520.0,
+    "tip_mass": 0.680388555,
+    "thrust_per_motor": 66.7233242289075,
+    "rpm": 3500,
+    "elements": 20,
+    "gravity": 9.80665
+  },
+  "defaults_dependency": {
+    "LENGTH_IN": 24.000000000000004,
+    "INITIAL_OD_IN": 2.1765675680702405,
+    "INITIAL_WALL_IN": 0.07913385826771653,
+    "YOUNG_MODULUS_GPA": 64.0,
+    "POISSON_RATIO": 0.3,
+    "DENSITY_KG_M3": 1520.0,
+    "MOTOR_MASS_COMBINED_LBM": 1.4999999999999998,
+    "THRUST_PER_MOTOR_LBF": 15.000000000000002,
+    "ROTOR_RPM": 3500,
+    "BEAM_ELEMENTS": 20,
+    "GRAVITY_M_S2": 9.80665,
+    "EIGENSOLVER_SEED": 20261123
+  },
+  "notes": [
+    "Supplied drone_arm.py is unmodified; its missing arm_inputs defaults are supplied in memory",
+    "Gross thrust is split over two motors to avoid doubling the existing total load",
+    "Poisson ratio is an unverified auxiliary assumption used only by the uncoupled torsion block",
+    "New code is a linear 3D Euler-Bernoulli frame, not the finite-rotation follower-thrust solver",
+    "First two frequencies form the expected two-plane bending pair"
+  ],
+  "reference": {
+    "linear_tip_z_mm": 1.2401678430586798,
+    "fe_bending_frequencies_Hz": [
+      58.33333308137712,
+      829.0034608536394,
+      2640.544828795867,
+      5484.428936962588
+    ],
+    "naca_bending_frequencies_Hz": [
+      58.33333333333338,
+      829.0026042793718,
+      2640.516296375232,
+      5484.171995124521
+    ],
+    "closed_form_tip_z_mm": 1.240167843067321,
+    "prior_export_linear_tip_z_mm": 1.2401678430586798,
+    "prior_export_nonlinear_tip_z_mm": 1.240117932676418
+  },
+  "new_frame": {
+    "elements": 20,
+    "nodes": 21,
+    "total_dofs": 126,
+    "free_dofs": 120,
+    "tube_mass_kg": 0.31171409224279,
+    "tip_z_mm": 1.2401678430703131,
+    "tip_slope_rad": 0.0030546880017261204,
+    "peak_bending_stress_MPa": 17.658129355442966,
+    "frequencies_Hz": [
+      58.33333336398398,
+      58.333333363984366,
+      829.0034608675621,
+      829.0034608676436,
+      1066.0975552345747,
+      1650.7761527631658,
+      2640.5448287828667,
+      2640.5448287835698
+    ],
+    "modal_strain_energy_fractions": [
+      {
+        "axial": 8.754786917963176e-25,
+        "torsion": 1.5367858702652265e-25,
+        "lateral_bending": 0.7737191497947133,
+        "vertical_bending": 0.22628085020528677
+      },
+      {
+        "axial": 7.359138685797584e-26,
+        "torsion": 1.2917332975425229e-26,
+        "lateral_bending": 0.22628085020613528,
+        "vertical_bending": 0.7737191497938646
+      },
+      {
+        "axial": 4.866609488448789e-26,
+        "torsion": 5.795668981651398e-26,
+        "lateral_bending": 0.017573421924173757,
+        "vertical_bending": 0.9824265780758262
+      },
+      {
+        "axial": 1.6478010550060548e-25,
+        "torsion": 1.4092525132421818e-25,
+        "lateral_bending": 0.982426578075834,
+        "vertical_bending": 0.017573421924166024
+      },
+      {
+        "axial": 1.0,
+        "torsion": 8.349084874029314e-30,
+        "lateral_bending": 2.907051453719258e-26,
+        "vertical_bending": 5.255401013111055e-25
+      },
+      {
+        "axial": 7.518151146285338e-26,
+        "torsion": 1.0,
+        "lateral_bending": 1.3758873269301547e-24,
+        "vertical_bending": 1.1884711681581288e-24
+      },
+      {
+        "axial": 5.217207387220078e-25,
+        "torsion": 9.431780831689649e-26,
+        "lateral_bending": 0.39741616856075546,
+        "vertical_bending": 0.6025838314392444
+      },
+      {
+        "axial": 2.4693448475096067e-25,
+        "torsion": 1.6422783349940423e-26,
+        "lateral_bending": 0.60258383143925,
+        "vertical_bending": 0.39741616856074996
+      }
+    ],
+    "modal_relative_residuals": [
+      2.2783999028399012e-10,
+      7.594947843631062e-11,
+      9.847485553250792e-12,
+      1.505608218904693e-11,
+      3.7241430684675804e-13,
+      5.851607504810979e-10,
+      2.224851302567995e-11,
+      1.2835505032918624e-11
+    ],
+    "equilibrium_residual_inf": 1.3056690451040964e-09,
+    "vertical_force_balance_N": -5.762075261372956e-10,
+    "vertical_tip_stiffness_N_m": 101299.18309919463
+  },
+  "mesh_refinement": [
+    {
+      "elements": 20,
+      "nodes": 21,
+      "total_dofs": 126,
+      "free_dofs": 120,
+      "tube_mass_kg": 0.31171409224279,
+      "tip_z_mm": 1.2401678430703131,
+      "tip_slope_rad": 0.0030546880017261204,
+      "peak_bending_stress_MPa": 17.658129355442966,
+      "frequencies_Hz": [
+        58.33333336398398,
+        58.333333363984366,
+        829.0034608675621,
+        829.0034608676436,
+        1066.0975552345747,
+        1650.7761527631658,
+        2640.5448287828667,
+        2640.5448287835698
+      ],
+      "modal_strain_energy_fractions": [
+        {
+          "axial": 8.754786917963176e-25,
+          "torsion": 1.5367858702652265e-25,
+          "lateral_bending": 0.7737191497947133,
+          "vertical_bending": 0.22628085020528677
+        },
+        {
+          "axial": 7.359138685797584e-26,
+          "torsion": 1.2917332975425229e-26,
+          "lateral_bending": 0.22628085020613528,
+          "vertical_bending": 0.7737191497938646
+        },
+        {
+          "axial": 4.866609488448789e-26,
+          "torsion": 5.795668981651398e-26,
+          "lateral_bending": 0.017573421924173757,
+          "vertical_bending": 0.9824265780758262
+        },
+        {
+          "axial": 1.6478010550060548e-25,
+          "torsion": 1.4092525132421818e-25,
+          "lateral_bending": 0.982426578075834,
+          "vertical_bending": 0.017573421924166024
+        },
+        {
+          "axial": 1.0,
+          "torsion": 8.349084874029314e-30,
+          "lateral_bending": 2.907051453719258e-26,
+          "vertical_bending": 5.255401013111055e-25
+        },
+        {
+          "axial": 7.518151146285338e-26,
+          "torsion": 1.0,
+          "lateral_bending": 1.3758873269301547e-24,
+          "vertical_bending": 1.1884711681581288e-24
+        },
+        {
+          "axial": 5.217207387220078e-25,
+          "torsion": 9.431780831689649e-26,
+          "lateral_bending": 0.39741616856075546,
+          "vertical_bending": 0.6025838314392444
+        },
+        {
+          "axial": 2.4693448475096067e-25,
+          "torsion": 1.6422783349940423e-26,
+          "lateral_bending": 0.60258383143925,
+          "vertical_bending": 0.39741616856074996
+        }
+      ],
+      "modal_relative_residuals": [
+        2.2783999028399012e-10,
+        7.594947843631062e-11,
+        9.847485553250792e-12,
+        1.505608218904693e-11,
+        3.7241430684675804e-13,
+        5.851607504810979e-10,
+        2.224851302567995e-11,
+        1.2835505032918624e-11
+      ],
+      "equilibrium_residual_inf": 1.3056690451040964e-09,
+      "vertical_force_balance_N": -5.762075261372956e-10,
+      "vertical_tip_stiffness_N_m": 101299.18309919463
+    },
+    {
+      "elements": 40,
+      "nodes": 41,
+      "total_dofs": 246,
+      "free_dofs": 240,
+      "tube_mass_kg": 0.31171409224279,
+      "tip_z_mm": 1.2401678429415954,
+      "tip_slope_rad": 0.003054688001448905,
+      "peak_bending_stress_MPa": 17.658129353117847,
+      "frequencies_Hz": [
+        58.33333333823462,
+        58.333333338235136,
+        829.0026578599942,
+        829.0026578603531,
+        1066.0929780665813,
+        1650.4579908967953,
+        2640.5180840428916,
+        2640.5180840518133
+      ],
+      "modal_strain_energy_fractions": [
+        {
+          "axial": 2.578781248035314e-25,
+          "torsion": 2.7529458990908037e-28,
+          "lateral_bending": 0.6297654028648169,
+          "vertical_bending": 0.3702345971351832
+        },
+        {
+          "axial": 6.99106204448074e-24,
+          "torsion": 7.463261171341893e-27,
+          "lateral_bending": 0.3702345971327152,
+          "vertical_bending": 0.6297654028672847
+        },
+        {
+          "axial": 1.5199857475779296e-24,
+          "torsion": 4.455983151780595e-27,
+          "lateral_bending": 0.9186780630456615,
+          "vertical_bending": 0.08132193695433854
+        },
+        {
+          "axial": 2.1106972302526914e-24,
+          "torsion": 6.0876935742009545e-27,
+          "lateral_bending": 0.08132193695452457,
+          "vertical_bending": 0.9186780630454755
+        },
+        {
+          "axial": 1.0,
+          "torsion": 1.0497554406620054e-29,
+          "lateral_bending": 9.351129388009436e-24,
+          "vertical_bending": 1.3743026286984591e-24
+        },
+        {
+          "axial": 7.956825599496844e-26,
+          "torsion": 1.0,
+          "lateral_bending": 1.2522977890929686e-24,
+          "vertical_bending": 5.94262817277067e-25
+        },
+        {
+          "axial": 4.777535989702819e-23,
+          "torsion": 1.5127029401957535e-24,
+          "lateral_bending": 0.3056703525304387,
+          "vertical_bending": 0.6943296474695612
+        },
+        {
+          "axial": 6.488838269213383e-23,
+          "torsion": 2.2842568281392273e-24,
+          "lateral_bending": 0.6943296474694052,
+          "vertical_bending": 0.3056703525305948
+        }
+      ],
+      "modal_relative_residuals": [
+        3.936361942011392e-10,
+        5.175190087722627e-10,
+        9.745533125314354e-11,
+        1.1329467291068572e-10,
+        3.3621924362761306e-12,
+        5.869486785163563e-10,
+        2.3775613471586487e-10,
+        2.889235295092375e-10
+      ],
+      "equilibrium_residual_inf": 1.0915938083999599e-08,
+      "vertical_force_balance_N": 2.3791983494447777e-08,
+      "vertical_tip_stiffness_N_m": 101299.18310971321
+    },
+    {
+      "elements": 80,
+      "nodes": 81,
+      "total_dofs": 486,
+      "free_dofs": 480,
+      "tube_mass_kg": 0.31171409224279,
+      "tip_z_mm": 1.2401678431440757,
+      "tip_slope_rad": 0.003054688001944152,
+      "peak_bending_stress_MPa": 17.658129355021508,
+      "frequencies_Hz": [
+        58.33333333167764,
+        58.33333333167785,
+        829.0026076388117,
+        829.0026076394174,
+        1066.091833213523,
+        1650.3784561647483,
+        2640.516408163777,
+        2640.5164081781354
+      ],
+      "modal_strain_energy_fractions": [
+        {
+          "axial": 1.8412250196954654e-24,
+          "torsion": 4.185467130665406e-27,
+          "lateral_bending": 0.2136675282123459,
+          "vertical_bending": 0.7863324717876541
+        },
+        {
+          "axial": 1.0824735224000661e-25,
+          "torsion": 2.460655219672136e-28,
+          "lateral_bending": 0.7863324717241907,
+          "vertical_bending": 0.21366752827580934
+        },
+        {
+          "axial": 3.2651773378922474e-23,
+          "torsion": 4.239421653968472e-25,
+          "lateral_bending": 0.5692739780917611,
+          "vertical_bending": 0.4307260219082389
+        },
+        {
+          "axial": 7.541992095568852e-25,
+          "torsion": 7.716039312821565e-27,
+          "lateral_bending": 0.43072602190152254,
+          "vertical_bending": 0.5692739780984774
+        },
+        {
+          "axial": 1.0,
+          "torsion": 7.769956708623226e-28,
+          "lateral_bending": 9.982112802630382e-22,
+          "vertical_bending": 4.957493931166867e-22
+        },
+        {
+          "axial": 1.8869231393302349e-25,
+          "torsion": 1.0,
+          "lateral_bending": 3.9429472591707734e-24,
+          "vertical_bending": 1.3460208364766167e-23
+        },
+        {
+          "axial": 2.2083941466620027e-23,
+          "torsion": 1.4484205828309862e-26,
+          "lateral_bending": 0.8693971492190399,
+          "vertical_bending": 0.13060285078096012
+        },
+        {
+          "axial": 1.4122512213700574e-22,
+          "torsion": 1.5845455787497208e-25,
+          "lateral_bending": 0.13060285078080372,
+          "vertical_bending": 0.8693971492191962
+        }
+      ],
+      "modal_relative_residuals": [
+        5.234284752033573e-09,
+        4.800061546808398e-09,
+        5.012493385135372e-10,
+        3.4862750176206013e-10,
+        3.323046897977656e-11,
+        8.15275805607735e-09,
+        1.2973251786578963e-10,
+        3.242419543817836e-10
+      ],
+      "equilibrium_residual_inf": 1.220750160194073e-07,
+      "vertical_force_balance_N": 4.261174524344824e-08,
+      "vertical_tip_stiffness_N_m": 101299.18309317727
+    }
+  ],
+  "poisson_sensitivity": [
+    {
+      "poisson": 0.0,
+      "tip_z_mm": 1.2401678430703131,
+      "first_frequency_Hz": 58.333333363983726,
+      "first_mode_bending_fraction": 1.0
+    },
+    {
+      "poisson": 0.3,
+      "tip_z_mm": 1.2401678430703131,
+      "first_frequency_Hz": 58.33333336398398,
+      "first_mode_bending_fraction": 1.0
+    },
+    {
+      "poisson": 0.49,
+      "tip_z_mm": 1.2401678430703131,
+      "first_frequency_Hz": 58.33333336398389,
+      "first_mode_bending_fraction": 1.0
+    }
+  ],
+  "differences": {
+    "linear_tip_mm": 1.163336094123224e-11,
+    "linear_tip_percent": 9.380472978996437e-10,
+    "first_frequency_Hz": 3.065060383278251e-08,
+    "first_frequency_percent": 5.254389228476997e-08
+  },
+  "source_sha256": {
+    "drone_arm.py": "df39bae64ead7c633d559d1aa47138f0b51b2c7af316179999571dbaec2ba762",
+    "compare_drone_arm.py": "53b21760a1ff4af4e931a6523c897f2d2d616ebc696b503bb0e885e01a8d9d31",
+    "arm.py": "f53092bdedbde8eec65f4b954579cb7ab176de5c55d6276fcd628eb35e03f119",
+    "vibration.py": "c59c16c52a240d70026e17481178825cc6e99cd24f6fca7c5fe174e908e6b8a5",
+    "output/optimization/results.json": "3960f13ff230080139cd930c85a5b35d63f4cd7c1edcb3681f9bf94b25b5105a"
+  }
+}

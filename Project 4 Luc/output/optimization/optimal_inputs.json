@@ -1,0 +1,72 @@
+{
+  "length_m": 0.6096,
+  "thrust_N": 133.446648457815,
+  "tip_mass_kg": 0.680388555,
+  "rpm": 3500,
+  "blades_per_rotor": 2,
+  "rotor_count": 2,
+  "applied_torque_Nm": 0,
+  "gravity_m_s2": 9.80665,
+  "required_safety_factor": 2.0,
+  "elements": 20,
+  "model_status": "Horizontal arm rigidly clamped at frame; thrust rotates with motor mount, normal to the deformed tip tangent. Gravity remains vertical. Uniform circular tube.",
+  "thrust_direction": "follower_normal_to_tip",
+  "material": {
+    "name": "Estimated effective roll-wrapped CFRP profile for preliminary optimization",
+    "E_bending_Pa": 64000000000.0,
+    "E_status": "Supplier typical lengthwise tensile modulus used as effective bending modulus; not independently measured EI",
+    "typical_tensile_strength_Pa": 650000000,
+    "design_tensile_strength_Pa": 650000000.0,
+    "design_compressive_strength_Pa": 910100000.0,
+    "design_shear_strength_Pa": 103400000.0,
+    "comparison_only": {
+      "compressive_strength_Pa": 910100000,
+      "torsional_strength_Pa": 103400000,
+      "source": "https://www.graphitestore.com/core/media/media.nl?c=4343521&h=6c6ce9187e4159654616&id=9929",
+      "status": "Different roll-wrapped laminate; estimates for comparison only. Torsional strength is not a transverse-shear allowable. Not used to certify CFT-WF."
+    },
+    "source": "https://media.easycomposites.co.uk/datasheets/EC-TDS-Carbon-Fibre-Woven-Finish-Tube.pdf",
+    "limitations": "Typical values are not guaranteed design allowables. No compressive/shear strength or shell buckling properties supplied. No ply-level failure prediction.",
+    "optimizer_estimate_basis": {
+      "name": "Estimated effective roll-wrapped CFRP profile for preliminary optimization",
+      "E_Pa": 64000000000.0,
+      "density_kg_m3": 1520.0,
+      "tensile_strength_Pa": 650000000.0,
+      "compressive_strength_Pa": 910100000.0,
+      "shear_strength_Pa": 103400000.0,
+      "property_basis": {
+        "E_Pa": "Easy Composites typical lengthwise tensile modulus used as effective bending modulus",
+        "tensile_strength_Pa": "Easy Composites typical lengthwise tensile strength; not a guaranteed design allowable",
+        "density_kg_m3": "Graphtek GR-CFRWT 1.52 g/cm3; estimate for the proposed tube",
+        "compressive_strength_Pa": "Graphtek GR-CFRWT comparison laminate; estimate for the proposed tube",
+        "shear_strength_Pa": "Graphtek GR-CFRWT torsional strength used as a nominal longitudinal shear proxy. Transfer to this laminate/transverse beam shear is unverified. Not an interlaminar allowable."
+      },
+      "sources": [
+        "https://media.easycomposites.co.uk/datasheets/EC-TDS-Carbon-Fibre-Woven-Finish-Tube.pdf",
+        "https://www.graphitestore.com/core/media/media.nl?c=4343521&h=22DqRe5XcXtOFJUqMtPHOuVeC4o8PE9P-gnJuKBYWPrJ3COD&id=9929"
+      ],
+      "thickness_samples": [],
+      "interpolation_policy": "Optional thickness_samples rows require wall_mm and all five numerical properties. Piecewise-linear interpolation is allowed only inside the sampled thickness interval. No invented endpoints or extrapolation. Empty table uses the stated constant estimates.",
+      "limitations": "Properties are held constant as dimensions vary. Laminate ply schedule and minimum allowables are not established. No shell buckling, ovalization, fatigue, joints, impact or dynamic follower-force stability prediction."
+    }
+  },
+  "candidates": [
+    {
+      "name": "Continuous optimized tube - estimated material",
+      "outer_diameter_m": 0.0552848162289841,
+      "wall_m": 0.0020099999999999996,
+      "mass_per_length_kg_m": 0.5113420148339733,
+      "source": "optimizer_inputs.json estimated material profile"
+    }
+  ],
+  "optimization": {
+    "outer_diameter_bounds_m": null,
+    "wall_bounds_m": null,
+    "density_kg_m3": null,
+    "deflection_limit_m": null,
+    "minimum_bending_frequency_Hz": null,
+    "nonlinear_deflection_limit_m": null,
+    "approve_continuous_laminate_scaling": false,
+    "note": "Do not infer density or strength-versus-thickness scaling from these two stock products. Uniform geometry has two variables. Limits and material allowables must be supplied before optimization."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "status": "Preliminary effective-material sizing study; user authorizes estimated properties",
+  "required_safety_factor": 2.0,
+  "outer_diameter_bounds_mm": [
+    10.0,
+    60.0
+  ],
+  "wall_bounds_mm": [
+    2.01,
+    3.0
+  ],
+  "wall_requirement": "User requires wall strictly greater than 2 mm. 2.01 mm is an explicit numerical margin, not a manufacturing tolerance.",
+  "bounds_status": "Wall > 2 mm is user specified. OD bounds and upper wall bound are editable study bounds, not confirmed mount/manufacturing limits.",
+  "reference_design_mm": [
+    40.0,
+    2.5
+  ],
+  "starting_designs_mm": [
+    [
+      40.0,
+      2.5
+    ],
+    [
+      30.0,
+      2.2
+    ],
+    [
+      18.0,
+      2.8
+    ]
+  ],
+  "reference_status": "Analyst-selected starting geometry; it must be screened against the active frequency target. Original 1.5 mm stock candidates violate the wall requirement.",
+  "minimum_inner_diameter_mm": 1.0,
+  "linear_elements": 20,
+  "nonlinear_elements": 40,
+  "ks_parameter": 80.0,
+  "evaluation_stations": 21,
+  "deflection_limit_mm": null,
+  "minimum_bending_frequency_Hz": null,
+  "minimum_bending_frequency_rotor_multiple": 1.0,
+  "frequency_requirement_basis": "Preserves the supplied optimize_arm.py rotor_margin constraint f1 >= rpm/60. Derived from inputs.json RPM for each run. This is a sizing criterion, not a complete rotor-arm resonance or flutter assessment. Set the rotor multiple to null to recover the prior strength-only study; fixed Hz and rotor multiple are mutually exclusive.",
+  "rounding_mm": {
+    "outer_diameter": 0.1,
+    "wall": 0.1
+  },
+  "material": {
+    "name": "Estimated effective roll-wrapped CFRP profile for preliminary optimization",
+    "E_Pa": 64000000000.0,
+    "density_kg_m3": 1520.0,
+    "tensile_strength_Pa": 650000000.0,
+    "compressive_strength_Pa": 910100000.0,
+    "shear_strength_Pa": 103400000.0,
+    "property_basis": {
+      "E_Pa": "Easy Composites typical lengthwise tensile modulus used as effective bending modulus",
+      "tensile_strength_Pa": "Easy Composites typical lengthwise tensile strength; not a guaranteed design allowable",
+      "density_kg_m3": "Graphtek GR-CFRWT 1.52 g/cm3; estimate for the proposed tube",
+      "compressive_strength_Pa": "Graphtek GR-CFRWT comparison laminate; estimate for the proposed tube",
+      "shear_strength_Pa": "Graphtek GR-CFRWT torsional strength used as a nominal longitudinal shear proxy. Transfer to this laminate/transverse beam shear is unverified. Not an interlaminar allowable."
+    },
+    "sources": [
+      "https://media.easycomposites.co.uk/datasheets/EC-TDS-Carbon-Fibre-Woven-Finish-Tube.pdf",
+      "https://www.graphitestore.com/core/media/media.nl?c=4343521&h=22DqRe5XcXtOFJUqMtPHOuVeC4o8PE9P-gnJuKBYWPrJ3COD&id=9929"
+    ],
+    "thickness_samples": [],
+    "interpolation_policy": "Optional thickness_samples rows require wall_mm and all five numerical properties. Piecewise-linear interpolation is allowed only inside the sampled thickness interval. No invented endpoints or extrapolation. Empty table uses the stated constant estimates.",
+    "limitations": "Properties are held constant as dimensions vary. Laminate ply schedule and minimum allowables are not established. No shell buckling, ovalization, fatigue, joints, impact or dynamic follower-force stability prediction."
+  }
+}

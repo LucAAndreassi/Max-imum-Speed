@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Drone arm report - local preview</title>
+<link rel="stylesheet" href="assets/style.css">
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},startup:{typeset:false}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body><main id="report">Loading generated report...</main>
+<script type="module">
+try {
+  const r=await fetch('assets/report.md');if(!r.ok)throw new Error('Generate report first: python run.py');
+  // Protect TeX against Markdown treating backslashes/underscores as markup.
+  const math=[];
+  const md=(await r.text()).replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$/g,s=>{math.push(s);return `MATHPLACEHOLDER${math.length-1}ENDMATH`;});
+  document.querySelector('#report').innerHTML=marked.parse(md).replace(/MATHPLACEHOLDER(\d+)ENDMATH/g,(_,i)=>math[+i]);
+  await import('./assets/viewer.js');
+  if(window.MathJax?.startup?.promise)await window.MathJax.startup.promise;
+  await window.MathJax?.typesetPromise?.();
+} catch(e) {document.querySelector('#report').append(document.createTextNode(' Preview error: '+e.message));}
+</script></body></html>

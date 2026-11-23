@@ -1,0 +1,243 @@
+{
+  "model": "Uniform clamped Euler-Bernoulli bending FE; 2 DOF per node [w,slope]",
+  "status": "Analysis run; not an optimized or certified design",
+  "parameters_SI": {
+    "length_m": 0.6096,
+    "thrust_N": 133.446648457815,
+    "tip_mass_kg": 0.680388555,
+    "E_Pa": 64000000000.0,
+    "outer_diameter_m": 0.0552848162289841,
+    "wall_m": 0.0020099999999999996,
+    "mass_per_length_kg_m": 0.5113420148339733,
+    "gravity_m_s2": 9.80665
+  },
+  "mass_basis": "Configured line mass for selected tube (see candidate source)",
+  "selected_base_candidate": "Continuous optimized tube - estimated material",
+  "mesh": {
+    "elements": 20,
+    "nodes": 21,
+    "total_dofs": 42,
+    "free_dofs": 40
+  },
+  "linear": {
+    "tip_deflection_m": 0.0012401678430586799,
+    "tip_slope_rad": 0.003054688001699624,
+    "root_reaction_force_N": -123.71744503157989,
+    "root_reaction_moment_Nm": -76.34988877263567,
+    "peak_bending_stress_Pa": 17658129.355240956,
+    "homogeneous_shear_screen_Pa": 752976.869538233,
+    "bending_frequencies_Hz": [
+      58.33333333333339,
+      829.0026042793719,
+      2640.5162963752323,
+      5484.171995124522
+    ],
+    "free_dof_residual_N_or_Nm": 1.0808449690813404e-09
+  },
+  "tube_mass_kg": 0.3117140922427902,
+  "total_modeled_mass_kg": 0.9921026472427901,
+  "material_for_strength_screen": {
+    "name": "Estimated effective roll-wrapped CFRP profile for preliminary optimization",
+    "E_bending_Pa": 64000000000.0,
+    "E_status": "Supplier typical lengthwise tensile modulus used as effective bending modulus; not independently measured EI",
+    "typical_tensile_strength_Pa": 650000000,
+    "design_tensile_strength_Pa": 650000000.0,
+    "design_compressive_strength_Pa": 910100000.0,
+    "design_shear_strength_Pa": 103400000.0,
+    "comparison_only": {
+      "compressive_strength_Pa": 910100000,
+      "torsional_strength_Pa": 103400000,
+      "source": "https://www.graphitestore.com/core/media/media.nl?c=4343521&h=6c6ce9187e4159654616&id=9929",
+      "status": "Different roll-wrapped laminate; estimates for comparison only. Torsional strength is not a transverse-shear allowable. Not used to certify CFT-WF."
+    },
+    "source": "https://media.easycomposites.co.uk/datasheets/EC-TDS-Carbon-Fibre-Woven-Finish-Tube.pdf",
+    "limitations": "Typical values are not guaranteed design allowables. No compressive/shear strength or shell buckling properties supplied. No ply-level failure prediction.",
+    "optimizer_estimate_basis": {
+      "name": "Estimated effective roll-wrapped CFRP profile for preliminary optimization",
+      "E_Pa": 64000000000.0,
+      "density_kg_m3": 1520.0,
+      "tensile_strength_Pa": 650000000.0,
+      "compressive_strength_Pa": 910100000.0,
+      "shear_strength_Pa": 103400000.0,
+      "property_basis": {
+        "E_Pa": "Easy Composites typical lengthwise tensile modulus used as effective bending modulus",
+        "tensile_strength_Pa": "Easy Composites typical lengthwise tensile strength; not a guaranteed design allowable",
+        "density_kg_m3": "Graphtek GR-CFRWT 1.52 g/cm3; estimate for the proposed tube",
+        "compressive_strength_Pa": "Graphtek GR-CFRWT comparison laminate; estimate for the proposed tube",
+        "shear_strength_Pa": "Graphtek GR-CFRWT torsional strength used as a nominal longitudinal shear proxy. Transfer to this laminate/transverse beam shear is unverified. Not an interlaminar allowable."
+      },
+      "sources": [
+        "https://media.easycomposites.co.uk/datasheets/EC-TDS-Carbon-Fibre-Woven-Finish-Tube.pdf",
+        "https://www.graphitestore.com/core/media/media.nl?c=4343521&h=22DqRe5XcXtOFJUqMtPHOuVeC4o8PE9P-gnJuKBYWPrJ3COD&id=9929"
+      ],
+      "thickness_samples": [],
+      "interpolation_policy": "Optional thickness_samples rows require wall_mm and all five numerical properties. Piecewise-linear interpolation is allowed only inside the sampled thickness interval. No invented endpoints or extrapolation. Empty table uses the stated constant estimates.",
+      "limitations": "Properties are held constant as dimensions vary. Laminate ply schedule and minimum allowables are not established. No shell buckling, ovalization, fatigue, joints, impact or dynamic follower-force stability prediction."
+    }
+  },
+  "strength_checks": {
+    "tension": {
+      "reserve_factor": 36.81024115994932,
+      "status": "PASS"
+    },
+    "compression": {
+      "reserve_factor": 51.540000737953655,
+      "status": "PASS"
+    },
+    "transverse_shear": {
+      "reserve_factor": 137.3216152886749,
+      "status": "PASS"
+    },
+    "nominal_maximum_stress_screen": {
+      "status": "PASS",
+      "minimum_known_reserve_factor": 36.81024115994932
+    },
+    "overall_structure": {
+      "status": "UNRESOLVED",
+      "reason": "Local shell failure, joints, laminate interaction and dynamic stability not evaluated"
+    }
+  },
+  "vibration": {
+    "method": "naca_tn_3459_eq13_14",
+    "analytical": {
+      "method": "naca_tn_3459_eq13_14",
+      "source": "https://ntrs.nasa.gov/api/citations/19930084187/downloads/19930084187.pdf",
+      "printed_page": 17,
+      "equations": [
+        13,
+        14
+      ],
+      "beam_rotation_rad_s": 0.0,
+      "tip_to_beam_mass_ratio": 2.1827327410980635,
+      "beta": [
+        1.0552765031816165,
+        3.97819272346828,
+        7.099901070368102,
+        10.232067691483902
+      ],
+      "beta_squared": [
+        1.1136084981672203,
+        15.82601734505597,
+        50.408595209014116,
+        104.6952092431087
+      ],
+      "frequencies_Hz": [
+        58.33333333333339,
+        829.0026042793719,
+        2640.5162963752323,
+        5484.171995124522
+      ],
+      "assumptions": "Uniform EI and line mass; fixed root; point tip mass without rotary inertia; unloaded stationary beam"
+    },
+    "fe_frequencies_Hz": [
+      58.33333286610578,
+      829.003460926686,
+      2640.5448287911113,
+      5484.4289369602975
+    ],
+    "fe_relative_frequency_error": [
+      -8.009616303539246e-09,
+      1.033346951784253e-06,
+      1.0805620066944854e-05,
+      4.685152763328482e-05
+    ],
+    "modes_file": "modes.npy",
+    "fe_modes_file": "fe_modes.npy",
+    "mode_normalization": "Continuum mass integral plus point tip mass",
+    "note": "Analytical nodal samples are not discrete K,M eigenvectors; fe_modes.npy contains the matrix eigenvectors"
+  },
+  "nonlinear": {
+    "elements": 80,
+    "tip_x_m": 0.6095984855361173,
+    "tip_z_m": 0.001240117932676418,
+    "tip_angle_rad": 0.0030546876051565667,
+    "residual_Nm": 1.0453859999870474e-12,
+    "newton_history": [
+      {
+        "load_factor": 0.1,
+        "residuals": [
+          0.09657291212231164,
+          4.513057483279681e-09,
+          1.7319479184152442e-13
+        ]
+      },
+      {
+        "load_factor": 0.2,
+        "residuals": [
+          0.09657291236077387,
+          9.026107861132004e-09,
+          2.149391775674303e-13
+        ]
+      },
+      {
+        "load_factor": 0.30000000000000004,
+        "residuals": [
+          0.09657291307613225,
+          1.3539171561660623e-08,
+          2.5934809855243657e-13
+        ]
+      },
+      {
+        "load_factor": 0.4,
+        "residuals": [
+          0.09657291426834358,
+          1.8052222827691367e-08,
+          4.694022948115162e-13
+        ]
+      },
+      {
+        "load_factor": 0.5,
+        "residuals": [
+          0.09657291593800033,
+          2.2565295410004182e-08,
+          7.513989430663059e-13
+        ]
+      },
+      {
+        "load_factor": 0.6,
+        "residuals": [
+          0.09657291808378365,
+          2.707827206904767e-08,
+          5.861977570020827e-13
+        ]
+      },
+      {
+        "load_factor": 0.7000000000000001,
+        "residuals": [
+          0.09657292070702783,
+          3.1591319782364735e-08,
+          1.332711718760038e-12
+        ]
+      },
+      {
+        "load_factor": 0.8,
+        "residuals": [
+          0.09657292380863958,
+          3.610439591739123e-08,
+          1.2256862191861728e-12
+        ]
+      },
+      {
+        "load_factor": 0.9,
+        "residuals": [
+          0.09657292738485401,
+          4.061736547100736e-08,
+          9.379164112033322e-13
+        ]
+      },
+      {
+        "load_factor": 1.0,
+        "residuals": [
+          0.09657293143848589,
+          4.513036344633292e-08,
+          1.0453859999870474e-12
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Effective beam properties, not a shell or ply-level laminate model",
+    "Frequencies are unloaded bending modes with point tip mass; rotor inertia and flutter omitted",
+    "Homogeneous transverse-shear screen and nominal maximum-stress checks do not cover local shell or joint failure"
+  ]
+}
