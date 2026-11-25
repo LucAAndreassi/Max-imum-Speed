@@ -750,13 +750,12 @@ The follower-load analysis uses a genuinely nonlinear state equation rather than
 
 ## 10. Reproducibility
 
-From an installed repository environment, the numerical report and site data are regenerated with one command:
+From an installed repository environment, the numerical analysis and optimization pipeline can be rerun with one command:
 
 ```bash
 python optimize_arm.py --update-report
-```
 
-The command reruns optimizer gradient checks, both optimization cases, mesh refinement, the core verification ladder, figures, `assets/results.json`, and the generated website report. The source and input fingerprints stored in the results prevent stale optimization data from being silently inserted into a regenerated report.
+The command reruns the optimizer gradient checks, the linear-only and linear-plus-N2 optimization cases, shadow-price checks, optimized-design mesh refinement, and the automated verification suite. It also regenerates the optimization outputs, assets/results.json, the verification and optimization figures, and the repository-generated index.md.
 
 The retained test suite can be run with
 
@@ -764,7 +763,7 @@ The retained test suite can be run with
 python -m unittest test_optimize test_vibration -v
 ```
 
-On the uploaded repository copy, **18/18 retained unit tests passed**. The underlying automated verification data also contain the detailed subchecks supporting the seven-rung ladder in Section 4.
+On the uploaded repository copy, 18/18 retained unit tests passed: 11 optimizer/model tests and 7 dedicated vibration tests. The separate automated verification routine contains 42 passing checks, including the detailed beam, vibration, equilibrium, gradient, nonlinear-solution, tangent, and adjoint checks that support the seven-rung verification summary presented in Section 4.
 
 ## 11. Limitations and AI-use statement
 
