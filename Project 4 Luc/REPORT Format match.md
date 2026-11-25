@@ -650,13 +650,7 @@ $$
 52.3\ \text{mm OD}\times2.5\ \text{mm wall},\qquad m=362.416\ \text{g}.
 $$
 
-Allowing both diameter and wall thickness to vary reduces tube mass by
-
-$$
-\boxed{13.990\%}
-$$
-
-relative to that feasible fixed-wall design.
+Allowing both diameter and wall thickness to vary reduces tube mass by 13.990% relative to that feasible fixed-wall design.
 
 A rounded custom-tube candidate of **55.3 mm OD × 2.1 mm wall** has mass **325.214 g**, minimum modeled SF **38.31**, linear tip deflection **1.191 mm**, and first bending frequency **59.378 Hz**.
 
