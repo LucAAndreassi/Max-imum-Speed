@@ -270,151 +270,196 @@ The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form th
 
 ## 4. Analysis-code verification
 
-The numerical model was verified using a seven-rung ladder patterned after the Project 4 worked example. Each rung compares the implementation against classical beam theory, an expected finite-element property, or an independently formulated reference solution before the model is used for optimization. Additional automated subchecks remain in the repository, but the table below presents the principal verification problems and their physical reference targets.
+The verification checks in this section use the prescribed base geometry, $D=40$ mm outer diameter and $t=2.5$ mm wall thickness. Here $D$ denotes outer diameter; the inner diameter is 35 mm. The full arm is a horizontal cantilever with combined upward thrust, a concentrated motor/rotor assembly mass and distributed tube self-weight. All calculations below are analysis or derivative checks; no optimizer is run for this verification update.
+
+| Base-case input | Value |
+|---|---:|
+| Outer diameter $D$ | 40 mm |
+| Wall thickness $t$ | 2.5 mm |
+| Inner diameter $D-2t$ | 35 mm |
+| Clamp-to-tip length $L$ | 0.6096 m |
+| Effective bending modulus $E$ | 64 GPa |
+| Effective density $\rho$ | 1520 kg/m$^3$ |
+| Combined thrust $T$ | 133.446648457815 N |
+| Concentrated tip mass $m_t$ | 0.680388555 kg |
+| Gravity $g$ | 9.80665 m/s$^2$ |
+| Net upward tip force $P=T-m_tg$ | 126.7743160349 N |
+| Downward tube self-weight $q=-\rho Ag$ | -4.390211192 N/m |
+| Linear FE mesh | 20 elements, 21 nodes, 40 free DOFs |
+| Nonlinear verification mesh | 80 angle elements; 40/80/160 refinement also checked |
+
+The isolated V1 and V2 tests deliberately change the active loads or supports to obtain classical closed-form benchmarks while retaining the base-case section, material and span. V3-V7 use the base-case properties and the configurations stated below. The nonlinear model is static; modal frequencies are those of an unloaded stationary beam with point tip mass.
 
 ### Verification ladder
 
-| Test | Setup | Exact or independent answer |
+| Test | Setup using the 40 mm OD x 2.5 mm wall base case | Exact or independent answer |
 |---|---|---|
-| **V1 Cantilever** | Euler-Bernoulli cantilever with transverse tip load $P$ | $\delta_L=PL^3/(3EI)$, $\theta_L=PL^2/(2EI)$, $M_0=PL$ |
-| **V2 Simply supported beam** | Simply supported beam under uniform distributed load $q$ | $\delta_{mid}=5qL^4/(384EI)$ |
-| **V3 Mesh convergence** | Uniformly loaded beam with successively refined cubic-Hermite meshes | Fourth-order displacement convergence |
-| **V4 Beam frequency** | Uniform cantilever with concentrated tip mass; compare the FE eigenproblem with the analytical characteristic equation | NACA TN 3459 cantilever-with-tip-mass solution |
-| **V5 Global checks** | Free-free reduced beam plus supported beam under known loading | Two planar rigid modes; reaction force and moment balance equal the applied loads |
-| **V6 Gradient check** | Adjoint derivatives compared with central finite differences in multiple directions | Agreement with finite differences and a first-order Taylor remainder proportional to $h^2$ |
-| **V7 N2 nonlinear benchmark** | Finite-rotation follower-loaded cantilever | Independently solved nonlinear continuum boundary-value problem |
+| **V1 Cantilever tip load** | $L=0.6096$ m, $E=64$ GPa, $P=126.7743160349$ N; suppress distributed self-weight to isolate the tip-load term | $\delta_L=PL^3/(3EI)$, $\theta_L=PL^2/(2EI)$, $\lvert M_0\rvert=PL$ |
+| **V2 Simply supported beam** | Same section and length; apply only $q=-\rho Ag=-4.390211192$ N/m; pin both ends and leave rotations free | $\delta_{mid}=5qL^4/(384EI)$ |
+| **V3 Mesh convergence** | Same cantilever with net tip load and tube self-weight; use 2, 4, 8, and 16 cubic-Hermite elements | Fourth-order convergence of the displacement-field $L_2$ error |
+| **V4 Beam frequency** | Same cantilever, $m_t=0.680388555$ kg, $\rho=1520$ kg/m$^3$; compare the 20-element mass/stiffness eigenproblem with the characteristic equation | Cantilever-with-point-tip-mass characteristic solution |
+| **V5 Global checks** | Full base-case cantilever loading for equilibrium; release the supports for a separate planar rigid-mode count | Zero force/moment imbalance and two free-free planar rigid modes |
+| **V6 Design gradients** | Evaluate all 18 mass/constraint derivatives at $(D,t)=(40,2.5)$ mm; use 20 linear and 40 nonlinear elements | Central finite differences; first-order Taylor remainder proportional to $h^2$ |
+| **V7 N2 follower-load benchmark** | Same physical arm, gravity and follower thrust; compare 80 nonlinear angle elements with an independent continuum BVP | Continuum follower-thrust tip displacement under the same loads |
 
-The principal numerical comparisons are:
+The principal numerical comparisons for this base case are:
 
-| Test | Numerical result | Exact / independent result | Relative error | Status |
+| Test | Numerical result | Exact / independent result | Error | Status |
 |---|---:|---:|---:|---|
-| **V1** Cantilever tip displacement | 0.011018911 m | 0.011018911 m | $1.74\times10^{-13}$ | PASS |
-| **V2** Simply supported midspan displacement | $-4.304262\times10^{-5}$ m | $-4.304262\times10^{-5}$ m | $7.87\times10^{-16}$ | PASS |
-| **V3** Displacement convergence order | 3.999999 | 4.000000 | $2.77\times10^{-7}$ | PASS |
-| **V4** First frequency with tip mass | 16.030337 Hz | 16.030337 Hz | $1.42\times10^{-9}$ | PASS |
-| **V5** Global force balance | $6.51\times10^{-12}$ N residual | 0 N | numerical precision | PASS |
-| **V6** Maximum optimizer-gradient discrepancy | $2.27\times10^{-7}$ | central finite difference | $2.27\times10^{-7}$ | PASS |
-| **V7** N2 follower-load tip displacement | 0.28690538 m | 0.28691646 m | $3.86\times10^{-5}$ | PASS |
+| **V1** Isolated tip-load cantilever displacement | 0.0028763736649 m | 0.0028763736649 m | $1.1795\times10^{-11}$ | PASS |
+| **V2** Simply supported self-weight midspan displacement | -2.3719440104810e-06 m | -2.3719440104873e-06 m | $2.6408\times10^{-12}$ | PASS |
+| **V3** Displacement convergence order | 4.000323851 | 4.000000000 | $8.0963\times10^{-5}$ | PASS |
+| **V4** First frequency with tip mass | 38.7142512070 Hz | 38.7142507467 Hz | $1.1889\times10^{-8}$ | PASS |
+| **V5** Global force balance | $1.9408\times10^{-9}$ N residual | 0 N | $1.9408\times10^{-9}$ N (absolute) | PASS |
+| **V6** Maximum normalized derivative discrepancy | $6.3342\times10^{-8}$ | Central differences, 18 entries | $6.3342\times10^{-8}$ | PASS |
+| **V7** N2 follower-load tip displacement, 80 elements | 0.0028534721428 m | 0.0028535833141 m | $3.8959\times10^{-5}$ | PASS |
 
-All seven rungs pass. Together they show that the linear finite-element model reproduces classical beam theory, the discretization converges at the expected rate, the vibration model matches an independent tip-mass solution, the assembled model satisfies global mechanics checks, the adjoint sensitivities agree with finite differences, and the N2 model agrees with an independent nonlinear benchmark.
+The error column is a dimensionless relative error except for V5, where the exact target is zero and an absolute force residual is reported. For V3, the error is $|p-4|/4$. V6 reports the maximum discrepancy across all 18 checked entries, using the derivative checker's normalization. PASS means that the numerical verification tolerance is met; it is not a statement that the base design meets the frequency sizing requirement.
 
-### 4.1 Classical beam verification
+The displacement checks use relative tolerance $10^{-9}$; V3 permits a 1% relative difference from order 4; V4 uses relative tolerance $2\times10^{-6}$; V5 requires force and moment imbalance below $10^{-7}$ in N and N m, respectively, and exactly two planar rigid modes. V6 uses $3\times10^{-4}$ for constraint derivative discrepancies and $10^{-6}$ for mass derivatives. V7 uses relative tolerance $10^{-4}$. All seven rungs pass these checks.
 
-The first two ladder tests verify the underlying Euler-Bernoulli beam implementation using classical closed-form solutions. V1 uses a cantilever tip load, while V2 uses a simply supported beam under uniform load, matching the style of the worked example.
+### 4.1 Classical beam verification and MATLAB comparison
 
-For a cantilever of length $L$, bending stiffness $EI$, and transverse tip load $P$,
+For the annular section, $A=\pi[D^2-(D-2t)^2]/4=2.9452431127\times10^{-4}$ m$^2$ and $I=\pi[D^4-(D-2t)^4]/64=5.2001948709\times10^{-8}$ m$^4$. The MATLAB hand calculations and Python model use the same $E$, density, length, thrust, tip mass, gravity and exact pound conversion. The tube mass is $m_b=\rho AL=0.2729038706$ kg and its total weight is $W_b=m_bg=2.6762727429$ N.
+
+V1 isolates the net tip force by suppressing the tube's distributed gravity load. V2 isolates the tube self-weight and changes the supports to a simply supported beam. Their formulas are listed in the verification ladder. Thus V1's tip-load-only displacement is larger than the displacement of the actual arm, where downward tube self-weight reduces the net upward deflection.
+
+For the actual cantilever under both loads, the MATLAB hand calculations use superposition:
 
 $$
-\delta_L=\frac{PL^3}{3EI},
+\delta_L=\frac{PL^3}{3EI}-\frac{W_bL^3}{8EI},
 \qquad
-\theta_L=\frac{PL^2}{2EI},
+\theta_L=\frac{PL^2}{2EI}-\frac{W_bL^2}{6EI},
+$$
+
+$$
+|M_0|=PL-\frac{W_bL}{2},
 \qquad
-M_0=PL.
+\sigma_{\max}=\frac{|M_0|D}{2I}.
 $$
 
-The finite-element solution reproduces the analytical tip displacement, tip rotation, and root moment to approximately machine precision. This verifies the element stiffness matrix, load application, sign convention, and fixed-root boundary conditions.
+The actual-arm Python solution gives $\delta_L=2.8536030024$ mm, $\theta_L=0.0070278865$ rad, $|M_0|=76.4658951219$ N m and $\sigma_{\max}=29.4088575601$ MPa. The signed root reaction moment is negative under the chosen convention; the expression above reports its magnitude. These actual-arm results are separate from the isolated V1 and V2 checks.
 
-For a cantilever subjected to a uniform distributed load $q$,
-
-$$
-\delta_L=\frac{qL^4}{8EI}.
-$$
-
-The computed tip displacement is $-4.1320915\times10^{-4}$ m, matching the analytical result with a relative error of $1.81\times10^{-13}$. A separate simply supported uniform-load calculation also reproduces the classical midspan solution
+The following table uses the higher-precision MATLAB command-window output supplied for this same base case. Python frequencies come from the consistent-mass FE eigenproblem, while MATLAB frequencies come from the independent characteristic equation. The fifth FE mode is extracted from the same saved matrices because the standalone analysis normally exports four modes. Errors are computed from the unrounded FE result and the supplied MATLAB number:
 
 $$
-\delta_{mid}=\frac{5qL^4}{384EI}.
+\varepsilon_{\%}=100\frac{|r_{\mathrm{FE}}-r_{\mathrm{MATLAB}}|}{|r_{\mathrm{MATLAB}}|}.
 $$
 
-These comparisons show that both concentrated and distributed loads are assembled correctly.
+$$
+\begin{array}{lrrr}
+\hline
+\text{Quantity} & \text{Python FEA} & \text{MATLAB output} & \text{Difference (\%)}\\
+\hline
+\text{Tip deflection (mm)} & 2.8536030024 & 2.8536030024 & 1.6743\times10^{-9} \\
+\text{Peak bending stress (MPa)} & 29.4088575601 & 29.4088575604 & 1.1443\times10^{-9} \\
+f_{1}\;\text{(Hz)} & 38.7142512070 & 38.7142507467 & 1.1889\times10^{-6} \\
+f_{2}\;\text{(Hz)} & 582.6353810913 & 582.6347793544 & 1.0328\times10^{-4} \\
+f_{3}\;\text{(Hz)} & 1859.4944976727 & 1859.4744067567 & 1.0805\times10^{-3} \\
+f_{4}\;\text{(Hz)} & 3864.2776029757 & 3864.0965664807 & 4.6851\times10^{-3} \\
+f_{5}\;\text{(Hz)} & 6598.5039727188 & 6597.6046499335 & 1.3631\times10^{-2} \\
+\hline
+\end{array}
+$$
+
+The static results agree to about $10^{-9}\%$, including the finite precision of the supplied MATLAB output. The largest frequency discrepancy is $0.013631\%$ in mode 5. This is an implementation comparison within Euler-Bernoulli theory, not experimental validation of material properties or higher physical modes.
 
 ### 4.2 Mesh convergence
 
-![Mesh convergence](assets/mesh-convergence.png)
+![Base-case mesh convergence](assets/section4-basecase-mesh-convergence.png)
 
-A correct finite-element formulation should not only approach the exact answer but should approach it at the expected rate as the mesh is refined. For the cubic-Hermite Euler-Bernoulli element used here, the displacement-field error is expected to converge at approximately fourth order.
+The same base-case cantilever is solved with 2, 4, 8 and 16 cubic-Hermite elements. Displacement-field error is integrated against the exact superposed tip-load and uniform-load solution using five-point Gauss quadrature on each element. The error is the unnormalized $L_2$ norm, $\sqrt{\int_0^L(w_h-w)^2\,dx}$, with units m$^{3/2}$. The point-load contribution is cubic and exactly representable; the quartic self-weight term drives the interpolation error.
 
-The measured $L_2$ displacement convergence order is **3.999999**, essentially identical to the theoretical value of 4. The first-frequency error also decreases at approximately fourth order, with a measured order of **3.9293**. This demonstrates that the numerical solution approaches the continuum solution at the expected rate rather than obtaining a correct result only for one particular mesh.
+| Linear elements | Displacement-field $L_2$ error (m$^{3/2}$) | FE first frequency (Hz) | Relative frequency error |
+|---:|---:|---:|---:|
+| 2 | $1.4757\times10^{-8}$ | 38.7143930749 | $3.6764\times10^{-6}$ |
+| 4 | $9.2229\times10^{-10}$ | 38.7142604852 | $2.5155\times10^{-7}$ |
+| 8 | $5.7643\times10^{-11}$ | 38.7142513598 | $1.5837\times10^{-8}$ |
+| 16 | $3.6000\times10^{-12}$ | 38.7142508007 | $1.3944\times10^{-9}$ |
+
+The fitted displacement convergence order is **4.000323851**, close to the theoretical value of 4. The first-frequency convergence order, measured from the 2- and 8-element errors to avoid the fine-mesh eigenvalue roundoff floor, is **3.929437419**. These are base-case measurements.
 
 ### 4.3 Natural-frequency verification
 
-The vibration implementation is checked independently using the classical characteristic equation for a uniform cantilever carrying a concentrated tip mass. Following NACA TN 3459,
+The uniform cantilever carries a concentrated tip mass but no tip rotary inertia. The independent characteristic equation used by the MATLAB hand calculation is
 
 $$
-1+\cos\beta\cosh\beta
--r\beta\left(\sin\beta\cosh\beta-\cos\beta\sinh\beta\right)=0,
+1+\cos\beta\cosh\beta+
+\eta\beta(\cos\beta\sinh\beta-\sin\beta\cosh\beta)=0,
+\qquad \eta=\frac{m_t}{\rho AL}=2.4931436605.
 $$
 
-where
+The positive roots give
 
 $$
-r=\frac{m_t}{\mu L}.
+f_n=\frac{\beta_n^2}{2\pi L^2}\sqrt{\frac{EI}{\rho A}}.
 $$
 
-After solving for the characteristic root $\beta$, the corresponding frequency is
-
-$$
-f_n=\frac{\beta_n^2}{2\pi}
-\sqrt{\frac{EI}{\mu L^4}}.
-$$
-
-For the verification problem, the finite-element model predicts a first natural frequency of **16.030337 Hz**, while the independent characteristic-equation solution gives **16.030337 Hz**. The relative difference is $1.42\times10^{-9}$. Additional checks of the first three modes also agree with the analytical characteristic equation.
-
-This test is particularly important because natural frequency becomes the governing performance constraint in the optimized drone arm.
+For the base case, the 20-element FE model gives $f_1=38.7142512070$ Hz, compared with the supplied MATLAB result $38.7142507467$ Hz. The relative difference is approximately $1.19\times10^{-8}$, or $1.19\times10^{-6}\%$. The five-mode comparison is shown in Section 4.1; the maximum frequency discrepancy is $0.013631\%$ in mode 5. Both calculations omit load-dependent tangent stiffness, gyroscopic terms and operating follower-force dynamic stability.
 
 ### 4.4 Global equilibrium and rigid-body behavior
 
-The model is also checked using physical properties that must hold regardless of the particular beam solution. For a free-free version of the reduced planar bending model, exactly **two rigid-body modes** are expected and two are obtained.
-
-For the supported model, the recovered reactions are compared with the applied forces and moments. The force-balance residual is
+Releasing the supports of the same reduced planar beam produces exactly **two rigid-body modes**, corresponding to transverse translation and in-plane rotation. The clamped full-load arm is checked independently for force and moment balance using assembled nodal forces and recovered root reactions.
 
 $$
-6.51\times10^{-12}\ \text{N},
+\left|R_z+\sum_i F_{z,i}\right|=1.9408\times10^{-9}\;\mathrm{N},
+\qquad
+\left|M_R+\sum_i x_iF_{z,i}+\sum_i M_i\right|=9.3303\times10^{-10}\;\mathrm{N\,m}.
 $$
 
-and the moment-balance residual is
-
-$$
-2.39\times10^{-11}\ \text{N\,m}.
-$$
-
-Both are effectively zero at numerical precision. These checks verify that loads are neither lost nor duplicated during finite-element assembly.
-
-Because the optimization model represents only a single bending plane, it has two rigid modes rather than the six rigid-body modes expected from a general three-dimensional frame model. The separate 3D frame comparison in Section 3.7 provides an additional check of the reduced model.
+Both residuals are below the $10^{-7}$ absolute verification tolerance. Because the model contains only one bending plane, its free-free nullspace has two rigid modes; a general 3D frame would have six.
 
 ### 4.5 Gradient verification
 
-The adjoint sensitivities are independently checked against central finite differences. Directional checks of tip displacement, root stress, and bending frequency agree to within approximately $9.02\times10^{-9}$ relative error on the verification fixture.
+All 18 objective/constraint derivative entries are checked at the base point $(D,t)=(40,2.5)$ mm using the supplied design-dependent material/mass model, 20 linear beam elements and 40 nonlinear angle elements. This evaluates the derivative code without executing an optimizer. Constraint derivatives have units mm$^{-1}$ and mass derivatives kg/mm. Central differences use $\Delta d_j=10^{-4}\max(|d_j|,1)$ in mm. The normalized discrepancy divides by $\max(|g_{FD}|,|g_{adj}|,10^{-7})$ for constraint derivatives; the mass check uses its mass-derivative normalization.
 
-The complete OD/wall optimizer check evaluates all 18 objective and constraint derivatives and has a maximum relative discrepancy of $2.27\times10^{-7}$. A first-order Taylor test also produces the expected $O(h^2)$ remainder behavior.
+| Response | Variable | Analytic / adjoint derivative | Central difference | Normalized relative error |
+|---|---|---:|---:|---:|
+| linear_tension | OD_mm | -0.00440790410738 | -0.00440790424314 | $3.0798\times10^{-8}$ |
+| linear_compression | OD_mm | -0.00295088435809 | -0.00295088445813 | $3.3902\times10^{-8}$ |
+| linear_shear | OD_mm | -0.00044014558882 | -0.000440145573599 | $3.4581\times10^{-8}$ |
+| nonlinear_tension | OD_mm | -0.00440689171423 | -0.00440689183294 | $2.6938\times10^{-8}$ |
+| nonlinear_compression | OD_mm | -0.0029514929869 | -0.00295149307125 | $2.8579\times10^{-8}$ |
+| nonlinear_shear | OD_mm | -0.000440130793445 | -0.000440130798349 | $1.1142\times10^{-8}$ |
+| bending_frequency | OD_mm | -0.0583495554261 | -0.0583495563762 | $1.6283\times10^{-8}$ |
+| inner_diameter | OD_mm | -0.1 | -0.0999999999999 | $6.6530\times10^{-13}$ |
+| mass | OD_mm | 0.00727743655019 | 0.00727743655018 | $1.3405\times10^{-12}$ |
+| linear_tension | wall_mm | -0.0262272457859 | -0.0262272460227 | $9.0293\times10^{-9}$ |
+| linear_compression | wall_mm | -0.0175539197569 | -0.0175539198606 | $5.9086\times10^{-9}$ |
+| linear_shear | wall_mm | -0.006239459337 | -0.00623945973222 | $6.3342\times10^{-8}$ |
+| nonlinear_tension | wall_mm | -0.0262207744575 | -0.0262207747501 | $1.1161\times10^{-8}$ |
+| nonlinear_compression | wall_mm | -0.0175579170121 | -0.017557917217 | $1.1670\times10^{-8}$ |
+| nonlinear_shear | wall_mm | -0.00623937743334 | -0.00623937749555 | $9.9717\times10^{-9}$ |
+| bending_frequency | wall_mm | -0.219520891001 | -0.219520892593 | $7.2535\times10^{-9}$ |
+| inner_diameter | wall_mm | 0.2 | 0.200000000001 | $6.5511\times10^{-12}$ |
+| mass | wall_mm | 0.101884111703 | 0.101884111703 | $1.5801\times10^{-13}$ |
 
-The complete gradient tables, directional-check results, and Taylor test are presented in Section 5.
+The largest normalized discrepancy is **6.334179e-08**. The following directional Taylor test uses $d(h)=d_0+h\,\mathrm{diag}(40,2.5)(0.6,0.8)^T$ and the combined mass/constraint output vector. Each remainder component is normalized by $\max(|f_i(d_0)|,1)$ before taking the vector norm.
+
+| Normalized perturbation $h$ | Normalized first-order Taylor remainder |
+|---:|---:|
+| $1.0\times10^{-2}$ | $1.8130\times10^{-4}$ |
+| $3.0\times10^{-3}$ | $1.6417\times10^{-5}$ |
+| $1.0\times10^{-3}$ | $1.8273\times10^{-6}$ |
+| $3.0\times10^{-4}$ | $1.6456\times10^{-7}$ |
+
+The measured remainder order is **1.997661810**, consistent with the expected quadratic behavior. These tables are the checks at the 40 mm base point; any separately reported study-wide derivative checks in Section 5 retain their own evaluation points.
 
 ### 4.6 N2 nonlinear benchmark
 
-Because the project includes an N2 finite-rotation follower-load model, the nonlinear implementation requires an independent nonlinear benchmark in addition to the linear beam checks.
+The same physical base case is evaluated with finite rotations and follower thrust normal to the deformed tip tangent. Tip mass gravity and tube self-weight retain their global vertical directions. An independent continuum boundary-value problem integrates the angle/curvature equations and deformed coordinates, with fixed root angle, zero free-end bending moment, and the follower direction tied to the unknown tip angle. It does not reuse the nonlinear FE residual.
 
-The nonlinear finite-element solution is compared with a separately formulated continuum boundary-value problem. For the follower-load benchmark, the finite-element model predicts a tip displacement of
+| Nonlinear angle elements | FE tip displacement (mm) | Continuum tip displacement (mm) | Relative error |
+|---:|---:|---:|---:|
+| 40 | 2.8531386287 | 2.8535833141 | $1.5583\times10^{-4}$ |
+| 80 | 2.8534721428 | 2.8535833141 | $3.8959\times10^{-5}$ |
+| 160 | 2.8535555213 | 2.8535833141 | $9.7396\times10^{-6}$ |
 
-$$
-0.28690538\ \text{m},
-$$
+The 80-element nonlinear benchmark gives **0.0028534721428 m** tip displacement versus **0.0028535833141 m** from the continuum BVP. Its relative error is **3.895851e-05**, satisfying the $10^{-4}$ criterion. Refinement from 40 to 80 to 160 elements reduces this error by approximately a factor of four each time, consistent with the linear angle interpolation.
 
-while the independent continuum solution gives
+A complex-step check of the 80-element follower-load tangent gives relative discrepancy **1.991757e-16**. Newton residuals for that solve fall from 9.657654e-01 to 2.388773e-05 to 1.080025e-12. This small-rotation base case reaches numerical precision rapidly; a separate large-rotation fixture remains available in `verify.py` for broader nonlinear verification.
 
-$$
-0.28691646\ \text{m}.
-$$
-
-The relative difference is
-
-$$
-3.86\times10^{-5}.
-$$
-
-The nonlinear tangent is also checked using complex-step differentiation, and Newton iteration demonstrates approximately quadratic convergence. Together, these comparisons verify the nonlinear residual, consistent tangent, and solution procedure before the N2 model is included in the optimization.
-
-Overall, all seven verification rungs pass their specified comparisons. The results establish that the linear finite-element model reproduces classical beam theory, the vibration model reproduces the independent tip-mass characteristic solution, the discretization converges at the expected rate, global equilibrium is satisfied, the adjoint sensitivities agree with finite differences, and the N2 follower-load implementation agrees with an independent nonlinear reference solution.
+The continuum nonlinear displacement differs from the linear result by **-0.000690%**. All seven base-case verification rungs pass, while the base-case first frequency remains below the study's $3500/60=58.333333$ Hz sizing requirement.
 
 ## 5. Sensitivity analysis
 
