@@ -270,7 +270,7 @@ The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form th
 
 ## 4. Analysis-code verification
 
-The verification checks in this section use the prescribed base geometry, $D=40$ mm outer diameter and $t=2.5$ mm wall thickness. Here $D$ denotes outer diameter; the inner diameter is 35 mm. The full arm is a horizontal cantilever with combined upward thrust, a concentrated motor/rotor assembly mass and distributed tube self-weight. All calculations below are analysis or derivative checks; no optimizer is run for this verification update.
+The verification checks in this section use the prescribed base geometry, $D=40$ mm outer diameter and $t=2.5$ mm wall thickness. Here $D$ denotes outer diameter; the inner diameter is 35 mm. The full arm is a horizontal cantilever with combined upward thrust, a concentrated motor/rotor assembly mass and distributed tube self-weight. All calculations below are analysis or derivative checks to validate the finite element model. 
 
 | Base-case input | Value |
 |---|---:|
@@ -279,10 +279,10 @@ The verification checks in this section use the prescribed base geometry, $D=40$
 | Inner diameter $D-2t$ | 35 mm |
 | Clamp-to-tip length $L$ | 0.6096 m |
 | Effective bending modulus $E$ | 64 GPa |
-| Effective density $\rho$ | 1520 kg/m$^3$ |
+| Effective density $\rho$ | 1520 $kg/m^3$ |
 | Combined thrust $T$ | 133.446648457815 N |
 | Concentrated tip mass $m_t$ | 0.680388555 kg |
-| Gravity $g$ | 9.80665 m/s$^2$ |
+| Gravity $g$ | 9.80665 $m/s^2$ |
 | Net upward tip force $P=T-m_tg$ | 126.7743160349 N |
 | Downward tube self-weight $q=-\rho Ag$ | -4.390211192 N/m |
 | Linear FE mesh | 20 elements, 21 nodes, 40 free DOFs |
@@ -307,14 +307,14 @@ The principal numerical comparisons for this base case are:
 | Test | Numerical result | Exact / independent result | Error | Status |
 |---|---:|---:|---:|---|
 | **V1** Isolated tip-load cantilever displacement | 0.0028763736649 m | 0.0028763736649 m | $1.1795\times10^{-11}$ | PASS |
-| **V2** Simply supported self-weight midspan displacement | -2.3719440104810e-06 m | -2.3719440104873e-06 m | $2.6408\times10^{-12}$ | PASS |
+| **V2** Simply supported self-weight midspan displacement | -2.371944010481e-06 m | -2.3719440105e-06 m | $8.0025\times10^{-12}$ | PASS |
 | **V3** Displacement convergence order | 4.000323851 | 4.000000000 | $8.0963\times10^{-5}$ | PASS |
 | **V4** First frequency with tip mass | 38.7142512070 Hz | 38.7142507467 Hz | $1.1889\times10^{-8}$ | PASS |
 | **V5** Global force balance | $1.9408\times10^{-9}$ N residual | 0 N | $1.9408\times10^{-9}$ N (absolute) | PASS |
 | **V6** Maximum normalized derivative discrepancy | $6.3342\times10^{-8}$ | Central differences, 18 entries | $6.3342\times10^{-8}$ | PASS |
 | **V7** N2 follower-load tip displacement, 80 elements | 0.0028534721428 m | 0.0028535833141 m | $3.8959\times10^{-5}$ | PASS |
 
-The error column is a dimensionless relative error except for V5, where the exact target is zero and an absolute force residual is reported. For V3, the error is $|p-4|/4$. V6 reports the maximum discrepancy across all 18 checked entries, using the derivative checker's normalization. PASS means that the numerical verification tolerance is met; it is not a statement that the base design meets the frequency sizing requirement.
+The error column is a dimensionless relative error except for V5, where the exact target is zero and an absolute force residual is reported. For V3, the error is $|p-4|/4$. V6 reports the maximum discrepancy across all 18 checked entries, using the derivative checker's normalization. PASS means that the numerical verification tolerance is met.
 
 The displacement checks use relative tolerance $10^{-9}$; V3 permits a 1% relative difference from order 4; V4 uses relative tolerance $2\times10^{-6}$; V5 requires force and moment imbalance below $10^{-7}$ in N and N m, respectively, and exactly two planar rigid modes. V6 uses $3\times10^{-4}$ for constraint derivative discrepancies and $10^{-6}$ for mass derivatives. V7 uses relative tolerance $10^{-4}$. All seven rungs pass these checks.
 
@@ -340,11 +340,9 @@ $$
 
 The actual-arm Python solution gives $\delta_L=2.8536030024$ mm, $\theta_L=0.0070278865$ rad, $|M_0|=76.4658951219$ N m and $\sigma_{\max}=29.4088575601$ MPa. The signed root reaction moment is negative under the chosen convention; the expression above reports its magnitude. These actual-arm results are separate from the isolated V1 and V2 checks.
 
-The following table uses the higher-precision MATLAB command-window output supplied for this same base case. Python frequencies come from the consistent-mass FE eigenproblem, while MATLAB frequencies come from the independent characteristic equation. The fifth FE mode is extracted from the same saved matrices because the standalone analysis normally exports four modes. Errors are computed from the unrounded FE result and the supplied MATLAB number:
+Errors are computed from the unrounded FE result and the supplied MATLAB number:
 
-$$
-\varepsilon_{\%}=100\frac{|r_{\mathrm{FE}}-r_{\mathrm{MATLAB}}|}{|r_{\mathrm{MATLAB}}|}.
-$$
+$$ \varepsilon_{\%}=100\frac{|r_{\mathrm{FE}}-r_{\mathrm{MATLAB}}|}{|r_{\mathrm{MATLAB}}|}.$$
 
 $$
 \begin{array}{lrrr}
@@ -362,7 +360,7 @@ f_{5}\;\text{(Hz)} & 6598.5039727188 & 6597.6046499335 & 1.3631\times10^{-2} \\
 \end{array}
 $$
 
-The static results agree to about $10^{-9}\%$, including the finite precision of the supplied MATLAB output. The largest frequency discrepancy is $0.013631\%$ in mode 5. This is an implementation comparison within Euler-Bernoulli theory, not experimental validation of material properties or higher physical modes.
+The static results agree to about $10^{-9}\%$. The largest frequency discrepancy is $0.013631\%$ in mode 5. 
 
 ### 4.2 Mesh convergence
 
