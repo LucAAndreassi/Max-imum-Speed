@@ -3,13 +3,13 @@ clear all; close all; clc;
 
 %units/constants
 intom = 0.0254;
-lbftokg = 0.4536;
+lbftokg = 0.45359237;
 g = 9.80665;
 
 
 %geometry controls
-do = 0.055285; %1.5*intom; %in -> m, outer diameter
-t = 0.00201; %0.0625*intom; %i-> m, wall thickness
+do = 0.04; %1.5*intom; %in -> m, outer diameter
+t = 0.0025; %0.0625*intom; %i-> m, wall thickness
 l = 0.6096; %24*intom; %in -> m, arm length
 
 %mech properties controls
@@ -37,6 +37,7 @@ torsionalStress = T*(do/2)/J;
 %arm deflection (max at tip)
 bendingDeflection = tipload*l^3/(3*E*I) - tube_weight*l^3/(8*E*I);
 
+
 %frequency 
 mu = rho*area;
 eta = motor_mass/(mu*l);
@@ -48,12 +49,15 @@ for n = 1:5
     fn(n) = b^2/(2*pi*l^2) * sqrt(E*I/mu);
 end
 
+q_V2 = -tube_weight/l; 
+
+V2_midspanDeflection = 5*q_V2*l^4/(384*E*I);
 
 %report findings
-fprintf('Tipload: %.2f N\nCross Sectional Area: %.6e m2\nArea MOI: %.6e m4\nPolar MOI: %.6e m4\n',tipload,area, I, J)
-fprintf('Tube weight: %.2f N\nBending stress: %.2f MPa\n', ...
+fprintf('Tipload: %.10f N\nCross Sectional Area: %.10e m2\nArea MOI: %.10e m4\nPolar MOI: %.10e m4\n',tipload,area, I, J)
+fprintf('Tube weight: %.10f N\nBending stress: %.10f MPa\n', ...
     tube_weight, bendingStress/1e6);
-fprintf('Bending deflection: %.3f mm\n',bendingDeflection*1e3);
-fprintf('Natural Frequency Mode 1: %.2f Hz\nNatural Frequency Mode 2: %.2f Hz\nNatural Frequency Mode 3: %.2f Hz\nNatural Frequency Mode 4: %.2f Hz\nNatural Frequency Mode 5: %.2f Hz\n', fn(1),fn(2),fn(3),fn(4),fn(5))
+fprintf('Bending deflection: %.10f mm\n',bendingDeflection*1e3);
+fprintf('Natural Frequency Mode 1: %.10f Hz\nNatural Frequency Mode 2: %.10f Hz\nNatural Frequency Mode 3: %.10f Hz\nNatural Frequency Mode 4: %.10f Hz\nNatural Frequency Mode 5: %.10f Hz\n', fn(1),fn(2),fn(3),fn(4),fn(5))
 
-
+fprintf('Midspan deflection: %.13f mm\n', V2_midspanDeflection*1e3);
