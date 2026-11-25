@@ -13,11 +13,13 @@ The original 40 mm OD / 2.5 mm-wall starting design is lighter (**272.904 g**) b
 
 The live viewer compares the starting and optimized tubes using one linked camera, true hollow-section geometry, deformation control, follower-load state display, first-bending-mode coloring and animation, and element inspection with nominal stress information. The metrics panel reports the mass objective and every enabled constraint with PASS/FAIL status. All numerical report values are drawn from the repository's generated `assets/results.json`.
 
+The principal engineering result is that satisfying static strength alone is not sufficient for this arm. The structure can remain well below its material-strength limit while still being dynamically unsuitable because of insufficient bending stiffness.
+
 ## 2. Structure and formulation
 
 ### 2.1 Engineering motivation and physical model
 
-The structure is one arm of a large coaxial multirotor. Reducing arm mass improves payload capability and vehicle efficiency, but a lighter tube must still carry the rotor thrust, tip mass, and self-weight without violating material-strength or vibration requirements. The arm is modeled as horizontal and perfectly clamped at the vehicle frame. The tip carries the complete **1.5 lb combined motor assembly**. Two coaxial rotors together generate **30 lbf total thrust**. Applied shaft-reaction torque is set to zero. In the nonlinear model, thrust follows the orientation of the motor mount and therefore rotates with the deformed tip tangent.
+The structure is one arm of a large coaxial multirotor. Reducing structural mass is beneficial because it increases useful payload capacity and reduces vehicle inertial mass; however, removing material also reduces bending stiffness and can move the arm’s natural frequencies closer to rotor-induced excitation. The arm is modeled as horizontal and perfectly clamped at the vehicle frame. The tip carries the complete **1.5 lb combined motor assembly**. Two coaxial rotors together generate **30 lbf total thrust**. Because the coaxial rotors counter-rotate, the mean applied shaft-reaction torque is assumed to cancel and is therefore set to zero in the present structural model. In the nonlinear model, thrust follows the orientation of the motor mount and therefore rotates with the deformed tip tangent.
 
 The shaft frequency is
 
@@ -25,7 +27,7 @@ $$
 f_{shaft}=\frac{3500}{60}=58.3333\ \text{Hz},
 $$
 
-and the two-blade passing frequency of each rotor is **116.667 Hz**. The vibration limit is derived from the specified 3500 RPM operating speed using the supplied project criterion that the first bending frequency must be at least one shaft-order frequency.
+and the two-blade passing frequency of each rotor is **116.667 Hz**. The vibration limit is derived from the specified 3500 RPM operating speed using the current design criterion that the first bending frequency must be at least one shaft-order frequency.
 
 $$
 f_1\ge f_{shaft}=58.3333\ \text{Hz}.
@@ -77,9 +79,7 @@ $$
 D_i\ge1\ \text{mm}.
 $$
 
-The 2.01 mm lower bound implements the stated requirement that wall thickness be strictly greater than 2 mm. The 10-60 mm OD interval and 3 mm upper wall bound are explicit study bounds, not validated manufacturing or installation limits.
-
-The outer-diameter range, upper wall-thickness bound, and minimum-bore requirement are team-selected study bounds used to define a practical optimization domain. The 2.01 mm lower wall bound implements the project requirement that wall thickness be strictly greater than 2 mm. A minimum nominal material safety factor of 2 is a team-selected preliminary design requirement.
+The 2.01 mm lower wall bound implements the requirement that wall thickness be strictly greater than 2 mm. The 10–60 mm outer-diameter interval, 3 mm upper wall-thickness bound, and minimum-bore requirement are team-selected study bounds used to define a practical optimization domain rather than validated manufacturing or installation limits. A minimum nominal material safety factor of 2 is also adopted as a team-selected preliminary design requirement.
 
 The hollow circular section properties are
 
@@ -90,7 +90,7 @@ $$
 
 ### 2.4 Objective and explicit constraints
 
-The objective is minimum tube mass:
+The optimization seeks the lightest admissible structural tube while enforcing material-strength, vibration, and geometric requirements. The nonlinear optimization evaluates the same strength requirements using the finite-rotation follower-load state. The objective is minimum tube mass:
 
 $$
 \boxed{\min_{D,t}\ m(D,t)=\rho A(D,t)L}.
@@ -601,7 +601,7 @@ $$
 \boxed{m_{tube}=311.714\ \text{g}}.
 $$
 
-The starting 40×2.5 mm tube is infeasible because $f_1=38.714$ Hz is below the required 58.333 Hz, so comparing mass directly to that start is not meaningful as an optimization benefit. The lightest **feasible fixed-wall** reference found on the 0.1 mm OD grid is
+The baseline 40mm x 2.5mm tube is infeasible because $f_1=38.714$ Hz is below the required 58.333 Hz, so comparing mass directly to that start is not meaningful as an optimization benefit. The lightest **feasible fixed-wall** reference found on the 0.1 mm OD grid is
 
 $$
 52.3\ \text{mm OD}\times2.5\ \text{mm wall},\qquad m=362.416\ \text{g}.
@@ -630,6 +630,8 @@ The optimum is controlled by two facts:
 
 1. **Bending frequency is active.** Any meaningful reduction in bending stiffness/mass distribution would push the first mode below 58.333 Hz.
 2. **Wall thickness is at its 2.01 mm lower bound.** Once the minimum wall is reached, the optimizer adjusts diameter until the frequency requirement is just met.
+
+Material strength is therefore not controlling the current optimum. The design is governned by the interaction between the minimum permitted wall thickness and the required bending frequency.
 
 The shadow-price checks validate the multiplier interpretation by tightening each active requirement and reoptimizing:
 
