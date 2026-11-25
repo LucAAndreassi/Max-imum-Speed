@@ -254,19 +254,35 @@ The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form th
 
 ## 4. Analysis-code verification
 
-The numerical model was verified using a ladder of seven benchmark tests following the structure of the Project 4 worked example. Each test compares the finite-element, vibration, sensitivity, or nonlinear implementation against a classical analytical solution, an expected convergence property, or an independently formulated reference problem. The purpose of the ladder is to establish that the numerical model reproduces known mechanics before it is used for optimization.
+## 4. Analysis-code verification
 
-The repository also evaluates additional automated subchecks within these seven tests. Those detailed checks are retained in the generated verification data, while the table below summarizes the principal verification result for each rung of the ladder.
+The numerical model was verified using a ladder of seven benchmark tests following the structure of the Project 4 worked example. Each rung compares the numerical implementation against a classical analytical solution, an expected finite-element convergence property, or an independently formulated reference solution.
 
-| Test | Verification problem | Numerical result | Exact / independent result | Error | Result |
-|---|---|---:|---:|---:|---|
-| **V1 Cantilever tip load** | Euler-Bernoulli cantilever subjected to a known point load; compare tip displacement with \(\delta=PL^3/(3EI)\) | 0.011018911 m | 0.011018911 m | \(1.74\times10^{-13}\) relative | PASS |
-| **V2 Uniformly loaded beam** | Cantilever subjected to uniform distributed load; compare tip displacement with \(\delta=qL^4/(8EI)\) | \(-4.1320915\times10^{-4}\) m | \(-4.1320915\times10^{-4}\) m | \(1.81\times10^{-13}\) relative | PASS |
-| **V3 Mesh convergence** | Refine the cubic-Hermite beam mesh and measure displacement-field convergence | 3.999999 order | 4th order expected | \(2.77\times10^{-7}\) relative | PASS |
-| **V4 Beam vibration with tip mass** | Cantilever with concentrated tip mass; compare first natural frequency with the NACA TN 3459 characteristic equation | 16.030337 Hz | 16.030337 Hz | \(1.42\times10^{-9}\) relative | PASS |
-| **V5 Global checks** | Free-free rigid modes and supported-model force/moment equilibrium | 2 rigid modes; force residual \(6.51\times10^{-12}\) N; moment residual \(2.39\times10^{-11}\) N m | 2 rigid modes; zero force and moment residual | Numerical precision | PASS |
-| **V6 Gradient check** | Compare adjoint directional derivatives of displacement, stress, and frequency with central finite differences | Maximum relative discrepancy \(9.02\times10^{-9}\) | Central finite-difference derivative | \(9.02\times10^{-9}\) | PASS |
-| **V7 N2 nonlinear benchmark** | Finite-rotation follower-load beam compared with an independently solved continuum boundary-value problem | 0.28690538 m tip displacement | 0.28691646 m | \(3.86\times10^{-5}\) relative | PASS |
+### Verification ladder
+
+| Test | Setup | Exact or independent reference |
+|---|---|---|
+| **V1 Cantilever tip load** | Cantilever beam with transverse point load $P$ at the free end | $\delta_L=PL^3/(3EI)$, $\theta_L=PL^2/(2EI)$, $M_0=PL$ |
+| **V2 Uniform beam load** | Cantilever beam subjected to uniform distributed load $q$ | $\delta_L=qL^4/(8EI)$ |
+| **V3 Mesh convergence** | Refine the cubic-Hermite beam mesh and measure displacement-field error | Fourth-order displacement convergence expected |
+| **V4 Beam vibration with tip mass** | Uniform cantilever with a concentrated mass at the free end | NACA TN 3459 cantilever-with-tip-mass characteristic equation |
+| **V5 Global checks** | Free-free beam plus supported beam under known loading | Two rigid modes for the planar model; force and moment residuals equal zero |
+| **V6 Gradient check** | Compare adjoint derivatives with central finite differences | Adjoint and finite-difference derivatives should agree; Taylor remainder should scale as $O(h^2)$ |
+| **V7 N2 nonlinear benchmark** | Finite-rotation beam subjected to a follower load | Independently solved nonlinear continuum boundary-value problem |
+
+The resulting numerical comparisons are:
+
+| Test | Numerical result | Reference result | Relative error | Status |
+|---|---:|---:|---:|---|
+| **V1** Tip displacement | 0.011018911 m | 0.011018911 m | $1.74\times10^{-13}$ | PASS |
+| **V2** Uniform-load tip displacement | $-4.1320915\times10^{-4}$ m | $-4.1320915\times10^{-4}$ m | $1.81\times10^{-13}$ | PASS |
+| **V3** Displacement convergence order | 3.999999 | 4.000000 | $2.77\times10^{-7}$ | PASS |
+| **V4** First frequency with tip mass | 16.030337 Hz | 16.030337 Hz | $1.42\times10^{-9}$ | PASS |
+| **V5** Global equilibrium | $6.51\times10^{-12}$ N force residual | 0 N | Numerical precision | PASS |
+| **V6** Gradient comparison | Maximum relative difference $9.02\times10^{-9}$ | Central finite difference | $9.02\times10^{-9}$ | PASS |
+| **V7** N2 follower-load tip displacement | 0.28690538 m | 0.28691646 m | $3.86\times10^{-5}$ | PASS |
+
+All seven rungs pass. The first four tests demonstrate that the finite-element and vibration models reproduce classical beam theory and expected convergence behavior. V5 confirms global equilibrium and rigid-body behavior, V6 verifies the adjoint sensitivities independently against finite differences, and V7 verifies the nonlinear follower-load model against a separately formulated continuum solution.
 
 ### 4.1 Classical beam verification
 
