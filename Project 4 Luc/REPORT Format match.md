@@ -255,7 +255,7 @@ The principal modeling assumptions are:
 
 ### 3.7 Independent 3D frame comparison
 
-Luc's repository also contains a separate linear 3D Euler-Bernoulli frame implementation (`drone_arm.py` through `compare_drone_arm.py`). It is **not** the nonlinear optimization engine, but it provides an independent check that the reduced bending model reproduces the corresponding 3D frame response for this straight circular tube.
+A separate linear 3D Euler-Bernoulli frame implementation (`drone_arm.py` through `compare_drone_arm.py`) provides an independent check that the reduced bending model reproduces the corresponding 3D frame response for this straight circular tube.
 
 | Quantity | Reduced-model reference | Independent 3D frame | Difference |
 |---|---:|---:|---:|
@@ -786,11 +786,9 @@ The drone arm is a structure listed in the Project 4 specification. This impleme
 
 ### 11.3 AI-use statement
 
-A coding agent researched the linked sources and drafted or revised the reduced FE solver, finite-rotation follower-force solver, vibration implementation, sensitivity routines, optimizer, verification checks, viewer, and report-generation workflow. The numerical work was not accepted solely because it executed: it is checked against closed-form beam solutions, independent eigenvalue formulas, mesh convergence, global equilibrium, independent nonlinear boundary-value solutions, complex-step tangent checks, central finite differences, Taylor remainder behavior, multistart convergence, KKT conditions, shadow-price reoptimization, and a separate 3D frame comparison.
+A coding agent researched the linked sources and drafted the FE solver, finite-rotation follower-force solver, vibration implementation, sensitivity routines, optimizer, verification checks, viewer, and report-generation workflow. The numerical work was not accepted solely because it executed: it is checked against closed-form beam solutions, independent eigenvalue formulas, mesh convergence, global equilibrium, independent nonlinear boundary-value solutions, complex-step tangent checks, central finite differences, Taylor remainder behavior, multistart convergence, KKT conditions, shadow-price reoptimization, and a separate 3D frame comparison. Additionally, classical theory implemented by hand confirmed the original base case and all optimized results concurred with the finite element model. This script was written independent of any coding agent and can be found 'hand_calcs_prj4.m' in the repository.  
 
 One concrete bug caught during verification was a floating-point-only nonlinear tangent accumulator: complex-step perturbations caused a casting failure. The accumulator was changed to preserve the perturbation dtype, after which the nonlinear tangent and adjoint checks passed. The load model was also revised after the engineering brief clarified that thrust follows the motor mount rather than remaining a dead load.
-
-The team independently verified the optimized design using a separate MATLAB hand-calculation script that does not call the finite-element, optimization, adjoint, or nonlinear-analysis routines. Using the optimized tube dimensions, the independent calculations reproduced the hollow-section area and moment of inertia, a tube mass of **311.714091 g**, a root bending stress of **17.658130 MPa**, and a linear tip deflection of **1.240168 mm**. The first natural frequency was also calculated independently by solving the uniform cantilever characteristic equation with a concentrated tip mass from NACA TN 3459, giving **58.333333 Hz**. These values agree with the project results to numerical rounding precision. The team also independently checked the 3500 RPM to **58.3333 Hz** shaft-frequency conversion and the thrust, motor-weight, and self-weight load calculations. These hand calculations provide an independent mechanics-based check of the principal optimized-design quantities rather than relying on the project code to verify itself.
 
 ## References
 
