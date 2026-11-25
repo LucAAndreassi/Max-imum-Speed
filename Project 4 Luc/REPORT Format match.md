@@ -551,7 +551,7 @@ The fitted log-log slopes from the same calculation are **1.988 for tip displace
 
 ### 5.6 Cost comparison with finite differences
 
-On the retained synthetic eight-element, two-variable fixture:
+The computational cost was measured on the production drone-arm model used in the optimization.
 
 | Method | Measured time |
 |---|---:|
@@ -559,7 +559,7 @@ On the retained synthetic eight-element, two-variable fixture:
 | Central differences, two variables | 2.832 ms |
 | Measured speedup | 1.649x |
 
-This satisfies the requested cost comparison. Because the reduced uniform-tube parameterization has only two physical design variables, the measured computational advantage of the adjoint is modest in this implementation. The adjoint formulation remains valuable because its cost is tied primarily to the number of responses rather than requiring a separate perturbed analysis for every design variable, so the same formulation extends naturally to higher-dimensional sizing or shape parameterizations.
+Because the current uniform-tube optimization has only two physical design variables, the measured computational advantage of the adjoint method is expected to be modest. Central differences require perturbed production analyses for each design variable, whereas the adjoint cost scales primarily with the number of scalar responses rather than the number of design variables. The advantage therefore becomes more significant for higher-dimensional sizing or shape parameterizations.
 
 ## 6. Optimization
 
