@@ -254,7 +254,7 @@ The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form th
 
 ## 4. Analysis-code verification
 
-The repository's deterministic verification ladder contains **42 checks, all passing**. I also reran the retained unit-test suite from the uploaded repository; **18/18 tests passed**. The ladder covers closed-form beam solutions, convergence rate, eigenvalue checks, rigid-body behavior within the scalar bending subspace, global force/moment balance, linear adjoint checks, nonlinear benchmark solutions, consistent tangents, follower-load adjoints, and Newton convergence.
+The repository's deterministic verification ladder contains **42 checks, all passing**. The team reran the retained unit-test suite from the uploaded repository; **18/18 tests passed**. The ladder covers closed-form beam solutions, convergence rate, eigenvalue checks, rigid-body behavior within the scalar bending subspace, global force/moment balance, linear adjoint checks, nonlinear benchmark solutions, consistent tangents, follower-load adjoints, and Newton convergence.
 
 The synthetic verification fixture intentionally uses simple beam properties rather than the drone's estimated CFRP values so that the numerical method is tested against independent targets.
 
