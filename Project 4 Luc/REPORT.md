@@ -796,7 +796,7 @@ The team independently verified the optimized design using a separate MATLAB han
 | Rubric category | Evidence in this report | Remaining issue |
 |---|---|---|
 | Structure and formulation (10) | Sections 2-3: motivation, units, variables, bounds, objective, explicit constraints, material basis | Study bounds/material allowables are preliminary |
-| Analysis code and verification (20) | Section 4: 42-check ladder, convergence, equilibrium, nonlinear benchmarks, separate 3D comparison | Reduced solver is not a general 3D frame |
+| Analysis code and verification (20) | Section 4: seven-check ladder, convergence, equilibrium, nonlinear benchmarks, separate 3D comparison | Reduced solver is not a general 3D frame |
 | Sensitivity analysis (20) | Section 5: adjoint derivations, directional checks, Taylor plot, N2 adjoint, 18 optimizer checks, timing | Only two physical variables limit adjoint-scaling demonstration |
 | Optimization (15) | Section 6: SLSQP, scaling, six starts, convergence, feasible reference, KKT, multipliers, shadow checks | None within two-variable formulation |
 | Nonlinear component (15) | Section 7: N2 equation, Newton solve, benchmark, adjoint, with/without comparison | N2 has negligible design effect, which is a valid finding |
