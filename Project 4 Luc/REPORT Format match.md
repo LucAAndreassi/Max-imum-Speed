@@ -551,16 +551,17 @@ The fitted log-log slopes from the same calculation are **1.988 for tip displace
 
 ### 5.6 Cost comparison with finite differences
 
-The computational cost was measured on the production drone-arm model used in the optimization.
+The computational cost was measured on the production drone-arm model at the optimizer gradient-check point, $D=35.000$ mm and $t=2.505$ mm. The production discretization uses **20 linear beam elements** and **40 nonlinear follower-load elements**. The analytic/adjoint evaluation computes the complete objective and constraint Jacobian for all eight enabled constraints, while the central-difference calculation perturbs both physical design variables and reruns the production analyses.
 
-| Method | Measured time |
+| Method | Median measured time |
 |---|---:|
-| Adjoint tip gradient | 1.718 ms |
-| Central differences, two variables | 2.832 ms |
-| Measured speedup | 1.649x |
+| Full analytic/adjoint Jacobian | 119.980 ms |
+| Central-difference Jacobian, two variables | 319.529 ms |
+| Measured speedup | 2.663x |
 
-Because the current uniform-tube optimization has only two physical design variables, the measured computational advantage of the adjoint method is expected to be modest. Central differences require perturbed production analyses for each design variable, whereas the adjoint cost scales primarily with the number of scalar responses rather than the number of design variables. The advantage therefore becomes more significant for higher-dimensional sizing or shape parameterizations.
+The two methods also produce essentially identical derivatives. The maximum relative discrepancy among the constraint gradients is $7.09\times10^{-8}$, while the maximum relative discrepancy in the mass gradient is $2.34\times10^{-12}$.
 
+Because the current uniform-tube optimization has only two physical design variables, the measured computational advantage of the adjoint method is modest but still significant: the complete analytic/adjoint Jacobian is approximately **2.66 times faster** than central differences on the production model. Central differences require separate perturbed production analyses for each design variable, whereas the adjoint formulation scales primarily with the number of scalar responses rather than the number of design variables. The computational advantage would therefore become more significant for higher-dimensional sizing or shape parameterizations.
 ## 6. Optimization
 
 ### 6.1 Algorithm, scaling, and starting designs
