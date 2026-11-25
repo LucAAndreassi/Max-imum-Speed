@@ -79,6 +79,8 @@ $$
 
 The 2.01 mm lower bound implements the stated requirement that wall thickness be strictly greater than 2 mm. The 10-60 mm OD interval and 3 mm upper wall bound are explicit study bounds, not validated manufacturing or installation limits.
 
+The outer-diameter range, upper wall-thickness bound, and minimum-bore requirement are team-selected study bounds used to define a practical optimization domain. The 2.01 mm lower wall bound implements the project requirement that wall thickness be strictly greater than 2 mm.
+
 The hollow circular section properties are
 
 $$
