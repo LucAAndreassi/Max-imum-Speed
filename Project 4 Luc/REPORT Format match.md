@@ -755,15 +755,17 @@ From an installed repository environment, the numerical analysis and optimizatio
 ```bash
 python optimize_arm.py --update-report
 
-The command reruns the optimizer gradient checks, the linear-only and linear-plus-N2 optimization cases, shadow-price checks, optimized-design mesh refinement, and the automated verification suite. It also regenerates the optimization outputs, assets/results.json, the verification and optimization figures, and the repository-generated index.md.
+The command reruns the optimizer gradient checks, the linear-only and linear-plus-N2 optimization cases, shadow-price checks, optimized-design mesh refinement, and the automated verification suite. It also regenerates the optimization outputs, assets/results.json.
 
-The retained test suite can be run with
+The retained unit-test suite can be run independently with
 
 ```bash
 python -m unittest test_optimize test_vibration -v
 ```
 
 On the uploaded repository copy, 18/18 retained unit tests passed: 11 optimizer/model tests and 7 dedicated vibration tests. The separate automated verification routine contains 42 passing checks, including the detailed beam, vibration, equilibrium, gradient, nonlinear-solution, tangent, and adjoint checks that support the seven-rung verification summary presented in Section 4.
+
+The polished report text is maintained separately from the automated numerical-generation workflow. Therefore, the commands above reproduce and verify the numerical analysis and project data, rather than regenerating the exact final report wording and formatting.
 
 ## 11. Limitations and AI-use statement
 
