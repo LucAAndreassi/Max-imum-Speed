@@ -631,7 +631,7 @@ The optimum is controlled by two facts:
 1. **Bending frequency is active.** Any meaningful reduction in bending stiffness/mass distribution would push the first mode below 58.333 Hz.
 2. **Wall thickness is at its 2.01 mm lower bound.** Once the minimum wall is reached, the optimizer adjusts diameter until the frequency requirement is just met.
 
-Material strength is therefore not controlling the current optimum. The design is governned by the interaction between the minimum permitted wall thickness and the required bending frequency.
+Material strength is therefore not controlling the current optimum. The design is governed by the interaction between the minimum permitted wall thickness and the required bending frequency.
 
 The shadow-price checks validate the multiplier interpretation by tightening each active requirement and reoptimizing:
 
