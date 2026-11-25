@@ -42,7 +42,7 @@ The optimization uses a preliminary effective roll-wrapped CFRP property set:
 | Property | Value used | Basis recorded in repository |
 |---|---:|---|
 | Effective longitudinal/bending modulus $E$ | 64 GPa | Easy Composites CFT-WF typical longitudinal tensile modulus |
-| Density $\rho$ | 1520 kg/m$^3$ | Graphtek comparison laminate, used as estimate |
+| Density $\rho$ | 1520 $kg/m^3$ | Graphtek comparison laminate, used as estimate |
 | Tensile strength $X_t$ | 650 MPa | Easy Composites typical tensile strength |
 | Compressive strength $X_c$ | 910.1 MPa | Graphtek comparison laminate, used as estimate |
 | Shear strength proxy $S$ | 103.4 MPa | Graphtek torsional strength, used as nominal longitudinal-shear proxy |
@@ -261,10 +261,6 @@ Luc's repository also contains a separate linear 3D Euler-Bernoulli frame implem
 |---|---:|---:|---:|
 | Linear tip deflection (mm) | 1.240167843059 | 1.240167843070 | 1.163e-11 |
 | First bending frequency (Hz) | 58.333333333333 | 58.333333363984 | 3.065e-08 |
-| Peak bending stress (MPa) | - | 17.658129 | - |
-| Equilibrium residual, infinity norm | - | 1.306e-09 | - |
-| 3D model DOFs | - | 126 (120 free) | - |
-
 
 The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form the expected nearly degenerate two-plane bending pair at 58.3333 Hz. The very small deflection/frequency differences support the reduced bending model for the modeled planar load case, while not converting the main optimizer into a general 3D-frame optimization.
 
@@ -307,7 +303,7 @@ The principal numerical comparisons for this base case are:
 | Test | Numerical result | Exact / independent result | Error | Status |
 |---|---:|---:|---:|---|
 | **V1** Isolated tip-load cantilever displacement | 0.0028763736649 m | 0.0028763736649 m | $1.1795\times10^{-11}$ | PASS |
-| **V2** Simply supported self-weight midspan displacement | -2.371944010481e-06 m | -2.3719440105e-06 m | $8.0025\times10^{-12}$ | PASS |
+| **V2** Simply supported self-weight midspan displacement | -2.3719440104e-06 m | -2.3719440105e-06 m | $8.0025\times10^{-12}$ | PASS |
 | **V3** Displacement convergence order | 4.000323851 | 4.000000000 | $8.0963\times10^{-5}$ | PASS |
 | **V4** First frequency with tip mass | 38.7142512070 Hz | 38.7142507467 Hz | $1.1889\times10^{-8}$ | PASS |
 | **V5** Global force balance | $1.9408\times10^{-9}$ N residual | 0 N | $1.9408\times10^{-9}$ N (absolute) | PASS |
@@ -320,7 +316,7 @@ The displacement checks use relative tolerance $10^{-9}$; V3 permits a 1% relati
 
 ### 4.1 Classical beam verification and MATLAB comparison
 
-For the annular section, $A=\pi[D^2-(D-2t)^2]/4=2.9452431127\times10^{-4}$ m$^2$ and $I=\pi[D^4-(D-2t)^4]/64=5.2001948709\times10^{-8}$ m$^4$. The MATLAB hand calculations and Python model use the same $E$, density, length, thrust, tip mass, gravity and exact pound conversion. The tube mass is $m_b=\rho AL=0.2729038706$ kg and its total weight is $W_b=m_bg=2.6762727429$ N.
+For the annular section, $A=\pi[D^2-(D-2t)^2]/4=2.9452431127\times10^{-4}$ $m^2$ and $I=\pi[D^4-(D-2t)^4]/64=5.2001948709\times10^{-8}$ $m^4$. The MATLAB hand calculations and Python model use the same $E$, density, length, thrust, tip mass, gravity and exact pound conversion. The tube mass is $m_b=\rho AL=0.2729038706$ kg and its total weight is $W_b=m_bg=2.6762727429$ N.
 
 V1 isolates the net tip force by suppressing the tube's distributed gravity load. V2 isolates the tube self-weight and changes the supports to a simply supported beam. Their formulas are listed in the verification ladder. Thus V1's tip-load-only displacement is larger than the displacement of the actual arm, where downward tube self-weight reduces the net upward deflection.
 
@@ -342,12 +338,16 @@ The actual-arm Python solution gives $\delta_L=2.8536030024$ mm, $\theta_L=0.007
 
 Errors are computed from the unrounded FE result and the supplied MATLAB number:
 
-$$ \varepsilon_{\%}=100\frac{|r_{\mathrm{FE}}-r_{\mathrm{MATLAB}}|}{|r_{\mathrm{MATLAB}}|}.$$
+```math
+\varepsilon_{\%}
+=100\frac{\lvert r_{\mathrm{FE}}-r_{\mathrm{MATLAB}}\rvert}
+{\lvert r_{\mathrm{MATLAB}}\rvert}
+```
 
 $$
 \begin{array}{lrrr}
 \hline
-\text{Quantity} & \text{Python FEA} & \text{MATLAB output} & \text{Difference (\%)}\\
+\text{Quantity} & \text{Python FEA} & \text{MATLAB output} & \text{Percentage Difference}\\
 \hline
 \text{Tip deflection (mm)} & 2.8536030024 & 2.8536030024 & 1.6743\times10^{-9} \\
 \text{Peak bending stress (MPa)} & 29.4088575601 & 29.4088575604 & 1.1443\times10^{-9} \\
@@ -366,9 +366,9 @@ The static results agree to about $10^{-9}\%$. The largest frequency discrepancy
 
 ![Base-case mesh convergence](assets/section4-basecase-mesh-convergence.png)
 
-The same base-case cantilever is solved with 2, 4, 8 and 16 cubic-Hermite elements. Displacement-field error is integrated against the exact superposed tip-load and uniform-load solution using five-point Gauss quadrature on each element. The error is the unnormalized $L_2$ norm, $\sqrt{\int_0^L(w_h-w)^2\,dx}$, with units m$^{3/2}$. The point-load contribution is cubic and exactly representable; the quartic self-weight term drives the interpolation error.
+The same base-case cantilever is solved with 2, 4, 8 and 16 cubic-Hermite elements. Displacement-field error is integrated against the exact superposed tip-load and uniform-load solution using five-point Gauss quadrature on each element. The error is the unnormalized $L_2$ norm, $\sqrt{\int_0^L(w_h-w)^2\,dx}$, with units $m^{3/2}$. The point-load contribution is cubic and exactly representable; the quartic self-weight term drives the interpolation error.
 
-| Linear elements | Displacement-field $L_2$ error (m$^{3/2}$) | FE first frequency (Hz) | Relative frequency error |
+| Linear elements | Displacement-field $L_2$ error ($m^{3/2}$) | FE first frequency (Hz) | Relative frequency error |
 |---:|---:|---:|---:|
 | 2 | $1.4757\times10^{-8}$ | 38.7143930749 | $3.6764\times10^{-6}$ |
 | 4 | $9.2229\times10^{-10}$ | 38.7142604852 | $2.5155\times10^{-7}$ |
@@ -409,7 +409,7 @@ Both residuals are below the $10^{-7}$ absolute verification tolerance. Because 
 
 ### 4.5 Gradient verification
 
-All 18 objective/constraint derivative entries are checked at the base point $(D,t)=(40,2.5)$ mm using the supplied design-dependent material/mass model, 20 linear beam elements and 40 nonlinear angle elements. This evaluates the derivative code without executing an optimizer. Constraint derivatives have units mm$^{-1}$ and mass derivatives kg/mm. Central differences use $\Delta d_j=10^{-4}\max(|d_j|,1)$ in mm. The normalized discrepancy divides by $\max(|g_{FD}|,|g_{adj}|,10^{-7})$ for constraint derivatives; the mass check uses its mass-derivative normalization.
+All 18 objective/constraint derivative entries are checked at the base point $(D,t)=(40,2.5)$ mm using the supplied design-dependent material/mass model, 20 linear beam elements and 40 nonlinear angle elements. This evaluates the derivative code without executing an optimizer. Constraint derivatives have units $mm^{-1}$ and mass derivatives kg/mm. Central differences use $\Delta d_j=10^{-4}\max(|d_j|,1)$ in mm. The normalized discrepancy divides by $\max(|g_{FD}|,|g_{adj}|,10^{-7})$ for constraint derivatives; the mass check uses its mass-derivative normalization.
 
 | Response | Variable | Analytic / adjoint derivative | Central difference | Normalized relative error |
 |---|---|---:|---:|---:|
