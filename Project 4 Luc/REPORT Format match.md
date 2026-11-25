@@ -25,7 +25,7 @@ $$
 f_{shaft}=\frac{3500}{60}=58.3333\ \text{Hz},
 $$
 
-and the two-blade passing frequency of each rotor is **116.667 Hz**. The current optimization uses the supplied project criterion
+and the two-blade passing frequency of each rotor is **116.667 Hz**. The vibration limit is derived from the specified 3500 RPM operating speed using the supplied project criterion that the first bending frequency must be at least one shaft-order frequency.
 
 $$
 f_1\ge f_{shaft}=58.3333\ \text{Hz}.
@@ -79,7 +79,7 @@ $$
 
 The 2.01 mm lower bound implements the stated requirement that wall thickness be strictly greater than 2 mm. The 10-60 mm OD interval and 3 mm upper wall bound are explicit study bounds, not validated manufacturing or installation limits.
 
-The outer-diameter range, upper wall-thickness bound, and minimum-bore requirement are team-selected study bounds used to define a practical optimization domain. The 2.01 mm lower wall bound implements the project requirement that wall thickness be strictly greater than 2 mm.
+The outer-diameter range, upper wall-thickness bound, and minimum-bore requirement are team-selected study bounds used to define a practical optimization domain. The 2.01 mm lower wall bound implements the project requirement that wall thickness be strictly greater than 2 mm. A minimum nominal material safety factor of 2 is a team-selected preliminary design requirement.
 
 The hollow circular section properties are
 
@@ -384,35 +384,11 @@ Because the optimization model represents only a single bending plane, it has tw
 
 ### 4.5 Gradient verification
 
-The adjoint sensitivities are verified independently against central finite differences. Directional derivatives are checked for tip displacement, root stress, and bending frequency using both coordinate directions and several additional perturbation directions.
+The adjoint sensitivities are independently checked against central finite differences. Directional checks of tip displacement, root stress, and bending frequency agree to within approximately $9.02\times10^{-9}$ relative error on the verification fixture.
 
-![Directional gradient checks](assets/gradient-check.png)
+The complete OD/wall optimizer check evaluates all 18 objective and constraint derivatives and has a maximum relative discrepancy of $2.27\times10^{-7}$. A first-order Taylor test also produces the expected $O(h^2)$ remainder behavior.
 
-The maximum relative difference among the reported directional checks is approximately
-
-$$
-9.02\times10^{-9},
-$$
-
-showing close agreement between the adjoint and finite-difference derivatives for the directional beam fixture. The complete OD/wall optimizer check in Section 5 evaluates all 18 objective and constraint derivatives; its largest relative discrepancy is **2.27e-07**.
-
-A first-order Taylor test provides a second check. For a response $Q$,
-
-$$
-R(h)
-=
-\left|
-Q(d+hv)-Q(d)-h\nabla Q(d)^Tv
-\right|.
-$$
-
-For a correct first derivative,
-
-$$
-R(h)=O(h^2).
-$$
-
-The measured log-log slopes are **1.988 for tip displacement, 1.990 for root stress, and 1.999 for bending frequency**, which closely match the theoretical slope of 2. The complete variable-by-variable gradient checks are presented in Section 5.
+The complete gradient tables, directional-check results, and Taylor test are presented in Section 5.
 
 ### 4.6 N2 nonlinear benchmark
 
