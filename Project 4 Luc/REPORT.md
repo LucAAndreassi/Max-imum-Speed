@@ -254,75 +254,161 @@ The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form th
 
 ## 4. Analysis-code verification
 
-The repository's deterministic verification ladder contains **42 checks, all passing**. The team reran the retained unit-test suite from the uploaded repository; **18/18 tests passed**. The ladder covers closed-form beam solutions, convergence rate, eigenvalue checks, rigid-body behavior within the scalar bending subspace, global force/moment balance, linear adjoint checks, nonlinear benchmark solutions, consistent tangents, follower-load adjoints, and Newton convergence.
+The numerical model was verified using a ladder of seven benchmark tests following the structure of the Project 4 worked example. Each test compares the finite-element, vibration, sensitivity, or nonlinear implementation against a classical analytical solution, an expected convergence property, or an independently formulated reference problem. The purpose of the ladder is to establish that the numerical model reproduces known mechanics before it is used for optimization.
 
-The synthetic verification fixture intentionally uses simple beam properties rather than the drone's estimated CFRP values so that the numerical method is tested against independent targets.
+The repository also evaluates additional automated subchecks within these seven tests. Those detailed checks are retained in the generated verification data, while the table below summarizes the principal verification result for each rung of the ladder.
 
-| Check | Unit | Computed | Reference | Error | Acceptance |
+| Test | Verification problem | Numerical result | Exact / independent result | Error | Result |
 |---|---|---:|---:|---:|---|
-| V1 tip force: displacement | m | 0.011018911 | 0.011018911 | 1.74e-13 (relative) | PASS; <= 1e-09 |
-| V1 tip force: slope | rad | 0.016528366 | 0.016528366 | 1.64e-13 (relative) | PASS; <= 1e-09 |
-| V1 root moment magnitude | N m | 100 | 100 | 1.49e-13 (relative) | PASS; <= 1e-09 |
-| V2 uniform load: tip | m | -0.00041320915 | -0.00041320915 | 1.81e-13 (relative) | PASS; <= 1e-09 |
-| V2 simply supported midspan | m | -4.304262e-05 | -4.304262e-05 | 7.87e-16 (relative) | PASS; <= 1e-09 |
-| V3 displacement L2 convergence order | 1 | 3.9999989 | 4 | 2.77e-07 (relative) | PASS; <= 0.01 |
-| V4 cantilever frequency | Hz | 48.664357 | 48.66435 | 1.31e-07 (relative) | PASS; <= 2e-06 |
-| V4 frequency convergence order | 1 | 3.9292664 | 4 | 0.0177 (relative) | PASS; <= 0.035 |
-| V4 frequency including tip mass | Hz | 16.030337 | 16.030337 | 1.42e-09 (relative) | PASS; <= 2e-06 |
-| V4 NACA eq13 zero tip mass | Hz | 48.66435 | 48.66435 | 0 (relative) | PASS; <= 1e-12 |
-| V4 NACA eq13 including tip mass | Hz | 16.030337 | 16.030337 | 1.55e-15 (relative) | PASS; <= 1e-12 |
-| V4 NACA versus FE mode 1 | Hz | 16.030337 | 16.030337 | 2.47e-09 (relative) | PASS; <= 1e-05 |
-| V4 NACA versus FE mode 2 | Hz | 219.527 | 219.52689 | 4.99e-07 (relative) | PASS; <= 1e-05 |
-| V4 NACA versus FE mode 3 | Hz | 698.2377 | 698.23406 | 5.22e-06 (relative) | PASS; <= 1e-05 |
-| V5 free-free bending rigid modes | 1 | 2 | 2 | 0 (relative) | PASS; <= 0 |
-| V5 consistent mass translation | kg | 0.4 | 0.4 | 0 (relative) | PASS; <= 1e-12 |
-| V5 force balance residual | N | 6.5085715e-12 | 0 | 6.51e-12 (absolute) | PASS; <= 1e-07 |
-| V5 moment balance residual | N m | -2.3874236e-11 | 0 | 2.39e-11 (absolute) | PASS; <= 1e-07 |
-| V6 tip_displacement gradient direction 0 | m | -0.032688823 | -0.032688823 | 3.6e-09 (relative) | PASS; <= 2e-05 |
-| V6 tip_displacement gradient direction 1 | m | -0.0087934139 | -0.0087934139 | 3.8e-09 (relative) | PASS; <= 2e-05 |
-| V6 tip_displacement gradient direction 2 | m | -0.017099831 | -0.017099831 | 2.54e-09 (relative) | PASS; <= 2e-05 |
-| V6 tip_displacement gradient direction 3 | m | -0.022518873 | -0.022518873 | 5.79e-11 (relative) | PASS; <= 2e-05 |
-| V6 tip_displacement gradient direction 4 | m | -0.011418653 | -0.011418653 | 3.57e-09 (relative) | PASS; <= 2e-05 |
-| V6 root_stress gradient direction 0 | Pa | 93248350 | 93248350 | 1.01e-09 (relative) | PASS; <= 2e-05 |
-| V6 root_stress gradient direction 1 | Pa | 36739926 | 36739926 | 3.51e-09 (relative) | PASS; <= 2e-05 |
-| V6 root_stress gradient direction 2 | Pa | 60022557 | 60022557 | 1.7e-09 (relative) | PASS; <= 2e-05 |
-| V6 root_stress gradient direction 3 | Pa | 74655520 | 74655520 | 1.7e-10 (relative) | PASS; <= 2e-05 |
-| V6 root_stress gradient direction 4 | Pa | 22998329 | 22998329 | 9.02e-09 (relative) | PASS; <= 2e-05 |
-| V6 bending_frequency gradient direction 0 | Hz | 32.375386 | 32.375386 | 3.15e-12 (relative) | PASS; <= 2e-05 |
-| V6 bending_frequency gradient direction 1 | Hz | 8.7090983 | 8.7090983 | 5.06e-12 (relative) | PASS; <= 2e-05 |
-| V6 bending_frequency gradient direction 2 | Hz | 16.93587 | 16.93587 | 2.43e-11 (relative) | PASS; <= 2e-05 |
-| V6 bending_frequency gradient direction 3 | Hz | 22.302951 | 22.302951 | 2.97e-13 (relative) | PASS; <= 2e-05 |
-| V6 bending_frequency gradient direction 4 | Hz | 11.309165 | 11.309165 | 1.13e-10 (relative) | PASS; <= 2e-05 |
-| V7 nonlinear tip vs independent BVP | m | 0.71377253 | 0.71379152 | 2.66e-05 (relative) | PASS; <= 0.0001 |
-| V7 pure moment circle x | m | 0.58333224 | 0.58333224 | 3.81e-16 (relative) | PASS; <= 1e-11 |
-| V7 pure moment circle z | m | 0.66402617 | 0.66402617 | 3.34e-16 (relative) | PASS; <= 1e-11 |
-| V7 consistent tangent relative error | 1 | 1.9539947e-16 | 0 | 1.95e-16 (absolute) | PASS; <= 1e-12 |
-| V8 nonlinear implicit EI gradient | m / (N m2) | -0.18089454 | -0.18089454 | 2.91e-11 (relative) | PASS; <= 1e-06 |
-| V9 follower tip vs independent BVP | m | 0.28690538 | 0.28691646 | 3.86e-05 (relative) | PASS; <= 0.0001 |
-| V9 follower nonsymmetric tangent | 1 | 2.0188919e-16 | 0 | 2.02e-16 (absolute) | PASS; <= 1e-12 |
-| V9 follower transposed adjoint | m / (N m2) | -0.2732302 | -0.27323021 | 8.25e-09 (relative) | PASS; <= 1e-06 |
-| V7 Newton convergence order | 1 | 1.8462876 | 2 | 0.0769 (relative) | PASS; <= 0.2 |
+| **V1 Cantilever tip load** | Euler-Bernoulli cantilever subjected to a known point load; compare tip displacement with \(\delta=PL^3/(3EI)\) | 0.011018911 m | 0.011018911 m | \(1.74\times10^{-13}\) relative | PASS |
+| **V2 Uniformly loaded beam** | Cantilever subjected to uniform distributed load; compare tip displacement with \(\delta=qL^4/(8EI)\) | \(-4.1320915\times10^{-4}\) m | \(-4.1320915\times10^{-4}\) m | \(1.81\times10^{-13}\) relative | PASS |
+| **V3 Mesh convergence** | Refine the cubic-Hermite beam mesh and measure displacement-field convergence | 3.999999 order | 4th order expected | \(2.77\times10^{-7}\) relative | PASS |
+| **V4 Beam vibration with tip mass** | Cantilever with concentrated tip mass; compare first natural frequency with the NACA TN 3459 characteristic equation | 16.030337 Hz | 16.030337 Hz | \(1.42\times10^{-9}\) relative | PASS |
+| **V5 Global checks** | Free-free rigid modes and supported-model force/moment equilibrium | 2 rigid modes; force residual \(6.51\times10^{-12}\) N; moment residual \(2.39\times10^{-11}\) N m | 2 rigid modes; zero force and moment residual | Numerical precision | PASS |
+| **V6 Gradient check** | Compare adjoint directional derivatives of displacement, stress, and frequency with central finite differences | Maximum relative discrepancy \(9.02\times10^{-9}\) | Central finite-difference derivative | \(9.02\times10^{-9}\) | PASS |
+| **V7 N2 nonlinear benchmark** | Finite-rotation follower-load beam compared with an independently solved continuum boundary-value problem | 0.28690538 m tip displacement | 0.28691646 m | \(3.86\times10^{-5}\) relative | PASS |
 
-A limitation of the reduced solver is important: the free-free check correctly produces **two** rigid modes in the scalar bending subspace, not the six rigid modes of a general 3D frame. A 3D rotation-invariance test is therefore not claimed for the reduced optimization model.
+### 4.1 Classical beam verification
 
-### 4.1 Mesh convergence
+The first two ladder tests verify the underlying Euler-Bernoulli beam implementation using classical closed-form solutions.
+
+For a cantilever of length \(L\), bending stiffness \(EI\), and transverse tip load \(P\),
+
+$$
+\delta_L=\frac{PL^3}{3EI},
+\qquad
+\theta_L=\frac{PL^2}{2EI},
+\qquad
+M_0=PL.
+$$
+
+The finite-element solution reproduces the analytical tip displacement, tip rotation, and root moment to approximately machine precision. This verifies the element stiffness matrix, load application, sign convention, and fixed-root boundary conditions.
+
+For a cantilever subjected to a uniform distributed load \(q\),
+
+$$
+\delta_L=\frac{qL^4}{8EI}.
+$$
+
+The computed tip displacement is \(-4.1320915\times10^{-4}\) m, matching the analytical result with a relative error of \(1.81\times10^{-13}\). A separate simply supported uniform-load calculation also reproduces the classical midspan solution
+
+$$
+\delta_{mid}=\frac{5qL^4}{384EI}.
+$$
+
+These comparisons show that both concentrated and distributed loads are assembled correctly.
+
+### 4.2 Mesh convergence
 
 ![Mesh convergence](assets/mesh-convergence.png)
 
-The left panel shows the $L_2$ displacement-field error for the uniformly loaded synthetic beam. The observed convergence order is **3.999999**, matching the expected fourth-order behavior of cubic Hermite bending interpolation. The right panel shows first-frequency error decreasing with mesh refinement; the observed order is **3.9293**, close to the expected fourth-order eigenvalue/frequency convergence. These plots verify discretization behavior rather than relying only on tip values that are exact for special beam cases.
+A correct finite-element formulation should not only approach the exact answer but should approach it at the expected rate as the mesh is refined. For the cubic-Hermite Euler-Bernoulli element used here, the displacement-field error is expected to converge at approximately fourth order.
 
-### 4.2 Nonlinear benchmark convergence
+The measured \(L_2\) displacement convergence order is **3.999999**, essentially identical to the theoretical value of 4. The first-frequency error also decreases at approximately fourth order, with a measured order of **3.9293**. This demonstrates that the numerical solution approaches the continuum solution at the expected rate rather than obtaining a correct result only for one particular mesh.
 
-| Tube | Elements | Nonlinear FE tip (mm) | Relative difference from continuum BVP |
-|---|---:|---:|---:|
-| 40 x 37 mm reference candidate | 40 | 4.420548 | 0.000156 |
-| 40 x 37 mm reference candidate | 80 | 4.421066 | 3.9e-05 |
-| 40 x 37 mm reference candidate | 160 | 4.421195 | 9.75e-06 |
-| 30 x 27 mm lighter candidate | 40 | 10.898712 | 0.000156 |
-| 30 x 27 mm lighter candidate | 80 | 10.899988 | 3.9e-05 |
-| 30 x 27 mm lighter candidate | 160 | 10.900306 | 9.75e-06 |
+### 4.3 Natural-frequency verification
 
-The follower/dead-load nonlinear FE solution converges toward an independently implemented continuum boundary-value solution. Error decreases by approximately a factor of four each time the nonlinear mesh doubles, consistent with the lower-order angle discretization.
+The vibration implementation is checked independently using the classical characteristic equation for a uniform cantilever carrying a concentrated tip mass. Following NACA TN 3459,
+
+$$
+1+\cos\beta\cosh\beta
+-r\beta\left(\sin\beta\cosh\beta-\cos\beta\sinh\beta\right)=0,
+$$
+
+where
+
+$$
+r=\frac{m_t}{\mu L}.
+$$
+
+After solving for the characteristic root \(\beta\), the corresponding frequency is
+
+$$
+f_n=\frac{\beta_n^2}{2\pi}
+\sqrt{\frac{EI}{\mu L^4}}.
+$$
+
+For the verification problem, the finite-element model predicts a first natural frequency of **16.030337 Hz**, while the independent characteristic-equation solution gives **16.030337 Hz**. The relative difference is \(1.42\times10^{-9}\). Additional checks of the first three modes also agree with the analytical characteristic equation.
+
+This test is particularly important because natural frequency becomes the governing performance constraint in the optimized drone arm.
+
+### 4.4 Global equilibrium and rigid-body behavior
+
+The model is also checked using physical properties that must hold regardless of the particular beam solution. For a free-free version of the reduced planar bending model, exactly **two rigid-body modes** are expected and two are obtained.
+
+For the supported model, the recovered reactions are compared with the applied forces and moments. The force-balance residual is
+
+$$
+6.51\times10^{-12}\ \text{N},
+$$
+
+and the moment-balance residual is
+
+$$
+2.39\times10^{-11}\ \text{N\,m}.
+$$
+
+Both are effectively zero at numerical precision. These checks verify that loads are neither lost nor duplicated during finite-element assembly.
+
+Because the optimization model represents only a single bending plane, it has two rigid modes rather than the six rigid-body modes expected from a general three-dimensional frame model. The separate 3D frame comparison in Section 3.6 provides an additional check of the reduced model.
+
+### 4.5 Gradient verification
+
+The adjoint sensitivities are verified independently against central finite differences. Directional derivatives are checked for tip displacement, root stress, and bending frequency using both coordinate directions and several additional perturbation directions.
+
+![Directional gradient checks](assets/gradient-check.png)
+
+The maximum relative difference among the reported directional checks is approximately
+
+$$
+9.02\times10^{-9},
+$$
+
+showing close agreement between the adjoint and finite-difference derivatives.
+
+A first-order Taylor test provides a second check. For a response \(Q\),
+
+$$
+R(h)
+=
+\left|
+Q(d+hv)-Q(d)-h\nabla Q(d)^Tv
+\right|.
+$$
+
+For a correct first derivative,
+
+$$
+R(h)=O(h^2).
+$$
+
+The measured log-log slopes are **1.988 for tip displacement, 1.990 for root stress, and 1.999 for bending frequency**, which closely match the theoretical slope of 2. The complete variable-by-variable gradient checks are presented in Section 5.
+
+### 4.6 N2 nonlinear benchmark
+
+Because the project includes an N2 finite-rotation follower-load model, the nonlinear implementation requires an independent nonlinear benchmark in addition to the linear beam checks.
+
+The nonlinear finite-element solution is compared with a separately formulated continuum boundary-value problem. For the follower-load benchmark, the finite-element model predicts a tip displacement of
+
+$$
+0.28690538\ \text{m},
+$$
+
+while the independent continuum solution gives
+
+$$
+0.28691646\ \text{m}.
+$$
+
+The relative difference is
+
+$$
+3.86\times10^{-5}.
+$$
+
+The nonlinear tangent is also checked using complex-step differentiation, and Newton iteration demonstrates approximately quadratic convergence. Together, these comparisons verify the nonlinear residual, consistent tangent, and solution procedure before the N2 model is included in the optimization.
+
+Overall, all seven verification rungs pass their specified comparisons. The results establish that the linear finite-element model reproduces classical beam theory, the vibration model reproduces the independent tip-mass characteristic solution, the discretization converges at the expected rate, global equilibrium is satisfied, the adjoint sensitivities agree with finite differences, and the N2 follower-load implementation agrees with an independent nonlinear reference solution.
 
 ## 5. Sensitivity analysis
 
