@@ -405,7 +405,7 @@ $$
 \left|M_R+\sum_i x_iF_{z,i}+\sum_i M_i\right|=9.3303\times10^{-10}\;\mathrm{N\,m}.
 $$
 
-Both residuals are below the $10^{-7}$ absolute verification tolerance. Because the model contains only one bending plane, its free-free nullspace has two rigid modes; a general 3D frame would have six.
+Both residuals are below the $10^{-7}$ absolute verification tolerance.
 
 ### 4.5 Gradient verification
 
