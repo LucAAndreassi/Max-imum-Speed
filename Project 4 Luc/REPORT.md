@@ -703,9 +703,16 @@ The exploratory path scales thrust and both gravity contributions together for t
 | N2 tip deflection (mm) | Not evaluated | 1.239973 | - |
 | Minimum modeled SF | 36.810241 | 36.810241 | 0 |
 
+Adding the follower-load strength constraints changes optimized mass by
+0%. At the optimized geometry, the linear tip displacement is
+1.240167843 mm, while the independent nonlinear continuum reference gives
+1.240166229 mm, a reduction of approximately 0.000130%.
 
-Adding the follower-load strength constraints changes optimized mass by **0%**. At the optimized geometry, the nonlinear tip displacement on the production N2 mesh is **1.239973 mm**, compared with **1.240168 mm** linearly. The small difference is physically consistent with the very small service deformation. The important result is not that N2 changes the design; it is that the nonlinear solver and its gradients are verified and demonstrate that N2 is inactive for this operating load.
-
+The production 40-element nonlinear model gives 1.239973043 mm. Most of
+its difference from the linear result is discretization error rather
+than physical geometric nonlinearity. Refining to 160 nonlinear elements
+gives 1.240154155 mm and approaches the continuum reference. The nonlinear
+constraints remain inactive, so including them does not change the optimum.
 ### 7.4 Optimized-design mesh refinement
 
 | Linear elements | Nonlinear elements | Min modeled SF | Nonlinear tip (mm) | First frequency (Hz) | Max constraint residual |
