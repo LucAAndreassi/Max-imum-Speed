@@ -360,7 +360,7 @@ f_{5}\;\text{(Hz)} & 6598.5039727188 & 6597.6046499335 & 1.3631\times10^{-2} \\
 \end{array}
 $$
 
-The static results agree to about $10^{-9}\%$. The largest frequency discrepancy is $0.013631\%$ in mode 5. 
+The static results agree to about $10^{-9}\%$. The largest frequency discrepancy is $0.013631\%$ in mode 5. This validates that our finite element model concurs with classical theory and can be used in the optimization for modeling the structure. 
 
 ### 4.2 Mesh convergence
 
