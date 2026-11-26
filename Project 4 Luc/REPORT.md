@@ -15,6 +15,8 @@ The live viewer compares the starting and optimized tubes using one linked camer
 
 The principal engineering result is that satisfying static strength alone is not sufficient for this arm. The structure can remain well below its material-strength limit while still being dynamically unsuitable because of insufficient vibrational performance.
 
+All code and results can be found in the Github directory: https://github.com/LucAAndreassi/Max-imum-Speed/tree/main/Project%204%20Luc
+
 ## 2. Structure and formulation
 
 ### 2.1 Engineering motivation and physical model
