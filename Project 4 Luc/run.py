@@ -18,6 +18,8 @@ import scipy
 from scipy.integrate import solve_bvp
 from arm import Beam,Elastica,section,hermite
 from verify import run_verification
+from base_case_verification import run_base_case_verification
+from benchmark_production import run_production_benchmark
 
 ROOT=Path(__file__).resolve().parent
 
@@ -272,6 +274,8 @@ def render_report(data):
 def main():
     os.chdir(ROOT)
     inp=json.loads((ROOT/"inputs.json").read_text())
+    study=json.loads((ROOT/"optimizer_inputs.json").read_text())
+    if inp["applied_torque_Nm"]!=0: raise ValueError("Reduced solver requires zero applied torque")
     if inp["applied_torque_Nm"]!=0: raise ValueError("Reduced solver requires zero applied torque")
     v=run_verification()
     if v["status"]!="pass":
