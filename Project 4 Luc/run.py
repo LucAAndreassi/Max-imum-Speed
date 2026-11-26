@@ -278,6 +278,12 @@ def main():
     if inp["applied_torque_Nm"]!=0: raise ValueError("Reduced solver requires zero applied torque")
     if inp["applied_torque_Nm"]!=0: raise ValueError("Reduced solver requires zero applied torque")
     v=run_verification()
+    base_case=run_base_case_verification(inp,study)
+if base_case["status"]!="pass":
+    raise RuntimeError("Physical base-case verification failed; report not regenerated")
+
+production_timing=run_production_benchmark(inp,study)
+
     if v["status"]!="pass":
         print(json.dumps([r for r in v["rows"] if not r["passed"]],indent=2))
         raise RuntimeError("Verification failed; report not regenerated")
@@ -287,7 +293,8 @@ def main():
                                thrust_only_root_moment_Nm=inp["thrust_N"]*inp["length_m"]),
               provenance=dict(python=platform.python_version(),numpy=np.__version__,scipy=scipy.__version__,
                               source_sha256={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest()
-                              for p in ["inputs.json","arm.py","vibration.py","verify.py","run.py","report_template.md"]}),
+for p in ["inputs.json","optimizer_inputs.json","arm.py","vibration.py","verify.py",
+          "base_case_verification.py","benchmark_production.py","run.py","report_template.md"]}),
               verification=v,candidates=[candidate(c,inp) for c in inp["candidates"]],
               optimization=dict(status="blocked_by_missing_design_inputs",optimized_design=None,
                                 reason="Compression/shear/local buckling/joint allowables and stiffness limits absent; stock products are discrete; uniform two-variable scope needs confirmation."))
