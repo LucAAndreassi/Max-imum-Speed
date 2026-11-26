@@ -295,14 +295,16 @@ production_timing=run_production_benchmark(inp,study)
                               source_sha256={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest()
 for p in ["inputs.json","optimizer_inputs.json","arm.py","vibration.py","verify.py",
           "base_case_verification.py","benchmark_production.py","run.py","report_template.md"]}),
-              verification=v,candidates=[candidate(c,inp) for c in inp["candidates"]],
+              verification=v,
+base_case_verification=base_case,
+production_timing=production_timing,
+candidates=[candidate(c,inp) for c in inp["candidates"]],
               optimization=dict(status="blocked_by_missing_design_inputs",optimized_design=None,
                                 reason="Compression/shear/local buckling/joint allowables and stiffness limits absent; stock products are discrete; uniform two-variable scope needs confirmation."))
     opt_path=ROOT/"output"/"optimization"/"results.json"
     if opt_path.exists():
         from optimize import fingerprint
         opt=json.loads(opt_path.read_text())
-        study=json.loads((ROOT/"optimizer_inputs.json").read_text())
         if opt.get("provenance")==fingerprint(inp,study) and opt.get("status")=="converged_preliminary_model":
             data["optimization"]=opt
             data["status"]="PRELIMINARY OPTIMUM - MODELED SF >= 2 WITH ESTIMATED MATERIAL"
@@ -329,7 +331,14 @@ for p in ["inputs.json","optimizer_inputs.json","arm.py","vibration.py","verify.
     with (ROOT/"assets"/"verification.csv").open("w",newline="",encoding="utf-8") as f:
         writer=csv.DictWriter(f,fieldnames=list(v["rows"][0]));writer.writeheader();writer.writerows(v["rows"])
     plots(data);render_report(data)
-    print(f"Verification: {len(v['rows'])} checks passed. Regenerated index.md, assets/results.json, tables, figures.")
+   print(f"Synthetic verification: {len(v['rows'])} checks passed.")
+print(f"Physical base-case verification: {len(base_case['ladder'])} ladder checks passed.")
+print(
+    f"Production benchmark: {production_timing['analytic_adjoint_median_ms']:.3f} ms analytic/adjoint vs "
+    f"{production_timing['central_difference_median_ms']:.3f} ms central difference "
+    f"({production_timing['speedup']:.3f}x)."
+)
+print("Regenerated index.md, assets/results.json, tables, figures.")
     for c in data["candidates"]:
         print(f"{c['name']}: tube {c['tube_mass_kg']*1000:.2f} g; stress {c['peak_bending_stress_Pa']/1e6:.3f} MPa; tip {c['tip_deflection_m']*1000:.3f} mm; f1 {c['first_bending_frequency_Hz']:.3f} Hz; SF unresolved")
 
