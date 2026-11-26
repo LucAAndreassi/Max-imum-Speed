@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Project 4 report and interactive drone-arm comparison.">
+  <title>Project 4 — Carbon-fiber coaxial drone arm</title>
+
+  <!-- Existing website files stay in Project 4 Luc/docs. Publish main / (root). -->
+  <base href="/Max-imum-Speed/Project%204%20Luc/docs/">
+  <link rel="stylesheet" href="assets/style.css">
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="page-width" id="report">Loading REPORT.md…</main>
+  <noscript><p class="page-width">Enable JavaScript to load the report and 3D viewer.</p></noscript>
+  <script>
+    // Keep report fragment links on this page despite the asset base URL.
+    const report = document.getElementById('report');
+    new MutationObserver(() => {
+      for (const link of report.querySelectorAll('a[href^="#"]')) {
+        const target = new URL(window.location.href);
+        target.hash = link.getAttribute('href');
+        link.setAttribute('href', target.href);
+      }
+    }).observe(report, { childList: true, subtree: true });
+  </script>
+  <script type="module" src="assets/report.js"></script>
+</body>
+</html>
