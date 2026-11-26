@@ -226,6 +226,169 @@ def optimization_report(data):
     return text,headline
 
 
+
+def base_case_verification_report(data):
+    b=data["base_case_verification"]
+    inp=b["inputs"]
+
+    text="## 4. Analysis-code verification\n\n"
+    text+=(
+        f"The verification checks in this section use the prescribed base geometry, "
+        f"$D={inp['outer_diameter_mm']:.0f}$ mm outer diameter and "
+        f"$t={inp['wall_mm']:.1f}$ mm wall thickness. "
+        f"The inner diameter is {inp['inner_diameter_mm']:.0f} mm.\n\n"
+    )
+
+    text+="| Base-case input | Value |\n|---|---:|\n"
+    text+=f"| Outer diameter $D$ | {inp['outer_diameter_mm']:.0f} mm |\n"
+    text+=f"| Wall thickness $t$ | {inp['wall_mm']:.1f} mm |\n"
+    text+=f"| Inner diameter $D-2t$ | {inp['inner_diameter_mm']:.0f} mm |\n"
+    text+=f"| Clamp-to-tip length $L$ | {inp['length_m']:.4f} m |\n"
+    text+=f"| Effective bending modulus $E$ | {inp['E_Pa']/1e9:.0f} GPa |\n"
+    text+=f"| Effective density $\\rho$ | {inp['density_kg_m3']:.0f} kg/m$^3$ |\n"
+    text+=f"| Combined thrust $T$ | {inp['thrust_N']:.12f} N |\n"
+    text+=f"| Concentrated tip mass $m_t$ | {inp['tip_mass_kg']:.9f} kg |\n"
+    text+=f"| Gravity $g$ | {inp['gravity_m_s2']:.5f} m/s$^2$ |\n"
+    text+=f"| Net upward tip force | {inp['net_upward_tip_force_N']:.10f} N |\n"
+    text+=f"| Downward tube self-weight | {inp['distributed_self_weight_N_per_m']:.10f} N/m |\n"
+    text+=f"| Linear FE mesh | {inp['linear_elements']} elements |\n"
+    text+=f"| Nonlinear verification mesh | {inp['nonlinear_verification_elements']} elements |\n\n"
+
+    text+="### Verification ladder\n\n"
+    text+="| Test | Numerical result | Exact / independent result | Error | Status |\n"
+    text+="|---|---:|---:|---:|---|\n"
+    for r in b["ladder"]:
+        status="PASS" if r["passed"] else "FAIL"
+        text+=(
+            f"| **{r['test']}** {r['name']} | "
+            f"{r['computed']:.12g} {r['unit']} | "
+            f"{r['reference']:.12g} {r['unit']} | "
+            f"{r['error']:.6e} | {status} |\n"
+        )
+
+    text+="\n### 4.1 Classical beam verification and hand-calculation comparison\n\n"
+    h=b["hand_calculation_comparison"]
+    text+=(
+        f"The generated annular-section properties are "
+        f"$A={h['section_area_m2']:.10e}$ m$^2$ and "
+        f"$I={h['second_moment_m4']:.10e}$ m$^4$. "
+        f"The tube mass is {h['tube_mass_kg']:.10f} kg and "
+        f"the tube weight is {h['tube_weight_N']:.10f} N.\n\n"
+    )
+    text+="| Quantity | FE / numerical | Independent formula | Relative error |\n"
+    text+="|---|---:|---:|---:|\n"
+    text+=(
+        f"| Linear tip displacement (mm) | "
+        f"{1000*h['linear_tip_displacement_FE_m']:.10f} | "
+        f"{1000*h['linear_tip_displacement_formula_m']:.10f} | "
+        f"{h['linear_tip_displacement_relative_error']:.6e} |\n"
+    )
+    for row in h["frequency_modes"]:
+        text+=(
+            f"| Frequency mode {row['mode']} (Hz) | "
+            f"{row['fe_Hz']:.10f} | "
+            f"{row['reference_Hz']:.10f} | "
+            f"{row['relative_error']:.6e} |\n"
+        )
+
+    text+="\n### 4.2 Mesh convergence\n\n"
+    text+="| Linear elements | Displacement-field $L_2$ error | FE first frequency (Hz) | Relative frequency error |\n"
+    text+="|---:|---:|---:|---:|\n"
+    for r in b["mesh_convergence"]:
+        text+=(
+            f"| {r['linear_elements']} | "
+            f"{r['displacement_L2_error_m32']:.6e} | "
+            f"{r['first_frequency_Hz']:.10f} | "
+            f"{r['frequency_relative_error']:.6e} |\n"
+        )
+    text+=(
+        f"\nThe fitted displacement convergence order is "
+        f"**{b['V3']['displacement_order']:.9f}**. "
+        f"The first-frequency convergence order is "
+        f"**{b['V3']['frequency_order']:.9f}**.\n\n"
+    )
+
+    text+="### 4.3 Global equilibrium and rigid-body behavior\n\n"
+    text+=(
+        f"The generated force-balance residual is "
+        f"**{b['V5']['force_balance_residual_N']:.6e} N** and the "
+        f"moment-balance residual is "
+        f"**{b['V5']['moment_balance_residual_Nm']:.6e} N m**. "
+        f"The released planar model contains exactly "
+        f"**{b['V5']['free_free_planar_rigid_modes']} rigid-body modes**.\n\n"
+    )
+
+    text+="### 4.4 Gradient verification\n\n"
+    text+="| Response | Variable | Analytic / adjoint | Central difference | Relative error |\n"
+    text+="|---|---|---:|---:|---:|\n"
+    for r in b["gradient_checks"]:
+        text+=(
+            f"| {r['response']} | {r['variable']} | "
+            f"{r['adjoint']:.12g} | "
+            f"{r['finite_difference']:.12g} | "
+            f"{r['relative_error']:.6e} |\n"
+        )
+    text+=(
+        f"\nThe maximum constraint-gradient discrepancy is "
+        f"**{b['V6']['maximum_constraint_gradient_error']:.6e}** and the "
+        f"maximum mass-gradient discrepancy is "
+        f"**{b['V6']['maximum_mass_gradient_error']:.6e}**. "
+        f"The generated first-order Taylor remainder has measured order "
+        f"**{b['taylor_test']['measured_order']:.9f}**.\n\n"
+    )
+
+    text+="### 4.5 N2 nonlinear benchmark\n\n"
+    text+="| Nonlinear elements | FE tip displacement (mm) | Continuum BVP (mm) | Relative error |\n"
+    text+="|---:|---:|---:|---:|\n"
+    for r in b["nonlinear_refinement"]:
+        text+=(
+            f"| {r['nonlinear_elements']} | "
+            f"{1000*r['tip_displacement_m']:.10f} | "
+            f"{1000*r['continuum_tip_displacement_m']:.10f} | "
+            f"{r['relative_error']:.6e} |\n"
+        )
+    text+=(
+        f"\nThe accepted 80-element nonlinear verification has relative error "
+        f"**{b['V7']['accepted_80_element_relative_error']:.6e}**. "
+        f"The complex-step tangent discrepancy is "
+        f"**{b['V7']['tangent_relative_error']:.6e}**. "
+        f"All seven verification rungs "
+        f"{'pass' if b['status']=='pass' else 'do not pass'}.\n"
+    )
+    return text
+
+
+def production_timing_report(data):
+    p=data["production_timing"]
+    text="### 5.6 Cost comparison with finite differences\n\n"
+    text+=(
+        f"The computational cost was measured on the production drone-arm model "
+        f"at the optimizer gradient-check point, "
+        f"$D={p['point_mm']['outer_diameter']:.3f}$ mm and "
+        f"$t={p['point_mm']['wall']:.3f}$ mm. "
+        f"The production discretization uses **{p['linear_elements']} linear beam elements** "
+        f"and **{p['nonlinear_elements']} nonlinear follower-load elements**. "
+        f"The analytic/adjoint evaluation computes the complete objective and constraint "
+        f"Jacobian for all **{p['constraint_count']} enabled constraints**, while central "
+        f"differences perturb both physical design variables.\n\n"
+    )
+    text+="| Method | Median measured time |\n|---|---:|\n"
+    text+=f"| Full analytic/adjoint Jacobian | {p['analytic_adjoint_median_ms']:.3f} ms |\n"
+    text+=f"| Central-difference Jacobian, two variables | {p['central_difference_median_ms']:.3f} ms |\n"
+    text+=f"| Measured speedup | {p['speedup']:.3f}x |\n\n"
+    text+=(
+        f"The maximum relative discrepancy among the constraint gradients is "
+        f"${p['max_constraint_gradient_relative_error']:.3e}$, while the maximum "
+        f"relative discrepancy in the mass gradient is "
+        f"${p['max_mass_gradient_relative_error']:.3e}$. "
+        f"The complete analytic/adjoint Jacobian is approximately "
+        f"**{p['speedup']:.2f} times faster** than central differences for this run. "
+        f"Because wall-clock timing depends on hardware and system load, the measured "
+        f"times may vary between regenerations while the derivative agreement must "
+        f"continue to satisfy the verification tolerances.\n"
+    )
+    return text
+
 def render_report(data):
     c=data["candidates"];v=data["verification"]
     table="| Quantity | "+" | ".join(x["name"] for x in c)+" |\n|---|---:|---:|\n"
@@ -252,7 +415,9 @@ def render_report(data):
         for z in a["nonlinear_refinement"]:
             refinements+=f"| {a['name']} | {z['elements']} | {1000*z['tip_z_m']:.6f} | {z['relative_error_vs_BVP']:.3g} |\n"
     opt_text,opt_headline=optimization_report(data)
-    replacements={"@@RESULTS@@":table,"@@VERIFICATION@@":ladder,"@@REFINEMENT@@":refinements,
+    replacements={"@@BASE_CASE_VERIFICATION@@":base_case_verification_report(data),
+                  "@@PRODUCTION_TIMING@@":production_timing_report(data),
+                  "@@RESULTS@@":table,"@@VERIFICATION@@":ladder,"@@REFINEMENT@@":refinements,
                   "@@OPTIMIZATION@@":opt_text,"@@OPTIMIZATION_HEADLINE@@":opt_headline,
                   "@@COUNTS@@":f"{sum(x['passed'] for x in v['rows'])}/{len(v['rows'])}",
                   "@@ADJOINT_MS@@":f"{v['timing']['adjoint_tip_gradient_ms']:.3f}",
@@ -275,32 +440,59 @@ def main():
     os.chdir(ROOT)
     inp=json.loads((ROOT/"inputs.json").read_text())
     study=json.loads((ROOT/"optimizer_inputs.json").read_text())
-    if inp["applied_torque_Nm"]!=0: raise ValueError("Reduced solver requires zero applied torque")
-    if inp["applied_torque_Nm"]!=0: raise ValueError("Reduced solver requires zero applied torque")
+    if inp["applied_torque_Nm"]!=0:
+        raise ValueError("Reduced solver requires zero applied torque")
+
     v=run_verification()
     base_case=run_base_case_verification(inp,study)
-if base_case["status"]!="pass":
-    raise RuntimeError("Physical base-case verification failed; report not regenerated")
+    if base_case["status"]!="pass":
+        raise RuntimeError("Physical base-case verification failed; report not regenerated")
 
-production_timing=run_production_benchmark(inp,study)
+    production_timing=run_production_benchmark(inp,study)
 
     if v["status"]!="pass":
         print(json.dumps([r for r in v["rows"] if not r["passed"]],indent=2))
         raise RuntimeError("Verification failed; report not regenerated")
-    data=dict(schema_version=1,status="PRELIMINARY - NO VERIFIED SAFE OPTIMUM",inputs=inp,
-              known_loads=dict(shaft_frequency_Hz=inp["rpm"]/60,
-                               blade_passing_frequency_Hz=inp["rpm"]*inp["blades_per_rotor"]/60,
-                               thrust_only_root_moment_Nm=inp["thrust_N"]*inp["length_m"]),
-              provenance=dict(python=platform.python_version(),numpy=np.__version__,scipy=scipy.__version__,
-                              source_sha256={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest()
-for p in ["inputs.json","optimizer_inputs.json","arm.py","vibration.py","verify.py",
-          "base_case_verification.py","benchmark_production.py","run.py","report_template.md"]}),
-              verification=v,
-base_case_verification=base_case,
-production_timing=production_timing,
-candidates=[candidate(c,inp) for c in inp["candidates"]],
-              optimization=dict(status="blocked_by_missing_design_inputs",optimized_design=None,
-                                reason="Compression/shear/local buckling/joint allowables and stiffness limits absent; stock products are discrete; uniform two-variable scope needs confirmation."))
+
+    data=dict(
+        schema_version=1,
+        status="PRELIMINARY - NO VERIFIED SAFE OPTIMUM",
+        inputs=inp,
+        known_loads=dict(
+            shaft_frequency_Hz=inp["rpm"]/60,
+            blade_passing_frequency_Hz=inp["rpm"]*inp["blades_per_rotor"]/60,
+            thrust_only_root_moment_Nm=inp["thrust_N"]*inp["length_m"],
+        ),
+        provenance=dict(
+            python=platform.python_version(),
+            numpy=np.__version__,
+            scipy=scipy.__version__,
+            source_sha256={
+                p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest()
+                for p in [
+                    "inputs.json",
+                    "optimizer_inputs.json",
+                    "arm.py",
+                    "vibration.py",
+                    "verify.py",
+                    "base_case_verification.py",
+                    "benchmark_production.py",
+                    "run.py",
+                    "report_template.md",
+                ]
+            },
+        ),
+        verification=v,
+        base_case_verification=base_case,
+        production_timing=production_timing,
+        candidates=[candidate(c,inp) for c in inp["candidates"]],
+        optimization=dict(
+            status="blocked_by_missing_design_inputs",
+            optimized_design=None,
+            reason="Compression/shear/local buckling/joint allowables and stiffness limits absent; stock products are discrete; uniform two-variable scope needs confirmation.",
+        ),
+    )
+
     opt_path=ROOT/"output"/"optimization"/"results.json"
     if opt_path.exists():
         from optimize import fingerprint
@@ -309,38 +501,65 @@ candidates=[candidate(c,inp) for c in inp["candidates"]],
             data["optimization"]=opt
             data["status"]="PRELIMINARY OPTIMUM - MODELED SF >= 2 WITH ESTIMATED MATERIAL"
             viewer=[]
-            for name,summary in [("Starting tube - estimated material",opt["initial_design"]),
-                                 ("Optimized tube - estimated material",opt["with_nonlinear"]["optimum"])]:
-                props=summary["material_properties"];view_inputs=copy.deepcopy(inp)
+            for name,summary in [
+                ("Starting tube - estimated material",opt["initial_design"]),
+                ("Optimized tube - estimated material",opt["with_nonlinear"]["optimum"]),
+            ]:
+                props=summary["material_properties"]
+                view_inputs=copy.deepcopy(inp)
                 view_inputs["material"]["E_bending_Pa"]=props["E_Pa"]
                 view_inputs["material"]["typical_tensile_strength_Pa"]=props["tensile_strength_Pa"]
                 D,t=summary["outer_diameter_mm"]/1000,summary["wall_mm"]/1000
                 A,_=section(D,t)
-                c=dict(name=name,outer_diameter_m=D,wall_m=t,mass_per_length_kg_m=props["density_kg_m3"]*A,
-                       source="optimizer_inputs.json estimated profile")
+                c=dict(
+                    name=name,
+                    outer_diameter_m=D,
+                    wall_m=t,
+                    mass_per_length_kg_m=props["density_kg_m3"]*A,
+                    source="optimizer_inputs.json estimated profile",
+                )
                 vdesign=candidate(c,view_inputs,load_factors=[0.,.25,.5,.75,1.])
                 vdesign["optimization_summary"]=summary
                 viewer.append(vdesign)
             data["optimization"]["viewer_designs"]=viewer
-            shutil.copyfile(ROOT/"output"/"optimization"/"convergence.png",ROOT/"assets"/"optimization-convergence.png")
+            shutil.copyfile(
+                ROOT/"output"/"optimization"/"convergence.png",
+                ROOT/"assets"/"optimization-convergence.png",
+            )
         else:
-            data["optimization"]={"status":"stale_result","optimized_design":None,
-                                  "reason":"Run python optimize.py --update-report for the current sources and inputs"}
+            data["optimization"]={
+                "status":"stale_result",
+                "optimized_design":None,
+                "reason":"Run python optimize.py --update-report for the current sources and inputs",
+            }
+
     (ROOT/"assets").mkdir(exist_ok=True)
-    (ROOT/"assets"/"results.json").write_text(json.dumps(data,indent=2,allow_nan=False)+"\n")
+    (ROOT/"assets"/"results.json").write_text(
+        json.dumps(data,indent=2,allow_nan=False)+"\n"
+    )
     with (ROOT/"assets"/"verification.csv").open("w",newline="",encoding="utf-8") as f:
-        writer=csv.DictWriter(f,fieldnames=list(v["rows"][0]));writer.writeheader();writer.writerows(v["rows"])
-    plots(data);render_report(data)
-   print(f"Synthetic verification: {len(v['rows'])} checks passed.")
-print(f"Physical base-case verification: {len(base_case['ladder'])} ladder checks passed.")
-print(
-    f"Production benchmark: {production_timing['analytic_adjoint_median_ms']:.3f} ms analytic/adjoint vs "
-    f"{production_timing['central_difference_median_ms']:.3f} ms central difference "
-    f"({production_timing['speedup']:.3f}x)."
-)
-print("Regenerated index.md, assets/results.json, tables, figures.")
+        writer=csv.DictWriter(f,fieldnames=list(v["rows"][0]))
+        writer.writeheader()
+        writer.writerows(v["rows"])
+
+    plots(data)
+    render_report(data)
+
+    print(f"Synthetic verification: {len(v['rows'])} checks passed.")
+    print(f"Physical base-case verification: {len(base_case['ladder'])} ladder checks passed.")
+    print(
+        f"Production benchmark: {production_timing['analytic_adjoint_median_ms']:.3f} ms analytic/adjoint vs "
+        f"{production_timing['central_difference_median_ms']:.3f} ms central difference "
+        f"({production_timing['speedup']:.3f}x)."
+    )
+    print("Regenerated index.md, assets/results.json, tables, figures.")
     for c in data["candidates"]:
-        print(f"{c['name']}: tube {c['tube_mass_kg']*1000:.2f} g; stress {c['peak_bending_stress_Pa']/1e6:.3f} MPa; tip {c['tip_deflection_m']*1000:.3f} mm; f1 {c['first_bending_frequency_Hz']:.3f} Hz; SF unresolved")
+        print(
+            f"{c['name']}: tube {c['tube_mass_kg']*1000:.2f} g; "
+            f"stress {c['peak_bending_stress_Pa']/1e6:.3f} MPa; "
+            f"tip {c['tip_deflection_m']*1000:.3f} mm; "
+            f"f1 {c['first_bending_frequency_Hz']:.3f} Hz; SF unresolved"
+        )
 
 
 if __name__=="__main__":main()
