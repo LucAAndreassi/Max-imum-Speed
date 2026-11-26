@@ -221,7 +221,7 @@ def optimization_report(data):
         text+=f"| {a['name']} | {a['scaled_multiplier']:.8g} | {a['residual']:.3g} |\n"
     text+=(f"\nThe KKT stationarity infinity norm is **{k['stationarity_inf_norm']:.3g}**, complementarity infinity norm is "
            f"**{k['complementarity_inf_norm']:.3g}**, and maximum violation is **{k['maximum_violation']:.3g}**. "
-           f"The active-set rank is **{k['active_rank']}**.\n\n")
+           f"The active-set rank is **{k["diagnostics"]["active_rank"]}**.\n\n")
     active_names=[a["name"] for a in k["active"]]
     if "bending_frequency" in active_names and "wall_lower_bound" in active_names:
         text+=("The optimum is controlled by two facts: the bending-frequency requirement is active and the wall "
@@ -233,7 +233,7 @@ def optimization_report(data):
         for c in shadows:
             measured="Unavailable" if c["change_kg"] is None else f"{1000*c['change_kg']:.6f}"
             text+=f"| {c['name']} | {c['step']:g} {c['unit']} | {1000*c['predicted_kg']:.6f} | {measured} |\n"
-        wall_row=next((r for r in k.get("rows",[]) if r["name"]=="wall_lower_bound"),None)
+        wall_row=next((r for r in k["diagnostics"]["rows"] if r["name"]=="wall_lower_bound"),None)
         if wall_row and wall_row.get("physical_multiplier") is not None:
             cost_g=1000*wall_row["physical_multiplier"]*0.1
             text+=f"\nIncreasing the active wall lower bound by 0.1 mm has a local predicted tube-mass cost of approximately **{cost_g:.3f} g** while the active set remains unchanged.\n\n"
