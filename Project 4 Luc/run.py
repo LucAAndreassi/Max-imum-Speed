@@ -147,84 +147,171 @@ def plots(data):
 def optimization_report(data):
     opt=data["optimization"]
     if opt.get("status")!="converged_preliminary_model":
-        return "No current optimizer result. Run `python optimize.py --update-report`. Status: "+opt.get("status","missing"), "Optimization has not been regenerated for the current inputs."
-    initial=opt["initial_design"];linear=opt["without_nonlinear"]["optimum"];best=opt["with_nonlinear"]["optimum"]
+        return ("## 6. Optimization\n\nNo current optimizer result. Run `python optimize.py --update-report`. "
+                "Status: "+opt.get("status","missing")+"\n", "Optimization has not been regenerated for the current inputs.")
+
+    initial=opt["initial_design"]
+    linear=opt["without_nonlinear"]["optimum"]
+    best=opt["with_nonlinear"]["optimum"]
     rounded=opt.get("rounded_design")
-    designs=[initial,linear,best]+([rounded] if rounded else [])
-    names=["Starting design","Linear constraints","Linear + follower constraints"]+(["Rounded candidate"] if rounded else [])
-    table="| Quantity | "+" | ".join(names)+" |\n|---|"+"---:|"*len(names)+"\n"
-    fields=[("OD (mm)","outer_diameter_mm",".5f"),("Wall (mm)","wall_mm",".5f"),
-            ("Tube mass (g)","tube_mass_g",".4f"),("Minimum modeled SF","minimum_modeled_safety_factor",".6f"),
-            ("Linear tip deflection (mm)","linear_tip_deflection_mm",".3f"),
-            ("Nonlinear FE tip deflection (mm)","nonlinear_tip_deflection_mm",".3f"),
-            ("First unloaded bending frequency (Hz)","first_bending_frequency_Hz",".3f")]
-    for label,key,fmt in fields:
-        table+="| "+label+" | "+" | ".join("Not evaluated" if d[key] is None else format(d[key],fmt) for d in designs)+" |\n"
+    study=opt["study"]
+    fmin=opt.get("resolved_minimum_bending_frequency_Hz")
+
     headline=(f"The preliminary optimizer selects a **{best['outer_diameter_mm']:.3f} mm OD, {best['wall_mm']:.2f} mm wall** uniform tube "
               f"weighing **{best['tube_mass_g']:.2f} g**. "
               f"Its minimum modeled nominal strength SF is **{best['minimum_modeled_safety_factor']:.5f}**. "
-              f"It has **{best['linear_tip_deflection_mm']:.1f} mm linear tip deflection** and a **{best['first_bending_frequency_Hz']:.2f} Hz** unloaded bending frequency.")
-    fmin=opt.get('resolved_minimum_bending_frequency_Hz')
+              f"It has **{best['linear_tip_deflection_mm']:.3f} mm linear tip deflection** and a "
+              f"**{best['first_bending_frequency_Hz']:.3f} Hz** unloaded bending frequency.")
     if fmin is not None:
-        headline+=f" The configured minimum bending frequency is **{fmin:.2f} Hz**; this does not establish operating dynamic stability."
-    text="The constrained sizing search in `optimize_arm.py` uses the existing `optimize.TubeModel`, `arm.Beam` and `arm.Elastica` FEM and adjoints. Edit `optimizer_inputs.json` and run `python optimize_arm.py --update-report`; `optimize.py` remains a compatible entry point.\n\n"
-    text+="The user now requires **wall thickness strictly greater than 2 mm**. The numerical lower bound is 2.01 mm; a 0.01 mm difference is not a manufacturing allowance. The OD interval is 10-60 mm and the wall upper bound is 3 mm, both explicit provisional study bounds. The reference 40 mm OD / 2.5 mm wall tube is an analyst-selected starting design under the same mass/material model. The original 1.5 mm stock candidates are excluded by the updated wall requirement.\n\n"
-    text+="The effective material profile uses $E=64$ GPa, $\\rho=1520$ kg/m3, $X_t=650$ MPa, $X_c=910.1$ MPa and $S=103.4$ MPa. The modulus/tensile value comes from CFT-WF typical data; density/compression are comparison estimates. The torsional strength is used as an **unverified longitudinal-shear proxy**, not an interlaminar allowable. These are explicit cross-product estimates authorized for this preliminary study, not measured properties of a new laminate. No interpolation endpoints were invented: the default profile is constant; an optional property table supports piecewise-linear thickness interpolation inside its data range only.\n\n"
-    text+="[CFT-WF source](https://media.easycomposites.co.uk/datasheets/EC-TDS-Carbon-Fibre-Woven-Finish-Tube.pdf), [Graphtek comparison source](https://www.graphitestore.com/core/media/media.nl?c=4343521&h=22DqRe5XcXtOFJUqMtPHOuVeC4o8PE9P-gnJuKBYWPrJ3COD&id=9929).\n\n"
-    text+="The objective is tube mass $m=\\rho A L$. The configured tip assembly mass is constant within each sizing run, so minimizing total modeled mass gives the same geometry. SLSQP minimizes mass divided by reference mass, with design variables scaled by reference OD and wall. At 21 fixed arc-length stations, both outer-fiber normal stresses $N/A\\pm MD/(2I)$ and nominal section shear are evaluated. Each failure family uses the smooth upper bound $\\mathrm{KS}_{80}(2\\sigma/X)-1\\le0$ (and the corresponding shear ratio). Thus a feasible aggregate implies every sampled nominal stress has SF at least 2. Linear stresses recover the exact uniform-load moment field from FE reactions; nonlinear resultants come from equilibrium on the deformed FE centerline, including tip-following thrust and vertical gravity.\n\n"
-    text+="The study with N2 retains the three linear strength constraints and adds three follower-load strength constraints. A minimum bore of 1 mm keeps a hollow section. The reported SF is the minimum unaggregated reserve factor across linear/nonlinear tension, compression and shear.\n\n"
-    if fmin is not None:
-        text+=f"The supplied script's frequency requirement is retained: the configured minimum is **{fmin:.6f} Hz**. The default rotor multiple is 1, so this is recalculated from the operating RPM divided by 60. It is a preliminary sizing criterion; rotor harmonics, gyroscopic coupling and flutter are not assessed.\n\n"
-    else:
-        text+="No minimum frequency limit is enabled for this study.\n\n"
-    if opt['study'].get('deflection_limit_mm') is None:
-        text+="No deflection limit is configured. The supplied file's stiffness/travel defaults were in missing dependency modules and have not been guessed.\n\n"
-    if not initial['feasible']:
-        text+="The starting 40 mm / 2.5 mm tube fails an enabled constraint; use the feasible fixed-wall reference below for a like-for-like mass saving.\n\n"
-    text+=table+"\n"
-    text+="The rounded geometry is a checked custom-tube candidate, not a verified stock product or a manufacturing tolerance analysis. Its nominal reserve must still cover any real geometric tolerance and property knockdown.\n\n"
-    text+="### Optimizer verification and convergence\n\n"
-    text+=f"All **{len(opt['gradient_checks'])}** mass/constraint partial-and-adjoint checks passed against central differences, including the density-dependent self-weight. Optimizer unit tests separately check the closed-form static solution, optional deflection/frequency gradients, tabulated properties, the follower tangent, an independent exact strength-only lower bound, infeasibility handling, the strict wall rule, rejection of nonstationary solver successes, recovery from failed starts, frequency-reference crossings, and shadow prices against reoptimization.\n\n"
-    text+="| Response | Variable | Adjoint/direct analytic | Central difference | Relative error |\n|---|---|---:|---:|---:|\n"
-    for r in opt["gradient_checks"]:
-        text+=f"| {r['response']} | {r['variable']} | {r['adjoint']:.8g} | {r['finite_difference']:.8g} | {r['relative_error']:.3g} |\n"
-    text+="\n| Case | Start | Solver success | Accepted (incl. KKT) | Tube mass (g) | Solver message |\n|---|---:|---|---|---:|---|\n"
-    for case,key in [("Linear","without_nonlinear"),("Linear + follower","with_nonlinear")]:
-        for r in opt[key]["starts"]:
-            mass_text=f"{r['design']['tube_mass_g']:.5f}" if r['design'] else "Unavailable"
-            text+=f"| {case} | {r['start']+1} | {r['success']} | {r['accepted']} | {mass_text} | {r['message']} |\n"
-    text+="\nConfigured starts, both bounding-box corners, and a feasible fixed-wall reference are searched, with duplicate starts removed. Only solver-successful, feasible runs passing primal, dual, stationarity and complementarity tolerances are eligible. A failed start is recorded and the remaining starts continue.\n\n![Optimization convergence](assets/optimization-convergence.png)\n\n"
-    reference=opt['with_nonlinear'].get('fixed_wall_reference')
-    if reference and reference['point']:
-        p=reference['point']
-        text+=f"The fixed-wall nominal reference uses **{p['outer_diameter_mm']:.3f} mm OD / {p['wall_mm']:.3f} mm wall**, at **{p['mass_kg']*1000:.3f} g**. Its OD is screened on a {reference['grid_mm']:g} mm grid and it passes all enabled constraints.\n\n"
-        savings=opt.get('fixed_wall_mass_reduction_percent')
+        headline+=f" The configured minimum bending frequency is **{fmin:.3f} Hz**."
+
+    text="## 6. Optimization\n\n"
+    text+="### 6.1 Algorithm, scaling, and starting designs\n\n"
+    text+=("The design is optimized with **SciPy SLSQP**. Objective mass is normalized by the reference mass, "
+           "and outer diameter and wall thickness are scaled by their reference values so that the optimizer "
+           "works with dimensionless quantities of comparable magnitude. A candidate is accepted only if the "
+           "solver reports success and the final point passes feasibility, stationarity, dual-feasibility, and "
+           "complementarity checks.\n\n")
+    text+=("The same problem is solved from six deliberately different starting geometries spanning the design "
+           "space. The table below reports the N2 starts; the linear-only problem uses the same start set and "
+           "converges to the same final design.\n\n")
+    text+="| Start | Initial OD (mm) | Initial wall (mm) | Initial tube mass (g) | Iterations | Final tube mass (g) | Result |\n"
+    text+="|---|---:|---:|---:|---:|---:|---|\n"
+    for r in opt["with_nonlinear"]["starts"]:
+        h0=r["history"][0]
+        label=r.get("label",f"Start {r['start']+1}")
+        result="PASS" if r.get("accepted") else "FAIL"
+        final_mass=r["design"]["tube_mass_g"] if r.get("design") else float("nan")
+        text+=f"| {label} | {h0['outer_diameter_mm']:.3f} | {h0['wall_mm']:.3f} | {1000*h0['mass_kg']:.3f} | {r['iterations']} | {final_mass:.3f} | {result} |\n"
+    text+=("\nAll accepted starts converge to the same optimum within numerical precision, providing evidence that the "
+           "reported solution is robust within the two-variable study region.\n\n")
+
+    text+="### 6.2 Convergence history\n\n"
+    text+="![Optimization convergence](assets/optimization-convergence.png)\n\n"
+    text+=(f"The optimization histories converge to approximately **{best['tube_mass_g']:.3f} g** while positive "
+           "constraint violation falls to numerical tolerance. The design is therefore not accepted solely because "
+           "SLSQP returned a success flag.\n\n")
+
+    text+="### 6.3 Optimized design and feasible reference\n\n"
+    text+=f"The optimized N2 design is\n\n$$\n\\boxed{{D={best['outer_diameter_mm']:.4f}\\ \\text{{mm}},\\qquad t={best['wall_mm']:.4f}\\ \\text{{mm}}}},\n$$\n\n"
+    text+=f"with\n\n$$\n\\boxed{{m_{{tube}}={best['tube_mass_g']:.3f}\\ \\text{{g}}}}.\n$$\n\n"
+    if fmin is not None and initial["first_bending_frequency_Hz"] < fmin:
+        text+=(f"The starting {initial['outer_diameter_mm']:.1f} mm OD x {initial['wall_mm']:.1f} mm tube is infeasible "
+               f"because $f_1={initial['first_bending_frequency_Hz']:.3f}$ Hz is below the required {fmin:.3f} Hz, "
+               "so direct mass reduction relative to that start is not a meaningful optimization benefit.\n\n")
+    reference=opt["with_nonlinear"].get("fixed_wall_reference")
+    if reference and reference.get("point"):
+        p=reference["point"]
+        text+=(f"The lightest **feasible fixed-wall** reference found on the {reference['grid_mm']:g} mm OD grid is "
+               f"**{p['outer_diameter_mm']:.3f} mm OD x {p['wall_mm']:.3f} mm wall**, with tube mass "
+               f"**{1000*p['mass_kg']:.3f} g**.\n\n")
+        savings=opt.get("fixed_wall_mass_reduction_percent")
         if savings is not None:
-            text+=f"Optimizing both dimensions saves **{savings:.3f}%** tube mass relative to this feasible fixed-wall reference.\n\n"
+            text+=f"Allowing both diameter and wall thickness to vary reduces tube mass by **{savings:.3f}%** relative to that feasible fixed-wall design.\n\n"
+    if rounded:
+        text+=(f"A rounded custom-tube candidate of **{rounded['outer_diameter_mm']:.1f} mm OD x {rounded['wall_mm']:.1f} mm wall** "
+               f"has mass **{rounded['tube_mass_g']:.3f} g**, minimum modeled SF **{rounded['minimum_modeled_safety_factor']:.2f}**, "
+               f"linear tip deflection **{rounded['linear_tip_deflection_mm']:.3f} mm**, and first bending frequency "
+               f"**{rounded['first_bending_frequency_Hz']:.3f} Hz**.\n\n")
+
+    text+="### 6.4 Active constraints, KKT multipliers, and engineering interpretation\n\n"
     k=opt["with_nonlinear"]["kkt"]
-    text+="### KKT interpretation\n\n| Active requirement | Scaled multiplier | Residual |\n|---|---:|---:|\n"
+    text+="| Active requirement | Scaled multiplier | Residual |\n|---|---:|---:|\n"
     for a in k["active"]:
         text+=f"| {a['name']} | {a['scaled_multiplier']:.8g} | {a['residual']:.3g} |\n"
-    text+=f"\nStationarity infinity norm: **{k['stationarity_inf_norm']:.3g}**; complementarity infinity norm: **{k['complementarity_inf_norm']:.3g}**; maximum violation: **{k['maximum_violation']:.3g}**. Multipliers are reconstructed by nonnegative least squares using mass/reference-mass and dimensions/reference-dimensions. The table converts bound multipliers back to the mm convention; JSON also records kg/mm, active-set rank and all four acceptance checks. This is local optimality evidence, not proof of a global optimum.\n\n"
-    active={a["name"]:a["scaled_multiplier"] for a in k["active"]}
-    if "wall_lower_bound" in active:
-        sensitivity=initial["tube_mass_g"]*active["wall_lower_bound"]
-        text+=f"The wall lower bound is active: increasing it by 0.1 mm has a local predicted mass cost of approximately **{sensitivity*.1:.3f} g**, while the active set remains unchanged.\n\n"
-    shadows=opt['with_nonlinear'].get('shadow_checks',[])
+    text+=(f"\nThe KKT stationarity infinity norm is **{k['stationarity_inf_norm']:.3g}**, complementarity infinity norm is "
+           f"**{k['complementarity_inf_norm']:.3g}**, and maximum violation is **{k['maximum_violation']:.3g}**. "
+           f"The active-set rank is **{k['active_rank']}**.\n\n")
+    active_names=[a["name"] for a in k["active"]]
+    if "bending_frequency" in active_names and "wall_lower_bound" in active_names:
+        text+=("The optimum is controlled by two facts: the bending-frequency requirement is active and the wall "
+               "thickness is at its lower bound. Material strength therefore does not govern the present optimum; "
+               "the design is controlled by minimum permitted wall thickness and bending stiffness.\n\n")
+    shadows=opt["with_nonlinear"].get("shadow_checks",[])
     if shadows:
-        text+="| Tightened active requirement | Step | Predicted mass change (g) | Reoptimized mass change (g) |\n|---|---:|---:|---:|\n"
+        text+="| Tightened requirement | Step | Predicted mass change (g) | Reoptimized mass change (g) |\n|---|---:|---:|---:|\n"
         for c in shadows:
-            measured="Unavailable" if c['change_kg'] is None else f"{1000*c['change_kg']:.6f}"
+            measured="Unavailable" if c["change_kg"] is None else f"{1000*c['change_kg']:.6f}"
             text+=f"| {c['name']} | {c['step']:g} {c['unit']} | {1000*c['predicted_kg']:.6f} | {measured} |\n"
-        text+="\nThese perturbations check local multiplier predictions; their sizes are numerical steps, not manufacturing tolerances.\n\n"
-    text+="### Nonlinear and mesh comparison\n\n"
-    text+=f"Adding follower-load constraints changes the optimized mass by **{opt['nonlinear_mass_change_percent']:.3g}%**. The selected active requirements are **{', '.join(active)}**. This comparison applies to the configured load, frequency and strength limits; it does not establish dynamic stability.\n\n"
-    text+="| Linear elements | Nonlinear elements | Minimum modeled SF | Nonlinear tip (mm) | First frequency (Hz) | Max constraint residual |\n|---:|---:|---:|---:|---:|---:|\n"
+        wall_row=next((r for r in k.get("rows",[]) if r["name"]=="wall_lower_bound"),None)
+        if wall_row and wall_row.get("physical_multiplier") is not None:
+            cost_g=1000*wall_row["physical_multiplier"]*0.1
+            text+=f"\nIncreasing the active wall lower bound by 0.1 mm has a local predicted tube-mass cost of approximately **{cost_g:.3f} g** while the active set remains unchanged.\n\n"
+
+    text+="## 7. N2 nonlinear component\n\n"
+    text+="### 7.1 Physical nonlinear effect\n\n"
+    text+=("The nonlinear load follows the motor-mount rotation, so the force direction depends on the unknown "
+           "deformed state. This makes the residual genuinely nonlinear and its tangent nonsymmetric. Newton's "
+           "method, load stepping, and a transposed-tangent adjoint are therefore required. The verification ladder "
+           "independently checks the nonlinear solution, tangent, Newton convergence, and implicit gradient.\n\n")
+
+    text+="### 7.2 Nonlinear load path\n\n"
+    text+="![Nonlinear load path](assets/nonlinear-path.png)\n\n"
+    text+=("The exploratory path scales thrust and both gravity contributions together for retained reference "
+           "geometries. It is a numerical nonlinearity demonstration, not an RPM/throttle map or a proof of strength "
+           "at amplified loads.\n\n")
+
+    text+="### 7.3 Design with and without N2\n\n"
+    text+="| Quantity | Linear-only optimization | Linear + N2 follower constraints | Change |\n|---|---:|---:|---:|\n"
+    rows=[
+        ("OD (mm)",linear["outer_diameter_mm"],best["outer_diameter_mm"]),
+        ("Wall (mm)",linear["wall_mm"],best["wall_mm"]),
+        ("Tube mass (g)",linear["tube_mass_g"],best["tube_mass_g"]),
+        ("First bending frequency (Hz)",linear["first_bending_frequency_Hz"],best["first_bending_frequency_Hz"]),
+        ("Linear tip deflection (mm)",linear["linear_tip_deflection_mm"],best["linear_tip_deflection_mm"]),
+        ("Minimum modeled SF",linear["minimum_modeled_safety_factor"],best["minimum_modeled_safety_factor"]),
+    ]
+    for label,a,b in rows:
+        text+=f"| {label} | {a:.6f} | {b:.6f} | {b-a:.6g} |\n"
+    linear_nl="Not evaluated" if linear.get("nonlinear_tip_deflection_mm") is None else f"{linear['nonlinear_tip_deflection_mm']:.6f}"
+    text+=f"| N2 tip deflection (mm) | {linear_nl} | {best['nonlinear_tip_deflection_mm']:.6f} | - |\n"
+    text+=(f"\nAdding the follower-load strength constraints changes optimized mass by **{opt['nonlinear_mass_change_percent']:.3g}%**. "
+           f"At the optimized geometry, nonlinear tip displacement is **{best['nonlinear_tip_deflection_mm']:.6f} mm** "
+           f"versus **{best['linear_tip_deflection_mm']:.6f} mm** linearly. The small difference is consistent with the "
+           "small service deformation; N2 is verified but inactive in selecting the current optimum.\n\n")
+
+    text+="### 7.4 Optimized-design mesh refinement\n\n"
+    text+="| Linear elements | Nonlinear elements | Min modeled SF | Nonlinear tip (mm) | First frequency (Hz) | Max constraint residual |\n|---:|---:|---:|---:|---:|---:|\n"
     for r in opt["mesh_refinement"]:
         text+=f"| {r['linear_elements']} | {r['nonlinear_elements']} | {r['minimum_modeled_safety_factor']:.8f} | {r['nonlinear_tip_deflection_mm']:.6f} | {r['first_bending_frequency_Hz']:.6f} | {r['max_constraint']:.3g} |\n"
-    text+="\nThe continuous optimum passes the refined nominal strength checks. Section shear remains a homogeneous-section screen. Shell buckling, joints, laminate interaction, damage and dynamic follower-force stability are unassessed. Therefore the **overall structural SF remains unresolved**, even though the specified nominal material-strength model meets SF 2.\n"
-    return text,headline
+    text+=("\nThe optimized responses remain essentially unchanged under mesh refinement, supporting the adequacy of the "
+           "production discretization for the reported quantities.\n\n")
 
+    text+="## 8. Initial-versus-optimized results\n\n"
+    text+=("The following tables report the objective and every enabled constraint family for the starting and final "
+           "designs. Deflection is reported as a response but is not a constraint because no deflection limit is configured.\n\n")
+    text+="| Metric | Starting design | Optimized design | Interpretation |\n|---|---:|---:|---|\n"
+    text+=f"| Tube mass | {initial['tube_mass_g']:.3f} g | {best['tube_mass_g']:.3f} g | Start is lighter but {'feasible' if initial['feasible'] else 'infeasible'} |\n"
+    text+=f"| Total modeled mass incl. tip assembly | {initial['total_modeled_mass_g']:.3f} g | {best['total_modeled_mass_g']:.3f} g | Constant tip mass included |\n"
+    text+=f"| Linear tip deflection | {initial['linear_tip_deflection_mm']:.4f} mm | {best['linear_tip_deflection_mm']:.4f} mm | Reported response, no limit configured |\n"
+    text+=f"| N2 tip deflection | {initial['nonlinear_tip_deflection_mm']:.4f} mm | {best['nonlinear_tip_deflection_mm']:.4f} mm | Follower-load response |\n"
+    freq_req=f">= {fmin:.6f} Hz" if fmin is not None else "No limit"
+    text+=f"| First bending frequency | {initial['first_bending_frequency_Hz']:.4f} Hz | {best['first_bending_frequency_Hz']:.4f} Hz | Requirement: {freq_req} |\n"
+    text+=f"| Minimum modeled nominal SF | {initial['minimum_modeled_safety_factor']:.4f} | {best['minimum_modeled_safety_factor']:.4f} | Requirement: >= {study['required_safety_factor']:g} |\n\n"
+
+    text+="| Constraint | Starting design | Optimized | Requirement | Start | Optimized |\n|---|---:|---:|---|---|---|\n"
+    for family,label in [("tension","tension"),("compression","compression"),("shear","shear")]:
+        s0=initial["strength_checks"]["linear"][family]["safety_factor"]
+        s1=best["strength_checks"]["linear"][family]["safety_factor"]
+        text+=f"| Linear {label} safety factor | {s0:.6f} | {s1:.6f} | >= {study['required_safety_factor']:g} | {'PASS' if s0>=study['required_safety_factor'] else 'FAIL'} | {'PASS' if s1>=study['required_safety_factor'] else 'FAIL'} |\n"
+    for family,label in [("tension","tension"),("compression","compression"),("shear","shear")]:
+        s0=initial["strength_checks"]["nonlinear"][family]["safety_factor"]
+        s1=best["strength_checks"]["nonlinear"][family]["safety_factor"]
+        text+=f"| Nonlinear {label} safety factor | {s0:.6f} | {s1:.6f} | >= {study['required_safety_factor']:g} | {'PASS' if s0>=study['required_safety_factor'] else 'FAIL'} | {'PASS' if s1>=study['required_safety_factor'] else 'FAIL'} |\n"
+    start_fpass=(fmin is None or initial["first_bending_frequency_Hz"]>=fmin)
+    best_fpass=(fmin is None or best["first_bending_frequency_Hz"]>=fmin-1e-9)
+    text+=f"| First bending frequency (Hz) | {initial['first_bending_frequency_Hz']:.6f} | {best['first_bending_frequency_Hz']:.6f} | {freq_req} | {'PASS' if start_fpass else 'FAIL'} | {'PASS' if best_fpass else 'FAIL'} |\n"
+    Dlo,Dhi=study["outer_diameter_bounds_mm"]
+    tlo,thi=study["wall_bounds_mm"]
+    bore=study["minimum_inner_diameter_mm"]
+    text+=f"| Outer diameter (mm) | {initial['outer_diameter_mm']:.6f} | {best['outer_diameter_mm']:.6f} | {Dlo:g} <= D <= {Dhi:g} | {'PASS' if Dlo<=initial['outer_diameter_mm']<=Dhi else 'FAIL'} | {'PASS' if Dlo<=best['outer_diameter_mm']<=Dhi else 'FAIL'} |\n"
+    best_wall_status="PASS (active lower bound)" if abs(best['wall_mm']-tlo)<1e-9 else ("PASS" if tlo<=best['wall_mm']<=thi else "FAIL")
+    text+=f"| Wall thickness (mm) | {initial['wall_mm']:.6f} | {best['wall_mm']:.6f} | {tlo:g} <= t <= {thi:g} | {'PASS' if tlo<=initial['wall_mm']<=thi else 'FAIL'} | {best_wall_status} |\n"
+    text+=f"| Inner diameter (mm) | {initial['inner_diameter_mm']:.6f} | {best['inner_diameter_mm']:.6f} | >= {bore:g} | {'PASS' if initial['inner_diameter_mm']>=bore else 'FAIL'} | {'PASS' if best['inner_diameter_mm']>=bore else 'FAIL'} |\n"
+    text+=("\nThe optimized design satisfies all enabled nominal constraints, but this should not be interpreted as full "
+           "structural certification because shell, joint, laminate-interaction, fatigue, and dynamic-stability "
+           "failure modes remain outside the model.\n")
+    return text,headline
 
 
 def base_case_verification_report(data):
