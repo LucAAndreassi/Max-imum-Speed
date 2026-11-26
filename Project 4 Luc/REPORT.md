@@ -269,7 +269,7 @@ The 3D frame contains **126 total DOFs (120 free)**. Its first two modes form th
 The verification checks in this section use the prescribed base geometry, $D=40$ mm outer diameter and $t=2.5$ mm wall thickness. Here $D$ denotes outer diameter; the inner diameter is 35 mm. The full arm is a horizontal cantilever with combined upward thrust, a concentrated motor/rotor assembly mass and distributed tube self-weight. All calculations below are analysis or derivative checks to validate the finite element model. 
 
 | Base-case input | Value |
-|---|---:|
+|:---|:---|
 | Outer diameter $D$ | 40 mm |
 | Wall thickness $t$ | 2.5 mm |
 | Inner diameter $D-2t$ | 35 mm |
