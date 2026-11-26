@@ -767,7 +767,10 @@ python optimize_arm.py --update-report
 python -m unittest test_optimize test_vibration -v
 ```
 
-The optimizer reads the loads from `inputs.json` and the design study from `optimizer_inputs.json`. It checks the objective and constraint derivatives, solves both the linear-only and N2 problems from six starting designs, and checks the optimum through mesh refinement and shadow-price reoptimization. It saves the numerical results and convergence history in `output/optimization/`. A rerun reproduced the reported optimum of **55.284816 mm outer diameter, 2.010 mm wall thickness, 311.714 g tube mass, and 58.333333 Hz first bending frequency**. All **18 unit tests passed**. The `--update-report` option also invokes `run.py` to regenerate the verification outputs, figures, and `assets/results.json`. The published page loads the written report and tables from `REPORT.md` and the 3D viewer data from `docs/assets/results.json`.
+The optimizer reads the loads from `inputs.json` and the design study from `optimizer_inputs.json`. It checks the objective and constraint derivatives, solves both the linear-only and N2 problems from six starting designs, and checks the optimum through mesh refinement and shadow-price reoptimization. It saves the numerical results and convergence history in `output/optimization/`. A rerun reproduced the reported optimum of **55.284816 mm outer diameter, 2.010 mm wall thickness, 311.714 g tube mass, and 58.333333 Hz first bending frequency**. All **18 unit tests passed**. The `--update-report` option also invokes `run.py` to regenerate the verification outputs, figures, and `assets/results.json`. The published page loads the written report and tables from `REPORT.md` and the 3D viewer data from `docs/assets/results.json`. After rebuilding, copy `assets/results.json` to `docs/assets/results.json`.
+If the results changed, update the affected values in `REPORT.md` and copy
+any regenerated figures it references to `docs/assets/`. Commit those
+updates to refresh the published site.
 
 ## 11. Limitations and AI-use statement
 
