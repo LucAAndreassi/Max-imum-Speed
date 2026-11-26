@@ -179,8 +179,6 @@ $$
 \tau_{NA}=\frac{V(R^3-r_i^3)}{3It}.
 $$
 
-This shear expression is a beam-section screen, not a validated interlaminar composite failure model.
-
 ### 3.4 Vibration with concentrated tip mass
 
 The independent FE eigenproblem is
@@ -762,23 +760,18 @@ The follower-load analysis uses a genuinely nonlinear state equation rather than
 
 ## 10. Reproducibility
 
-From an installed repository environment, the numerical analysis and optimization pipeline can be rerun with one command:
+Run the following from `Project 4 Luc/` with the dependencies in `requirements.txt` installed:
 
 ```bash
-python optimize_arm.py --update-report
-```
-
-The command reruns the optimizer gradient checks, the linear-only and linear-plus-N2 optimization cases, shadow-price checks, optimized-design mesh refinement, and the automated verification calculations. It also regenerates the optimization outputs and `assets/results.json`.
-
-The retained unit-test suite can be run independently with
-
-```bash
+python optimize_arm.py
 python -m unittest test_optimize test_vibration -v
 ```
 
-On the uploaded repository copy, **18/18 retained unit tests passed**: 11 optimizer/model tests and 7 dedicated vibration tests. The separate automated verification routine contains **42 passing checks**, including the detailed beam, vibration, equilibrium, gradient, nonlinear-solution, tangent, and adjoint checks that support the seven-rung verification summary presented in Section 4.
+The optimizer reads the loads from `inputs.json` and the design study from `optimizer_inputs.json`. It checks the objective and constraint derivatives, solves both the linear-only and N2 problems from six starting designs, and checks the optimum through mesh refinement and shadow-price reoptimization. It saves the numerical results and convergence history in `output/optimization/`. A rerun reproduced the reported optimum of **55.284816 mm outer diameter, 2.010 mm wall thickness, 311.714 g tube mass, and 58.333333 Hz first bending frequency**. All **18 unit tests passed**.
 
-The polished report text is maintained separately from the automated numerical-generation workflow. Therefore, the commands above reproduce and verify the numerical analysis and project data, rather than regenerating the exact final report wording and formatting.
+The `--update-report` option also invokes `run.py` to regenerate the verification outputs, figures, and `assets/results.json`. In the reviewed revision (`1c52228`), this step requires renaming `base_case_verification (1).py` to `base_case_verification.py` and reading `active_rank` and `rows` from the KKT `diagnostics` object in `run.py`. With those corrections in a local copy, the generator completed and passed **42 synthetic verification checks** and **all seven physical base-case checks**.
+
+The published page loads the written report and tables from `REPORT.md` and the 3D viewer data from `docs/assets/results.json`. After a successful regeneration, copy `assets/results.json` to `docs/assets/results.json`, refresh the corresponding figures in `docs/assets/`, and reconcile any changed numerical values in `REPORT.md` before publishing.
 
 ## 11. Limitations and AI-use statement
 
