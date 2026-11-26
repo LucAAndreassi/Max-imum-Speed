@@ -530,6 +530,9 @@ Because the follower load is nonconservative, $R_\theta$ is nonsymmetric and the
 The nonlinear sensitivity check compares the transposed-tangent adjoint against independently converged finite-difference solves as the EI perturbation is reduced. The V9 follower-force adjoint has relative error **8.25e-09** at its accepted check point, and the tangent itself matches complex-step differentiation to approximately **2.0e-16** relative error.
 
 ### 5.4 Gradient checks for every response and design variable
+The following derivatives are evaluated at D = 35.000 mm and
+t = 2.505 mm using 20 linear elements and 40 nonlinear elements.
+They are separate from the D = 40 mm, t = 2.5 mm checks in Section 4.5.
 
 ![Directional gradient checks](assets/gradient-check.png)
 
