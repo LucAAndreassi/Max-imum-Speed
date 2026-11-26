@@ -13,7 +13,7 @@ The original 40 mm OD / 2.5 mm-wall starting design is lighter (**272.904 g**) b
 
 The live viewer compares the starting and optimized tubes using one linked camera, true hollow-section geometry, deformation control, follower-load state display, first-bending-mode coloring and animation, and element inspection with nominal stress information. The metrics panel reports the mass objective and every enabled constraint with PASS/FAIL status. The live viewer draws its numerical content from the repository's generated assets/results.json; the polished report text and reported numerical results are maintained separately from the automated numerical-generation workflow.
 
-The principal engineering result is that satisfying static strength alone is not sufficient for this arm. The structure can remain well below its material-strength limit while still being dynamically unsuitable because of insufficient bending stiffness.
+The principal engineering result is that satisfying static strength alone is not sufficient for this arm. The structure can remain well below its material-strength limit while still being dynamically unsuitable because of insufficient vibrational performance.
 
 ## 2. Structure and formulation
 
