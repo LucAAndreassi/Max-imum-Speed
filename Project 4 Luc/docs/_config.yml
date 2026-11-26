@@ -1,0 +1,8 @@
+title: Carbon-fiber coaxial drone arm
+markdown: kramdown
+kramdown:
+  input: GFM
+  math_engine: mathjax
+  parse_span_html: false
+exclude:
+  - PAGES_SETUP.md

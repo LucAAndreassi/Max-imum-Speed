@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive structural optimization report for a uniform carbon-fiber coaxial drone arm.">
+  <title>{{ page.title | default: site.title | escape }}</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script>
+    window.MathJax = {tex: {inlineMath: [['\\(', '\\)'], ['$', '$']]}};
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+  </script>
+  <script type="module" src="assets/report.js"></script>
+</head>
+<body>
+  <a class="skip" href="#summary">Skip to report</a>
+  <header class="hero">
+    <div class="page-width">
+      <div class="hero-top">
+        <span>Design Optimization / Project 4</span>
+        <a href="https://github.com/LucAAndreassi/Max-imum-Speed/tree/main/Project%204%20Luc">Source repository ↗</a>
+      </div>
+      <div class="hero-main">
+        <h1>Carbon-fiber<br>coaxial drone arm</h1>
+        <p>PDE-constrained mass optimization of a uniform tube under thrust, self-weight, and a minimum bending frequency.</p>
+      </div>
+      <div class="hero-stats" id="hero-stats">
+        <a href="#comparison">Open the 3D comparison ↓</a>
+      </div>
+    </div>
+  </header>
+  <nav class="report-nav" aria-label="Report sections"><div class="page-width">
+    <a href="#comparison">3D comparison</a><a href="#formulation">Formulation</a><a href="#analysis">Analysis</a>
+    <a href="#verification">Verification</a><a href="#sensitivities">Sensitivities</a>
+    <a href="#optimization">Optimization</a><a href="#nonlinear">N2</a><a href="#results">Results</a>
+    <a href="#reproducibility">Reproducibility</a><a href="#limitations">Limitations</a>
+  </div></nav>
+  <main class="page-width" id="report">
+    {{ content }}
+  </main>
+  <footer><div class="page-width"><span>Project 4 · Structural design optimization</span><a href="#summary">Back to summary ↑</a></div></footer>
+</body>
+</html>
