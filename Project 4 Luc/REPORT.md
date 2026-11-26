@@ -568,7 +568,7 @@ $$
 R(h)=|Q(d+hv)-Q(d)-h\nabla Q(d)^Tv|.
 $$
 
-For a correct first derivative, $R(h)=O(h^2)$. The plot below is generated directly by GitHub from the Markdown, so it requires no additional image file. It shows the normalized tip-displacement Taylor remainder for an outer-diameter perturbation direction. Both axes are plotted as base-10 logarithms; therefore a slope of 2 is the expected first-order Taylor-test behavior.
+For a correct first derivative, $R(h)=O(h^2)$. It shows the normalized tip-displacement Taylor remainder for an outer-diameter perturbation direction. Both axes are plotted as base-10 logarithms; therefore a slope of 2 is the expected first-order Taylor-test behavior.
 
 ```mermaid
 xychart-beta
