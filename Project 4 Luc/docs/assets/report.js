@@ -57,7 +57,6 @@ function scrollTables() {
 }
 
 async function start() {
-  async function start() {
   await loadReportMarkdown();
   scrollTables();
 
