@@ -763,7 +763,7 @@ The follower-load analysis uses a genuinely nonlinear state equation rather than
 Run the following from `Project 4 Luc/` with the dependencies in `requirements.txt` installed:
 
 ```bash
-python optimize_arm.py
+python optimize_arm.py --update-report
 python -m unittest test_optimize test_vibration -v
 ```
 
