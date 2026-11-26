@@ -1,7 +1,136 @@
+// Written report content comes from REPORT.md; results.json supplies the 3D viewer.
 import { startViewer } from "./viewer.js";
 
+const REPORT_URL =
+  "https://raw.githubusercontent.com/LucAAndreassi/Max-imum-Speed/main/Project%204%20Luc/REPORT.md";
+const MARKED_URL =
+  "https://cdn.jsdelivr.net/npm/marked@15.0.12/lib/marked.esm.js";
+const MERMAID_URL =
+  "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
+
 const n = (value, digits = 2) => Number(value).toFixed(digits);
-const badge = pass => '<span class="flag ' + (pass ? 'pass">PASS' : 'fail">FAIL') + '</span>';
+const badge = pass =>
+  '<span class="flag ' + (pass ? 'pass">PASS' : 'fail">FAIL') + "</span>";
+
+async function loadReportMarkdown(report) {
+  const [response, { marked }] = await Promise.all([
+    fetch(REPORT_URL + "?v=" + Date.now(), { cache: "no-store" }),
+    import(MARKED_URL)
+  ]);
+  if (!response.ok) {
+    throw new Error("REPORT.md returned HTTP " + response.status + ".");
+  }
+
+  let source = (await response.text())
+    .replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+
+  // Protect TeX before Markdown parses underscores, pipes, and backslashes.
+  const equations = [];
+  const hold = value =>
+    "REPORTMATH" + (equations.push(value) - 1) + "END";
+  source = source
+    .replace(/\x60{3}math[^\r\n]*\r?\n([\s\S]*?)\x60{3}/g,
+      (_, tex) => hold("$$\n" + tex.trim() + "\n$$"))
+    .replace(/\$\$[\s\S]*?\$\$|\$[^\r\n$]+?\$/g, hold);
+
+  const escapeHTML = value => value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const html = await marked.parse(source);
+  report.innerHTML = html.replace(/REPORTMATH(\d+)END/g,
+    (_, i) => escapeHTML(equations[Number(i)]));
+
+  const ids = [
+    "summary", "formulation", "analysis", "verification",
+    "sensitivities", "optimization", "nonlinear", "results",
+    "extension", "reproducibility", "limitations"
+  ];
+  for (const heading of report.querySelectorAll("h2")) {
+    const section = /^(\d+)\./.exec(heading.textContent.trim());
+    if (section && ids[Number(section[1]) - 1]) {
+      heading.id = ids[Number(section[1]) - 1];
+    } else if (heading.textContent.trim().toLowerCase() === "references") {
+      heading.id = "references";
+    }
+  }
+}
+
+function placeViewerAfterSummary(report) {
+  const host = report.querySelector("#arm-viewer") ||
+    document.createElement("div");
+  host.id = "arm-viewer";
+  host.textContent = "Loading the 3D comparison…";
+
+  const wrapper = document.createElement("section");
+  wrapper.id = "comparison";
+  wrapper.className = "comparison";
+  wrapper.setAttribute("aria-labelledby", "comparison-title");
+
+  const header = document.createElement("div");
+  header.className = "section-heading";
+  const title = document.createElement("h2");
+  title.id = "comparison-title";
+  title.textContent = "Initial vs. optimized";
+  const instructions = document.createElement("p");
+  instructions.textContent =
+    "Drag to rotate both views. Scroll or pinch to zoom. Hover or tap the tube to inspect an element.";
+  header.append(title, instructions);
+  wrapper.append(header, host);
+
+  // Place the viewer after the entire summary, immediately before Section 2.
+  const nextSection = report.querySelector("#formulation");
+  if (nextSection) nextSection.before(wrapper);
+  else report.append(wrapper);
+  return host;
+}
+
+function scrollTables(report) {
+  for (const table of report.querySelectorAll("table")) {
+    if (table.parentElement?.classList.contains("table-scroll")) continue;
+    const wrapper = document.createElement("div");
+    wrapper.className = "table-scroll";
+    wrapper.tabIndex = 0;
+    wrapper.setAttribute("role", "region");
+    wrapper.setAttribute("aria-label", "Report data table");
+    table.before(wrapper);
+    wrapper.append(table);
+  }
+}
+
+async function enhanceReport(report) {
+  // start() is called without top-level await, so this does not block page load.
+  if (document.readyState !== "complete") {
+    await new Promise(resolve =>
+      window.addEventListener("load", resolve, { once: true }));
+  }
+
+  try {
+    await window.MathJax?.startup?.promise;
+    if (window.MathJax?.typesetPromise) {
+      await window.MathJax.typesetPromise([report]);
+    }
+  } catch (error) {
+    console.warn("Unable to typeset report equations:", error);
+  }
+
+  const blocks = [...report.querySelectorAll("pre > code.language-mermaid")];
+  if (!blocks.length) return;
+  try {
+    const { default: mermaid } = await import(MERMAID_URL);
+    mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+    const nodes = blocks.map(code => {
+      const pre = code.parentElement;
+      pre.className = "mermaid";
+      pre.textContent = code.textContent;
+      return pre;
+    });
+    await mermaid.run({ nodes });
+  } catch (error) {
+    console.warn("Unable to render report diagrams:", error);
+  }
+}
 
 function formatComparison(data) {
   const o = data.optimization;
@@ -44,42 +173,42 @@ function formatComparison(data) {
   return {designs, target, length: data.inputs.length_m, load: o.loads, o};
 }
 
-function scrollTables() {
-  for (const table of document.querySelectorAll("main > table")) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "table-scroll";
-    wrapper.tabIndex = 0;
-    wrapper.setAttribute("role", "region");
-    wrapper.setAttribute("aria-label", "Report data table");
-    table.before(wrapper);
-    wrapper.append(table);
-  }
-}
-
-async function start() {
-  await loadReportMarkdown();
-  scrollTables();
-
-  const host = document.querySelector("#arm-viewer");
-  if (!host) return;
-
+async function initializeViewer(host) {
   try {
-    const response = await fetch(
-      new URL("results.json", import.meta.url)
-    );
-
+    const url = new URL("results.json", import.meta.url);
+    url.searchParams.set("v", Date.now());
+    const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
-      throw new Error("Viewer data returned HTTP " + response.status);
+      throw new Error("Viewer data returned HTTP " + response.status + ".");
     }
-
     const comparison = formatComparison(await response.json());
     await startViewer(host, comparison, badge, n);
   } catch (error) {
+    console.error("Unable to initialize the 3D viewer:", error);
     host.textContent = "Unable to load the 3D viewer. " + error.message;
   }
 }
 
+async function start() {
+  const report = document.querySelector("#report");
+  if (!report) throw new Error('The page needs a <main id="report"> element.');
+  report.textContent = "Loading REPORT.md…";
+
+  await loadReportMarkdown(report);
+  const host = placeViewerAfterSummary(report);
+  scrollTables(report);
+  await Promise.all([enhanceReport(report), initializeViewer(host)]);
+
+  if (location.hash) {
+    document.getElementById(
+      decodeURIComponent(location.hash.slice(1))
+    )?.scrollIntoView();
+  }
+}
+
 start().catch(error => {
-  document.querySelector("#report").textContent =
-    "Unable to load REPORT.md. " + error.message;
+  console.error("Unable to load the written report:", error);
+  const report = document.querySelector("#report");
+  if (report) report.textContent = "Unable to load REPORT.md. " + error.message;
 });
+
